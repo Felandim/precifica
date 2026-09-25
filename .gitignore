@@ -1,0 +1,22 @@
+# segredos e estado local — nunca versionar
+.herenow/
+herenow.json
+*claim*.json
+credentials
+.env
+.env.*
+*.pem
+*.key
+# logs / processos / túneis antigos
+*.log
+*.nohup
+keepalive.sh
+cloudflared*
+LIVE_URL.txt
+LIVE*.txt
+_ship_tmp/
+# gerados
+*.xlsx
+__pycache__/
+*.pyc
+node_modules/
