@@ -1,1 +1,180 @@
-file:///tmp/push-parts/prazo-repasse.html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prazo de repasse / float de caixa no marketplace | Precifica</title>
+  <meta name="description" content="Quando o marketplace paga, quantos dias de float e quanto de capital fica travado no repasse (ML, Shopee, Amazon BR). ESTIMATIVA. Sem cadastro.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/prazo-repasse.html">
+  <meta property="og:title" content="Prazo de repasse / float de caixa | Precifica">
+  <meta property="og:description" content="Float a receber e float já gasto no lag de repasse. Necessidade de caixa e badge VERDE/AMARELO/VERMELHO. ESTIMATIVA.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/prazo-repasse.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"O que é o prazo de repasse no marketplace?","acceptedAnswer":{"@type":"Answer","text":"É o tempo entre a venda e o depósito do valor líquido na sua conta (Mercado Livre, Shopee, Amazon BR). Enquanto isso, você já pagou produto e frete — o float de caixa. ESTIMATIVA."}},
+    {"@type":"Question","name":"Como o Precifica calcula o float de caixa?","acceptedAnswer":{"@type":"Answer","text":"líquido/pedido = ticket × (1 − taxa%); saída/pedido = custo + frete; prazo efetivo = prazo + (% parceladas × atraso extra); float a receber = vendas/dia × prazo efetivo × líquido; float já gasto = vendas/dia × prazo efetivo × saída. Necessidade de caixa ≈ float já gasto. ESTIMATIVA."}},
+    {"@type":"Question","name":"Qual a diferença para a calculadora de capital de giro?","acceptedAnswer":{"@type":"Answer","text":"Capital de giro soma estoque + lead + a receber no ciclo completo. Esta ferramenta foca só no lag de repasse do marketplace: quanto está travado esperando o pagamento e quanto você já gastou antes do depósito."}},
+    {"@type":"Question","name":"Como interpretar VERDE, AMARELO e VERMELHO?","acceptedAnswer":{"@type":"Answer","text":"VERMELHO se inputs inválidos, margem por pedido ≤ 0 ou necessidade de caixa > 60 dias de margem diária; AMARELO se prazo efetivo ≥ 21 dias ou float já gasto > 30 dias de margem diária; VERDE caso contrário. ESTIMATIVA."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="shopee.html">Shopee</a>
+        <a href="amazon.html">Amazon</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="prazo-repasse.html" aria-current="page">Prazo repasse</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · ESTIMATIVA</p>
+      <h1>Prazo de repasse / float de caixa no marketplace</h1>
+      <p>Responda: <strong>quando o marketplace paga, quantos dias de float e quanto de capital fica travado esperando o repasse?</strong> Sem cadastro. Sem hype.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-precifica-prazo-repasse></div>
+    </div>
+
+    <section class="section wrap" id="dicas">
+      <h2>Três passos</h2>
+      <div class="steps">
+        <article class="step">
+          <p class="step__n">01</p>
+          <h3>Vendas, ticket e prazo</h3>
+          <p>Volume diário, ticket médio e prazo típico do marketplace (ou preset ML/Shopee/Amazon).</p>
+        </article>
+        <article class="step">
+          <p class="step__n">02</p>
+          <h3>Taxa, custo e frete</h3>
+          <p>O que sai do bolso antes do depósito: produto + frete que você paga — e a taxa que reduz o líquido.</p>
+        </article>
+        <article class="step">
+          <p class="step__n">03</p>
+          <h3>Veja o float e a necessidade de caixa</h3>
+          <p>Quanto já gastou, quanto ainda vai receber e quantos dias até o primeiro repasse. Copie o resumo.</p>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:16px;max-width:62ch">Fecha o loop com <a href="capital-giro.html">Capital giro</a> · <a href="custo-devolucao.html">Custo devolução</a> · <a href="meta-lucro.html">Meta lucro</a> · <a href="equilibrio.html">Equilíbrio</a> · <a href="index.html">Precifica</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o Prazo de repasse te mostrou o buraco de caixa no float, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>O que é o prazo de repasse no marketplace?</summary>
+        <p>Tempo entre a venda e o depósito do líquido na sua conta. Enquanto isso você já pagou produto e frete — float de caixa. ESTIMATIVA.</p>
+      </details>
+      <details>
+        <summary>Como o Precifica calcula o float?</summary>
+        <p>Prazo efetivo = prazo + (% parceladas × atraso extra); float a receber = vendas/dia × prazo efetivo × líquido após taxa; float já gasto = vendas/dia × prazo efetivo × (custo+frete).</p>
+      </details>
+      <details>
+        <summary>Qual a diferença para capital de giro?</summary>
+        <p>Capital de giro cobre estoque + lead + a receber. Aqui o foco é só o lag de repasse: caixa travado esperando o marketplace pagar.</p>
+      </details>
+      <details>
+        <summary>Como interpretar VERDE, AMARELO e VERMELHO?</summary>
+        <p>VERMELHO se inputs inválidos, margem ≤ 0 ou necessidade &gt; 60 dias de margem diária; AMARELO se prazo efetivo ≥ 21 ou float gasto &gt; 30 dias de margem; VERDE caso contrário.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Estimativa. Confirme prazos de repasse e regras de parcelamento no Seller Center / simulador oficial. O Precifica não é conselho contábil, fiscal ou financeiro. O modelo não inclui chargebacks, ads, impostos extras nem variação por tipo de anúncio.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="prazo-repasse.html">Prazo repasse</a>
+        <a href="taxa-mercado-livre.html">Taxa ML</a>
+        <a href="taxa-shopee.html">Taxa Shopee</a>
+        <a href="taxa-amazon.html">Taxa Amazon</a>
+        <a href="taxa-magalu.html">Taxa Magalu</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+</body>
+</html>

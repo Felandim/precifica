@@ -3075,6 +3075,142 @@
     });
 
 
+
+    /* 129) prazo-repasse: happy path VERDE — defaults */
+    push(129, function () {
+      // vendas=8, ticket=89, prazo=14, taxa=16, custo=35, frete=12
+      // liquido=74.76; caixaSaida=47; margem=27.76
+      // floatReceber=8*14*74.76=8373.12; floatJaGasto=8*14*47=5264
+      // margemDia=222.08; ratio≈23.70 < 30; prazo 14 < 21 → VERDE
+      var r = calculatePrazoRepasse({
+        vendasPorDia: 8,
+        ticketMedio: 89,
+        prazoRepasseDias: 14,
+        taxaMarketplacePct: 16,
+        custoProdutoUnit: 35,
+        fretePagoPeloSellerUnit: 12
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (Math.abs(r.receitaBrutaDia - 712) > 1e-9) throw new Error("receitaDia " + r.receitaBrutaDia);
+      if (Math.abs(r.liquidoPorPedidoAposTaxa - 74.76) > 1e-9) throw new Error("liquido " + r.liquidoPorPedidoAposTaxa);
+      if (Math.abs(r.caixaSaidaPorPedido - 47) > 1e-9) throw new Error("caixaSaida " + r.caixaSaidaPorPedido);
+      if (Math.abs(r.floatReceber - 8373.12) > 1e-6) throw new Error("floatReceber " + r.floatReceber);
+      if (Math.abs(r.floatJaGasto - 5264) > 1e-6) throw new Error("floatJaGasto " + r.floatJaGasto);
+      if (Math.abs(r.necessidadeCaixa - 5264) > 1e-6) throw new Error("necessidade " + r.necessidadeCaixa);
+      if (r.diasAtePrimeiroRepasse !== 14) throw new Error("dias " + r.diasAtePrimeiroRepasse);
+      if (Math.abs(r.margemPorPedido - 27.76) > 1e-9) throw new Error("margem " + r.margemPorPedido);
+      if (r.badge !== "VERDE") throw new Error("badge " + r.badge);
+      return "happy verde necessidade=" + r.necessidadeCaixa;
+    });
+
+    /* 130) prazo-repasse: prazo ≥ 21 OU float > 30 dias de margem → AMARELO */
+    push(130, function () {
+      var r = calculatePrazoRepasse({
+        vendasPorDia: 8,
+        ticketMedio: 89,
+        prazoRepasseDias: 21,
+        taxaMarketplacePct: 16,
+        custoProdutoUnit: 35,
+        fretePagoPeloSellerUnit: 12
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.prazoEfetivoDias !== 21) throw new Error("prazoEfetivo " + r.prazoEfetivoDias);
+      if (Math.abs(r.floatJaGasto - 8 * 21 * 47) > 1e-6) throw new Error("float " + r.floatJaGasto);
+      if (r.badge !== "AMARELO") throw new Error("badge " + r.badge);
+      return "amarelo prazo=" + r.prazoRepasseDias;
+    });
+
+    /* 131) prazo-repasse: margem ≤ 0 OU float > 60 dias de margem → VERMELHO */
+    push(131, function () {
+      var neg = calculatePrazoRepasse({
+        vendasPorDia: 8,
+        ticketMedio: 50,
+        prazoRepasseDias: 14,
+        taxaMarketplacePct: 16,
+        custoProdutoUnit: 40,
+        fretePagoPeloSellerUnit: 12
+      });
+      // liquido=42; caixa=52; margem=-10 → VERMELHO
+      if (!neg.ok) throw new Error(neg.error || "fail neg");
+      if (!(neg.margemPorPedido <= 0)) throw new Error("expected non-pos margem " + neg.margemPorPedido);
+      if (neg.badge !== "VERMELHO") throw new Error("badge margem " + neg.badge);
+      var huge = calculatePrazoRepasse({
+        vendasPorDia: 8,
+        ticketMedio: 89,
+        prazoRepasseDias: 100,
+        taxaMarketplacePct: 16,
+        custoProdutoUnit: 35,
+        fretePagoPeloSellerUnit: 12
+      });
+      // floatJaGasto=8*100*47=37600; margemDia=222.08; ratio≈169 > 60 → VERMELHO
+      if (!huge.ok) throw new Error(huge.error || "fail huge");
+      if (huge.badge !== "VERMELHO") throw new Error("badge huge " + huge.badge);
+      return "vermelho margem=" + neg.margemPorPedido;
+    });
+
+    /* 132) prazo-repasse: inputs inválidos → error VERMELHO */
+    push(132, function () {
+      var r = calculatePrazoRepasse({
+        vendasPorDia: 0,
+        ticketMedio: 89,
+        custoProdutoUnit: 35
+      });
+      if (r.ok) throw new Error("expected fail zero vendas");
+      if (r.badge !== "VERMELHO") throw new Error("badge " + r.badge);
+      var neg = calculatePrazoRepasse({
+        vendasPorDia: 5,
+        ticketMedio: -1,
+        custoProdutoUnit: 10
+      });
+      if (neg.ok) throw new Error("expected fail neg ticket");
+      return "invalid ok";
+    });
+
+    /* 133) prazo-repasse: defaults + parcelamento + join copy */
+    push(133, function () {
+      var empty = calculatePrazoRepasse({});
+      if (empty.ok) throw new Error("empty should fail (missing vendas/ticket/custo)");
+      var r = calculatePrazoRepasse({
+        vendasPorDia: 8,
+        ticketMedio: 89,
+        custoProdutoUnit: 35
+        // defaults: prazo 14, taxa 16, frete 12, pctParc 0, atrasoExtra 0
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.prazoRepasseDias !== 14) throw new Error("default prazo " + r.prazoRepasseDias);
+      if (r.taxaMarketplacePct !== 16) throw new Error("default taxa " + r.taxaMarketplacePct);
+      if (r.fretePagoPeloSellerUnit !== 12) throw new Error("default frete " + r.fretePagoPeloSellerUnit);
+      var parc = calculatePrazoRepasse({
+        vendasPorDia: 8,
+        ticketMedio: 89,
+        prazoRepasseDias: 14,
+        taxaMarketplacePct: 16,
+        custoProdutoUnit: 35,
+        fretePagoPeloSellerUnit: 12,
+        percentualVendasParceladas: 50,
+        atrasoExtraParcelamento: 30
+      });
+      // prazoEfetivo = 14 + 0.5*30 = 29
+      if (!parc.ok) throw new Error(parc.error || "fail parc");
+      if (Math.abs(parc.prazoEfetivoDias - 29) > 1e-9) throw new Error("prazoEfetivo " + parc.prazoEfetivoDias);
+      if (Math.abs(parc.floatJaGasto - 8 * 29 * 47) > 1e-6) throw new Error("float parc " + parc.floatJaGasto);
+      if (parc.badge !== "AMARELO" && parc.badge !== "VERMELHO") {
+        throw new Error("expected AMARELO/VERMELHO for prazoEfetivo 29, got " + parc.badge);
+      }
+      var joined = joinPrazoRepasseCopy(r);
+      if (!joined || joined.indexOf("ESTIMATIVA") === -1) throw new Error("join");
+      if (joined !== r.copyText) throw new Error("copyText mismatch");
+      if (badgePrazoRepasse(r) !== r.badge) throw new Error("badge helper");
+      if (
+        joined.toLowerCase().indexOf("repasse") === -1 &&
+        joined.toLowerCase().indexOf("float") === -1
+      ) {
+        throw new Error("missing topic");
+      }
+      return "defaults+join+parc badge=" + r.badge + "/" + parc.badge;
+    });
+
+
     var passed = results.filter(function (r) { return r.ok; }).length;
     results.forEach(function (r) {
       console.log("[" + (r.ok ? "PASS" : "FAIL") + "] teste " + r.id + " — " + r.detail);
@@ -14025,6 +14161,509 @@
   }
 
 
+
+  function badgePrazoRepasse(r) {
+    if (!r || !r.ok) return "VERMELHO";
+    if (!(r.margemPorPedido === r.margemPorPedido) || r.margemPorPedido <= 0) return "VERMELHO";
+    if (
+      r.margemDia > 0 &&
+      r.necessidadeCaixa === r.necessidadeCaixa &&
+      r.necessidadeCaixa > r.margemDia * 60
+    ) {
+      return "VERMELHO";
+    }
+    if (r.prazoEfetivoDias >= 21) return "AMARELO";
+    if (
+      r.margemDia > 0 &&
+      r.floatJaGasto === r.floatJaGasto &&
+      r.floatJaGasto > r.margemDia * 30
+    ) {
+      return "AMARELO";
+    }
+    return "VERDE";
+  }
+
+  function buildPrazoRepasseAdvice(r) {
+    if (!r.ok) return r.error || "Dados incompletos.";
+    var base =
+      "Com ~" +
+      (Math.round(r.vendasPorDia * 100) / 100) +
+      " vendas/dia e prazo efetivo de " +
+      (Math.round(r.prazoEfetivoDias * 100) / 100) +
+      " dias, você já gastou ~" +
+      formatBRL(r.floatJaGasto) +
+      " (produto+frete) antes do repasse e tem ~" +
+      formatBRL(r.floatReceber) +
+      " a receber líquido. Necessidade de caixa mínima: " +
+      formatBRL(r.necessidadeCaixa) +
+      ". ";
+    if (r.margemPorPedido <= 0) {
+      base += "Margem por pedido ≤ 0 — o float vira buraco: revise preço, taxa ou frete. ";
+    } else if (r.margemDia > 0 && r.necessidadeCaixa > r.margemDia * 60) {
+      base += "Caixa travado > 60 dias de margem diária — risco alto de sufoco no giro. ";
+    } else if (r.prazoEfetivoDias >= 21) {
+      base += "Prazo efetivo ≥ 21 dias: planeje capital extra ou priorize liquidação mais rápida. ";
+    } else if (r.margemDia > 0 && r.floatJaGasto > r.margemDia * 30) {
+      base += "Float gasto > 30 dias de margem diária — aperto de caixa provável no crescimento. ";
+    } else {
+      base += "Float de repasse sob controle vs margem diária. ";
+    }
+    return (
+      base +
+      "ESTIMATIVA — prazos reais variam por marketplace, tipo de anúncio e parcelamento; confirme no Seller Center."
+    );
+  }
+
+  function joinPrazoRepasseCopy(r) {
+    r = r || {};
+    var lines = [];
+    lines.push("Prazo de repasse / float de caixa · Precifica");
+    if (r.ok) {
+      lines.push("Vendas/dia: " + r.vendasPorDia);
+      lines.push("Ticket médio: " + formatBRL(r.ticketMedio));
+      lines.push("Prazo repasse (dias): " + r.prazoRepasseDias);
+      lines.push(
+        "Parceladas: " +
+          (Math.round(r.percentualVendasParceladas * 100) / 100) +
+          "% · atraso extra: " +
+          r.atrasoExtraParcelamento +
+          " dias"
+      );
+      lines.push(
+        "Prazo efetivo (dias): " + (Math.round(r.prazoEfetivoDias * 100) / 100)
+      );
+      lines.push("Taxa marketplace: " + (Math.round(r.taxaMarketplacePct * 100) / 100) + "%");
+      lines.push("Custo produto/un: " + formatBRL(r.custoProdutoUnit));
+      lines.push("Frete pago pelo seller/un: " + formatBRL(r.fretePagoPeloSellerUnit));
+      lines.push("Receita bruta/dia: " + formatBRL(r.receitaBrutaDia));
+      lines.push("Líquido/pedido após taxa: " + formatBRL(r.liquidoPorPedidoAposTaxa));
+      lines.push("Caixa saída/pedido: " + formatBRL(r.caixaSaidaPorPedido));
+      lines.push("Margem/pedido: " + formatBRL(r.margemPorPedido));
+      lines.push("Float a receber: " + formatBRL(r.floatReceber));
+      lines.push("Float já gasto: " + formatBRL(r.floatJaGasto));
+      lines.push("Necessidade de caixa: " + formatBRL(r.necessidadeCaixa));
+      lines.push("Dias até 1º repasse (efetivo): " + (Math.round(r.diasAtePrimeiroRepasse * 100) / 100));
+      lines.push("Badge: " + (r.badge || "—"));
+      if (r.advice) lines.push(r.advice);
+    } else {
+      lines.push("Erro: " + (r.error || "dados inválidos"));
+    }
+    lines.push(
+      r.disclaimer ||
+        "ESTIMATIVA — Prazo de repasse / float de caixa. Não é conselho financeiro."
+    );
+    return lines.join("\n");
+  }
+
+  function calculatePrazoRepasse(input) {
+    input = input || {};
+    var vendasPorDia = toNumber(input.vendasPorDia);
+    var ticketMedio = toNumber(input.ticketMedio);
+    var custoProdutoUnit = toNumber(input.custoProdutoUnit);
+
+    var prazoRepasseDias;
+    if (input.prazoRepasseDias == null || input.prazoRepasseDias === "") {
+      prazoRepasseDias = 14;
+    } else {
+      prazoRepasseDias = toNumber(input.prazoRepasseDias);
+    }
+
+    var taxaMarketplacePct;
+    if (input.taxaMarketplacePct == null || input.taxaMarketplacePct === "") {
+      taxaMarketplacePct = 16;
+    } else {
+      taxaMarketplacePct = toNumber(input.taxaMarketplacePct);
+    }
+
+    var fretePagoPeloSellerUnit;
+    if (input.fretePagoPeloSellerUnit == null || input.fretePagoPeloSellerUnit === "") {
+      fretePagoPeloSellerUnit = 12;
+    } else {
+      fretePagoPeloSellerUnit = toNumber(input.fretePagoPeloSellerUnit);
+    }
+
+    var percentualVendasParceladas;
+    if (input.percentualVendasParceladas == null || input.percentualVendasParceladas === "") {
+      percentualVendasParceladas = 0;
+    } else {
+      percentualVendasParceladas = toNumber(input.percentualVendasParceladas);
+    }
+
+    var atrasoExtraParcelamento;
+    if (input.atrasoExtraParcelamento == null || input.atrasoExtraParcelamento === "") {
+      atrasoExtraParcelamento = 0;
+    } else {
+      atrasoExtraParcelamento = toNumber(input.atrasoExtraParcelamento);
+    }
+
+    var disclaimer =
+      "ESTIMATIVA — Prazo de repasse / float de caixa no marketplace no navegador. Modelo: float a receber = vendas/dia × prazo efetivo × líquido após taxa; float já gasto = vendas/dia × prazo efetivo × (custo+frete). Prazo efetivo = prazo + (% parceladas × atraso extra). Não inclui ads, impostos extras, chargeback nem variação por anúncio. Não é conselho financeiro.";
+
+    function fail(msg) {
+      var f = {
+        ok: false,
+        error: msg,
+        vendasPorDia: vendasPorDia,
+        ticketMedio: ticketMedio,
+        prazoRepasseDias: prazoRepasseDias,
+        taxaMarketplacePct: taxaMarketplacePct,
+        custoProdutoUnit: custoProdutoUnit,
+        fretePagoPeloSellerUnit: fretePagoPeloSellerUnit,
+        percentualVendasParceladas: percentualVendasParceladas,
+        atrasoExtraParcelamento: atrasoExtraParcelamento,
+        prazoEfetivoDias: null,
+        receitaBrutaDia: null,
+        liquidoPorPedidoAposTaxa: null,
+        caixaSaidaPorPedido: null,
+        margemPorPedido: null,
+        margemDia: null,
+        floatReceber: null,
+        floatJaGasto: null,
+        necessidadeCaixa: null,
+        diasAtePrimeiroRepasse: null,
+        badge: "VERMELHO",
+        advice: msg,
+        disclaimer: disclaimer,
+        copyText: ""
+      };
+      f.copyText = joinPrazoRepasseCopy(f);
+      return f;
+    }
+
+    if (!(vendasPorDia > 0) || vendasPorDia !== vendasPorDia) {
+      return fail("Informe vendas por dia maior que zero.");
+    }
+    if (!(ticketMedio > 0) || ticketMedio !== ticketMedio) {
+      return fail("Informe o ticket médio (R$) maior que zero.");
+    }
+    if (!(custoProdutoUnit >= 0) || custoProdutoUnit !== custoProdutoUnit) {
+      return fail("Informe o custo do produto (R$) ≥ 0.");
+    }
+    if (!(prazoRepasseDias >= 0) || prazoRepasseDias !== prazoRepasseDias) {
+      return fail("Informe o prazo de repasse (dias) ≥ 0.");
+    }
+    if (!(taxaMarketplacePct >= 0) || taxaMarketplacePct !== taxaMarketplacePct) {
+      return fail("Informe a taxa do marketplace (%) ≥ 0.");
+    }
+    if (!(fretePagoPeloSellerUnit >= 0) || fretePagoPeloSellerUnit !== fretePagoPeloSellerUnit) {
+      return fail("Informe o frete pago pelo seller (R$) ≥ 0.");
+    }
+    if (
+      !(percentualVendasParceladas >= 0) ||
+      percentualVendasParceladas !== percentualVendasParceladas
+    ) {
+      return fail("Informe o % de vendas parceladas ≥ 0.");
+    }
+    if (!(atrasoExtraParcelamento >= 0) || atrasoExtraParcelamento !== atrasoExtraParcelamento) {
+      return fail("Informe o atraso extra de parcelamento (dias) ≥ 0.");
+    }
+
+    var prazoEfetivoDias =
+      prazoRepasseDias + (percentualVendasParceladas / 100) * atrasoExtraParcelamento;
+    var receitaBrutaDia = vendasPorDia * ticketMedio;
+    var liquidoPorPedidoAposTaxa = ticketMedio * (1 - taxaMarketplacePct / 100);
+    var caixaSaidaPorPedido = custoProdutoUnit + fretePagoPeloSellerUnit;
+    var margemPorPedido = liquidoPorPedidoAposTaxa - caixaSaidaPorPedido;
+    var margemDia = vendasPorDia * margemPorPedido;
+    var floatReceber = vendasPorDia * prazoEfetivoDias * liquidoPorPedidoAposTaxa;
+    var floatJaGasto = vendasPorDia * prazoEfetivoDias * caixaSaidaPorPedido;
+    var necessidadeCaixa = floatJaGasto;
+    var diasAtePrimeiroRepasse = prazoEfetivoDias;
+
+    var result = {
+      ok: true,
+      error: null,
+      vendasPorDia: vendasPorDia,
+      ticketMedio: ticketMedio,
+      prazoRepasseDias: prazoRepasseDias,
+      taxaMarketplacePct: taxaMarketplacePct,
+      custoProdutoUnit: custoProdutoUnit,
+      fretePagoPeloSellerUnit: fretePagoPeloSellerUnit,
+      percentualVendasParceladas: percentualVendasParceladas,
+      atrasoExtraParcelamento: atrasoExtraParcelamento,
+      prazoEfetivoDias: prazoEfetivoDias,
+      receitaBrutaDia: receitaBrutaDia,
+      liquidoPorPedidoAposTaxa: liquidoPorPedidoAposTaxa,
+      caixaSaidaPorPedido: caixaSaidaPorPedido,
+      margemPorPedido: margemPorPedido,
+      margemDia: margemDia,
+      floatReceber: floatReceber,
+      floatJaGasto: floatJaGasto,
+      necessidadeCaixa: necessidadeCaixa,
+      diasAtePrimeiroRepasse: diasAtePrimeiroRepasse,
+      badge: "AMARELO",
+      advice: "",
+      disclaimer: disclaimer,
+      copyText: ""
+    };
+    result.badge = badgePrazoRepasse(result);
+    result.advice = buildPrazoRepasseAdvice(result);
+    result.copyText = joinPrazoRepasseCopy(result);
+    return result;
+  }
+
+  function mountPrazoRepasse(root) {
+    if (!root || typeof document === "undefined") return;
+    root.innerHTML = "";
+    root.classList.add("freightgen", "tacosgen", "prazorepassegen");
+
+    var panel = el("div", { class: "freightgen__panel titlegen__panel" });
+    panel.appendChild(
+      el("p", { class: "freightgen__kicker titlegen__kicker" }, "Prazo de repasse · ESTIMATIVA")
+    );
+    panel.appendChild(
+      el(
+        "h2",
+        { class: "freightgen__title titlegen__title" },
+        "Quando o marketplace paga — e quanto de caixa fica travado no float?"
+      )
+    );
+
+    var fields = el("div", { class: "freightgen__fields titlegen__fields" });
+    fields.appendChild(
+      field({
+        id: "pr-preset",
+        label: "Preset de marketplace (prazo)",
+        type: "select",
+        options: [
+          { value: "14", label: "Mercado Livre · ~14 dias", selected: true },
+          { value: "7", label: "Shopee · ~7 dias (rápido)" },
+          { value: "14-shopee", label: "Shopee · ~14 dias" },
+          { value: "14-amz", label: "Amazon BR · ~14 dias" },
+          { value: "21", label: "Amazon BR / parcelado · ~21 dias" },
+          { value: "custom", label: "Livre (usar campo abaixo)" }
+        ]
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-vendas",
+        label: "Vendas por dia",
+        value: "8",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-ticket",
+        label: "Ticket médio (R$)",
+        value: "89",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-prazo",
+        label: "Prazo de repasse (dias)",
+        value: "14",
+        step: "1",
+        min: "0",
+        placeholder: "padrão 14"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-taxa",
+        label: "Taxa do marketplace (%)",
+        value: "16",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 16%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-custo",
+        label: "Custo do produto / un (R$)",
+        value: "35",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-frete",
+        label: "Frete pago pelo seller / un (R$)",
+        value: "12",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 12"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-parc-pct",
+        label: "% vendas parceladas (opcional)",
+        value: "0",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "pr-parc-atraso",
+        label: "Atraso extra parcelamento (dias)",
+        value: "0",
+        step: "1",
+        min: "0",
+        placeholder: "padrão 0"
+      })
+    );
+    panel.appendChild(fields);
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__hint titlegen__hint" },
+        "Float a receber = vendas/dia × prazo efetivo × líquido após taxa. Float já gasto = vendas/dia × prazo efetivo × (custo+frete). Prazo efetivo = prazo + (% parceladas × atraso extra). ESTIMATIVA."
+      )
+    );
+    root.appendChild(panel);
+
+    var out = el("div", { class: "freightgen__out", "aria-live": "polite" });
+    root.appendChild(out);
+
+    var PRESET_DAYS = {
+      "14": 14,
+      "7": 7,
+      "14-shopee": 14,
+      "14-amz": 14,
+      "21": 21
+    };
+
+    function applyPreset() {
+      var preset = document.getElementById("pr-preset");
+      var prazo = document.getElementById("pr-prazo");
+      if (!preset || !prazo) return;
+      var v = preset.value;
+      if (v !== "custom" && PRESET_DAYS[v] != null) {
+        prazo.value = String(PRESET_DAYS[v]);
+      }
+    }
+
+    function read() {
+      var prazoRaw = document.getElementById("pr-prazo").value;
+      var taxaRaw = document.getElementById("pr-taxa").value;
+      var freteRaw = document.getElementById("pr-frete").value;
+      var parcPctRaw = document.getElementById("pr-parc-pct").value;
+      var parcAtrasoRaw = document.getElementById("pr-parc-atraso").value;
+      return {
+        vendasPorDia: document.getElementById("pr-vendas").value,
+        ticketMedio: document.getElementById("pr-ticket").value,
+        prazoRepasseDias: prazoRaw === "" ? undefined : prazoRaw,
+        taxaMarketplacePct: taxaRaw === "" ? undefined : taxaRaw,
+        custoProdutoUnit: document.getElementById("pr-custo").value,
+        fretePagoPeloSellerUnit: freteRaw === "" ? undefined : freteRaw,
+        percentualVendasParceladas: parcPctRaw === "" ? undefined : parcPctRaw,
+        atrasoExtraParcelamento: parcAtrasoRaw === "" ? undefined : parcAtrasoRaw
+      };
+    }
+
+    function render() {
+      var r = calculatePrazoRepasse(read());
+      out.innerHTML = "";
+      var loss = !r.ok || r.badge === "VERMELHO";
+      var card = el(
+        "article",
+        { class: "result-card" + (loss ? " result-card--loss" : "") }
+      );
+      card.appendChild(
+        el(
+          "p",
+          { class: "result-card__label" },
+          "Prazo de repasse · " + (r.badge || "—") + " · ESTIMATIVA"
+        )
+      );
+      if (!r.ok) {
+        card.appendChild(el("p", { class: "result-card__price is-loss" }, "—"));
+        card.appendChild(el("p", { class: "result-card__hint" }, r.error || "Dados incompletos"));
+      } else {
+        var headline =
+          formatBRL(r.necessidadeCaixa) +
+          " travados · " +
+          (Math.round(r.diasAtePrimeiroRepasse * 100) / 100) +
+          " dias";
+        card.appendChild(
+          el(
+            "p",
+            { class: "result-card__price" + (loss ? " is-loss" : "") },
+            headline
+          )
+        );
+        var grid = el("div", { class: "result-card__grid" });
+        function row(k, v) {
+          var d = el("div");
+          d.appendChild(el("span", { class: "muted" }, k));
+          d.appendChild(el("strong", null, v));
+          grid.appendChild(d);
+        }
+        row("Receita bruta / dia", formatBRL(r.receitaBrutaDia));
+        row("Líquido / pedido após taxa", formatBRL(r.liquidoPorPedidoAposTaxa));
+        row("Caixa saída / pedido", formatBRL(r.caixaSaidaPorPedido));
+        row("Margem / pedido", formatBRL(r.margemPorPedido));
+        row(
+          "Prazo efetivo",
+          (Math.round(r.prazoEfetivoDias * 100) / 100).toLocaleString("pt-BR") + " dias"
+        );
+        row("Float a receber", formatBRL(r.floatReceber));
+        row("Float já gasto", formatBRL(r.floatJaGasto));
+        row("Necessidade de caixa", formatBRL(r.necessidadeCaixa));
+        row(
+          "Dias até 1º repasse",
+          (Math.round(r.diasAtePrimeiroRepasse * 100) / 100).toLocaleString("pt-BR")
+        );
+        row("Badge", r.badge || "—");
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "result-card__hint" }, r.advice));
+      }
+      out.appendChild(card);
+
+      var actions = el("div", { class: "freightgen__actions" });
+      var btn = el("button", { type: "button", class: "btn btn--solid" }, "Copiar resumo");
+      btn.addEventListener("click", function () {
+        var text = r.copyText || joinPrazoRepasseCopy(r);
+        copyText(text)
+          .then(function () {
+            toast("Resumo copiado.");
+          })
+          .catch(function () {
+            toast("Copia o resumo na mão.");
+          });
+      });
+      actions.appendChild(btn);
+      out.appendChild(actions);
+    }
+
+    var presetNode = document.getElementById("pr-preset");
+    if (presetNode) {
+      presetNode.addEventListener("change", function () {
+        applyPreset();
+        render();
+      });
+    }
+
+    [
+      "pr-vendas",
+      "pr-ticket",
+      "pr-prazo",
+      "pr-taxa",
+      "pr-custo",
+      "pr-frete",
+      "pr-parc-pct",
+      "pr-parc-atraso"
+    ].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", render);
+        node.addEventListener("change", render);
+      }
+    });
+    render();
+  }
+
+
   function wireGlobalUi() {
     document.querySelectorAll("[data-precifica-calc]").forEach(function (node) {
       mountCalculator(node, { preset: node.getAttribute("data-preset") || "" });
@@ -14128,6 +14767,10 @@
 
     document.querySelectorAll("[data-precifica-custo-devolucao]").forEach(function (node) {
       mountCustoDevolucao(node);
+    });
+
+    document.querySelectorAll("[data-precifica-prazo-repasse]").forEach(function (node) {
+      mountPrazoRepasse(node);
     });
 
 
@@ -14285,6 +14928,11 @@
     joinCustoDevolucaoCopy: joinCustoDevolucaoCopy,
     badgeCustoDevolucao: badgeCustoDevolucao,
     buildCustoDevolucaoAdvice: buildCustoDevolucaoAdvice,
+    calculatePrazoRepasse: calculatePrazoRepasse,
+    mountPrazoRepasse: mountPrazoRepasse,
+    joinPrazoRepasseCopy: joinPrazoRepasseCopy,
+    badgePrazoRepasse: badgePrazoRepasse,
+    buildPrazoRepasseAdvice: buildPrazoRepasseAdvice,
     HOOK_MAX: HOOK_MAX,
     AMAZON_BULLET_SOFT: AMAZON_BULLET_SOFT,
     AMAZON_BULLET_HARD: AMAZON_BULLET_HARD,
