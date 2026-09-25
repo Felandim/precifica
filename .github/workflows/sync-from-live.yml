@@ -1,0 +1,52 @@
+# Traz para a main os arquivos públicos do site durável (here.now), verificando o sha256 de cada um
+# contra site-manifest.txt, e espelha o site público na branch gh-pages.
+# Fluxo diário: publicar no here.now -> atualizar site-manifest.txt (+ fontes) na main -> este workflow roda.
+name: sync-from-live
+on:
+  push:
+    branches: [main]
+    paths: [site-manifest.txt, .github/workflows/sync-from-live.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sync
+  cancel-in-progress: false
+env:
+  LIVE: https://mellow-quarry-n7jk.here.now
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Baixar e verificar arquivos do site
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/pub" && mkdir -p "$RUNNER_TEMP/pub"
+          while read -r sha path; do
+            [ -z "$path" ] && continue
+            case "$path" in /*|*..*) echo "caminho inválido: $path"; exit 1;; esac
+            mkdir -p "$RUNNER_TEMP/pub/$(dirname "$path")"
+            curl -fsSL --retry 3 "$LIVE/$path" -o "$RUNNER_TEMP/pub/$path"
+            echo "$sha  $RUNNER_TEMP/pub/$path" | sha256sum -c --quiet -
+          done < site-manifest.txt
+          echo "ok: $(wc -l < site-manifest.txt) arquivos verificados"
+      - name: Commit na main
+        run: |
+          set -euo pipefail
+          cp -a "$RUNNER_TEMP/pub/." .
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "main já atualizada"; else git commit -q -m "site: sync do here.now ($(date -u +%F))" && git push origin HEAD:main; fi
+      - name: Espelhar site público em gh-pages
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/pub"
+          touch .nojekyll
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "gh-pages: espelho de ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
