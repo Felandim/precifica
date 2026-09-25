@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estoque mínimo / ponto de pedido | Precifica</title>
+  <meta name="description" content="Quantas unidades manter de estoque mínimo e quando pedir reposição? Demanda diária, lead time, estoque de segurança e custo de capital. ESTIMATIVA. Sem cadastro.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/estoque-minimo.html">
+  <meta property="og:title" content="Estoque mínimo / ponto de pedido | Precifica">
+  <meta property="og:description" content="Calcule ponto de pedido, estoque alvo, quando comprar e capital travado. Badge VERDE/AMARELO/VERMELHO. ESTIMATIVA.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/estoque-minimo.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"O que é estoque mínimo / ponto de pedido?","acceptedAnswer":{"@type":"Answer","text":"É o nível de unidades em que você deve pedir reposição ao fornecedor: demanda no lead time + estoque de segurança. Quando o estoque atual cai até esse ponto, é hora de comprar. ESTIMATIVA."}},
+    {"@type":"Question","name":"Como calcular o ponto de pedido?","acceptedAnswer":{"@type":"Answer","text":"demandaLead = vendasPorDia × leadTimeDias; estoqueSeguranca = vendasPorDia × coberturaSegurancaDias; pontoPedido = ceil(demandaLead + estoqueSeguranca). Estoque alvo = pontoPedido + demandaLead (ROP + um ciclo de lead time). ESTIMATIVA."}},
+    {"@type":"Question","name":"Como interpretar VERDE, AMARELO e VERMELHO?","acceptedAnswer":{"@type":"Answer","text":"VERMELHO se precisa comprar agora, se os dias até ruptura forem menores que o lead time, ou inputs inválidos; AMARELO se o estoque está perto do ponto de pedido (até 20% acima) ou dias até ruptura &lt; lead + segurança; VERDE se o estoque está confortável acima do alvo. ESTIMATIVA."}},
+    {"@type":"Question","name":"Isso substitui o WMS ou o planejamento do fornecedor?","acceptedAnswer":{"@type":"Answer","text":"Não. É uma estimativa no navegador para sellers de marketplace. Confirme lead time real, MOQ e sazonalidade com o fornecedor. Não é conselho financeiro."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="shopee.html">Shopee</a>
+        <a href="amazon.html">Amazon</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html" aria-current="page">Estoque mín.</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · ESTIMATIVA</p>
+      <h1>Estoque mínimo / ponto de pedido</h1>
+      <p>Responda: <strong>quantas unidades manter de estoque mínimo e quando pedir reposição?</strong> Demanda diária, lead time do fornecedor, colchão de segurança e custo de capital. Sem cadastro. Sem hype.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-precifica-estoque-minimo></div>
+    </div>
+
+    <section class="section wrap" id="dicas">
+      <h2>Três passos</h2>
+      <div class="steps">
+        <article class="step">
+          <p class="step__n">01</p>
+          <h3>Informe demanda e lead time</h3>
+          <p>Média de unidades vendidas por dia e quantos dias o fornecedor leva para entregar.</p>
+        </article>
+        <article class="step">
+          <p class="step__n">02</p>
+          <h3>Defina o colchão e o estoque atual</h3>
+          <p>Dias de segurança (padrão 7), unidades em mão e custo unitário para ver capital travado.</p>
+        </article>
+        <article class="step">
+          <p class="step__n">03</p>
+          <h3>Veja quando comprar</h3>
+          <p>Ponto de pedido, estoque alvo, quantidade sugerida e badge. Copie o resumo.</p>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:16px;max-width:62ch">Fecha o loop com <a href="meta-lucro.html">Meta lucro</a> · <a href="desconto-maximo.html">Desconto máx.</a> · <a href="equilibrio.html">Equilíbrio</a> · <a href="kit-combo.html">Kit/Combo</a> · <a href="index.html">Precifica</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o estoque mínimo te ajudou a evitar ruptura, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>O que é estoque mínimo / ponto de pedido?</summary>
+        <p>Nível de unidades em que você deve pedir reposição: demanda no lead time + estoque de segurança. ESTIMATIVA.</p>
+      </details>
+      <details>
+        <summary>Como calcular o ponto de pedido?</summary>
+        <p>demandaLead = vendas/dia × lead time; segurança = vendas/dia × dias de colchão; pontoPedido = ceil(demandaLead + segurança). Estoque alvo = pontoPedido + demandaLead.</p>
+      </details>
+      <details>
+        <summary>Como interpretar VERDE, AMARELO e VERMELHO?</summary>
+        <p>VERMELHO se precisa comprar agora ou dias até ruptura &lt; lead time; AMARELO se perto do ponto (±20%) ou dias &lt; lead + segurança; VERDE se confortável acima do alvo.</p>
+      </details>
+      <details>
+        <summary>Substitui WMS ou o fornecedor?</summary>
+        <p>Não. Confirme lead time real, MOQ e sazonalidade. ESTIMATIVA — não é conselho financeiro.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Estimativa. Confirme taxas no Seller Center / simulador oficial e o seu regime tributário. O Precifica não é conselho contábil, fiscal ou financeiro.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="taxa-mercado-livre.html">Taxa ML</a>
+        <a href="taxa-shopee.html">Taxa Shopee</a>
+        <a href="taxa-amazon.html">Taxa Amazon</a>
+        <a href="taxa-magalu.html">Taxa Magalu</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+</body>
+</html>

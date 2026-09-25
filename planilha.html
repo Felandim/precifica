@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planilha de preço Mercado Livre e Shopee | Precifica</title>
+  <meta name="description" content="Planilha precificação Mercado Livre: cola SKUs e sai o preço mínimo em lote. Planilha taxa marketplace, custo, embalagem e frete. Sem cadastro. ESTIMATIVA.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/planilha.html">
+  <meta property="og:title" content="Planilha de preço Mercado Livre e Shopee | Precifica">
+  <meta property="og:description" content="Preço em lote por SKU: cola do Excel, mesma taxa e margem, CSV pra baixar. Mercado Livre, Shopee e Amazon BR.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/planilha.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Qual o formato da cola na planilha de preço?","acceptedAnswer":{"@type":"Answer","text":"CSV, TSV ou Excel BR com ponto e vírgula. Com cabeçalho (sku, custo, embalagem, frete) ou sem: primeira coluna SKU, segunda custo. Aceita decimal brasileiro (45,90). Até 200 linhas."}},
+    {"@type":"Question","name":"Quantos SKUs a planilha de precificação aceita?","acceptedAnswer":{"@type":"Answer","text":"Até 200 SKUs por cola. Acima disso o lote é truncado. Mesma taxa, imposto e margem para o lote inteiro."}},
+    {"@type":"Question","name":"A planilha substitui o simulador oficial do Mercado Livre?","acceptedAnswer":{"@type":"Answer","text":"Não. É estimativa no navegador para preço em lote. Confirme taxa, frete e o Simulador de custos do Mercado Livre no Seller Center antes de publicar."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="shopee.html">Shopee</a>
+        <a href="amazon.html">Amazon</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html" aria-current="page">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta</p>
+      <h1>Lote por planilha — preço mínimo de cada SKU</h1>
+      <p>Cola a lista do Excel (CSV, TSV ou ponto e vírgula). Escolhe marketplace, taxa e margem uma vez. Sai o <strong>preço mínimo</strong> de cada SKU, com lucro e margem. Baixa CSV ou copia a tabela. Sem cadastro. Sem clicar anúncio por anúncio.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-precifica-sheet></div>
+    </div>
+
+    <section class="section wrap" id="dicas">
+      <h2>Dicas curtas</h2>
+      <div class="steps">
+        <article class="step">
+          <p class="step__n">01</p>
+          <h3>Cola do Excel</h3>
+          <p>Copia as células e cola aqui. Cabeçalho sku/custo ajuda. Sem cabeçalho: SKU e custo nas duas primeiras colunas.</p>
+        </article>
+        <article class="step">
+          <p class="step__n">02</p>
+          <h3>Mesma taxa no lote</h3>
+          <p>Taxa, imposto e margem valem para todos os SKUs da cola. Se um anúncio é Premium e outro Clássico, roda em dois lotes.</p>
+        </article>
+        <article class="step">
+          <p class="step__n">03</p>
+          <h3>Confirma no Seller Center</h3>
+          <p>O número é ESTIMATIVA. Leva o preço mínimo pro simulador oficial antes de publicar.</p>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:16px;max-width:62ch">Depois do lote, o frete e o anúncio. <a href="index.html">Precifica</a> · <a href="mercado-livre.html">Calculadora Mercado Livre</a> · <a href="frete.html">Calculadora de frete</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o lote te poupou meia hora de planilha, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>Qual o formato da cola?</summary>
+        <p>CSV, TSV ou Excel BR (;). Com cabeçalho (sku, custo, embalagem, frete) ou sem. Decimal brasileiro (45,90) ok. Limite 200 SKUs.</p>
+      </details>
+      <details>
+        <summary>Qual o limite de SKUs?</summary>
+        <p>200 por cola. Acima disso o lote é truncado. Mesma taxa e margem para o lote inteiro.</p>
+      </details>
+      <details>
+        <summary>Substitui o simulador oficial?</summary>
+        <p>Não. Só estima no navegador. Confira taxa, frete e o <a href="https://www.mercadolivre.com.br/simulador-de-custos" rel="noopener noreferrer" target="_blank">Simulador de custos do Mercado Livre</a>.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Estimativa. Confirme taxas no Seller Center / simulador oficial e o seu regime tributário. O Precifica não é conselho contábil, fiscal ou financeiro. Esta planilha não é o simulador oficial do Mercado Livre.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="taxa-mercado-livre.html">Taxa ML</a>
+        <a href="taxa-shopee.html">Taxa Shopee</a>
+        <a href="taxa-amazon.html">Taxa Amazon</a>
+        <a href="taxa-magalu.html">Taxa Magalu</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+</body>
+</html>

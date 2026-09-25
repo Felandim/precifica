@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulador de bid / CPC Mercado Livre Ads | Precifica</title>
+  <meta name="description" content="Simule bid e CPC de Product Ads no Mercado Livre: cliques, pedidos, ACOS-like, ROAS, break-even CPC e max bid sugerido. ESTIMATIVA. Sem cadastro.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/bid-ml.html">
+  <meta property="og:title" content="Simulador de bid / CPC Mercado Livre Ads | Precifica">
+  <meta property="og:description" content="Até quanto pagar de bid sem comer o lucro: CAC ads, lucro após ads, break-even CPC e badge VERDE/AMARELO/VERMELHO. ESTIMATIVA.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/bid-ml.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"O que é break-even CPC no Mercado Livre Ads?","acceptedAnswer":{"@type":"Answer","text":"É o CPC máximo em que o lucro unitário após taxa e imposto ainda cobre o custo de ads por pedido. Fórmula ESTIMATIVA: lucro unitário × (conversão pós-clique ÷ 100). Acima disso o bid come a margem."}},
+    {"@type":"Question","name":"Bid e CPC são a mesma coisa?","acceptedAnswer":{"@type":"Answer","text":"No simulador tratamos CPC ≈ bid como ESTIMATIVA para Product Ads / Ads do ML. Na prática o CPC pago pode ficar abaixo do lance. Confirme no painel de Ads do Mercado Livre."}},
+    {"@type":"Question","name":"O que é o max bid sugerido (80%)?","acceptedAnswer":{"@type":"Answer","text":"É 80% do break-even CPC — uma folga de segurança para não operar no limite. Se o badge ficar AMARELO, prefira esse teto. ESTIMATIVA."}},
+    {"@type":"Question","name":"Essa ferramenta substitui o relatório oficial de Ads?","acceptedAnswer":{"@type":"Answer","text":"Não. É ESTIMATIVA no navegador. Confirme CTR, conversão, CPC e ROAS no painel de Ads / Product Ads do Mercado Livre antes de subir lance ou orçamento."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="shopee.html">Shopee</a>
+        <a href="amazon.html">Amazon</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html" aria-current="page">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · ESTIMATIVA</p>
+      <h1>Simulador de bid / CPC Mercado Livre Ads</h1>
+      <p>Entre o <strong>bid (CPC)</strong>, CTR, conversão pós-clique, preço, custo, taxa ML e orçamento diário. Saem cliques, pedidos, <strong>CAC ads</strong>, lucro após ads, <strong>ACOS-like</strong>, <strong>ROAS</strong>, break-even CPC, max bid sugerido e badge <strong>VERDE/AMARELO/VERMELHO</strong>. Sem cadastro. Confirme no painel de Ads do Mercado Livre.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-precifica-bid></div>
+    </div>
+
+    <section class="section wrap" id="dicas">
+      <h2>Três passos</h2>
+      <div class="steps">
+        <article class="step">
+          <p class="step__n">01</p>
+          <h3>Margem unitária</h3>
+          <p>Preço − custo − taxa % − taxa fixa − imposto. Sem isso o bid é chute. Use a <a href="taxa-mercado-livre.html">taxa ML</a> e o <a href="mercado-livre.html">precificador</a>.</p>
+        </article>
+        <article class="step">
+          <p class="step__n">02</p>
+          <h3>CTR e conversão</h3>
+          <p>Do Ads console: CTR estimado e % de pedidos após o clique. CPC ≈ bid nesta ESTIMATIVA.</p>
+        </article>
+        <article class="step">
+          <p class="step__n">03</p>
+          <h3>Teto de bid</h3>
+          <p>Break-even CPC = lucro unitário × conversão. Max sugerido = 80% desse teto. VERMELHO = lance come lucro — baixe bid ou suba margem.</p>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:16px;max-width:62ch">Fecha o preço antes de anunciar. <a href="tacos.html">TACOS / ACOS</a> · <a href="mercado-livre.html">Calculadora ML</a> · <a href="equilibrio.html">Ponto de equilíbrio</a> · <a href="taxa-mercado-livre.html">Taxa ML</a> · <a href="index.html">Precifica</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o simulador te poupou de queimar margem em bid, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>O que é break-even CPC no Mercado Livre Ads?</summary>
+        <p>É o CPC máximo em que o lucro unitário após taxa e imposto ainda cobre o custo de ads por pedido. Fórmula ESTIMATIVA: lucro unitário × (conversão pós-clique ÷ 100). Acima disso o bid come a margem.</p>
+      </details>
+      <details>
+        <summary>Bid e CPC são a mesma coisa?</summary>
+        <p>No simulador tratamos CPC ≈ bid como ESTIMATIVA para Product Ads / Ads do ML. Na prática o CPC pago pode ficar abaixo do lance. Confirme no painel de Ads do Mercado Livre.</p>
+      </details>
+      <details>
+        <summary>O que é o max bid sugerido (80%)?</summary>
+        <p>É 80% do break-even CPC — uma folga de segurança para não operar no limite. Se o badge ficar AMARELO, prefira esse teto. ESTIMATIVA.</p>
+      </details>
+      <details>
+        <summary>Substitui o relatório oficial de Ads?</summary>
+        <p>Não. Só estima no navegador. Confira CTR, conversão, CPC e ROAS no painel de Ads / Product Ads do Mercado Livre antes de subir lance ou orçamento.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Estimativa. Confirme taxas no Seller Center / simulador oficial e o seu regime tributário. O Precifica não é conselho contábil, fiscal ou financeiro.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="taxa-mercado-livre.html">Taxa ML</a>
+        <a href="taxa-shopee.html">Taxa Shopee</a>
+        <a href="taxa-amazon.html">Taxa Amazon</a>
+        <a href="taxa-magalu.html">Taxa Magalu</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+</body>
+</html>

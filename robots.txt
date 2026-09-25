@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://solitary-waterfall-4024.zerodeploy.app/sitemap.xml

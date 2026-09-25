@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Imposto Simples no preço | Precifica</title>
+  <meta name="description" content="Depois da taxa do marketplace, frete e DAS (Simples Nacional), qual a margem líquida real? Preço mínimo para o DAS não comer o lucro. ESTIMATIVA. Sem cadastro.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/imposto-simples.html">
+  <meta property="og:title" content="Imposto Simples no preço | Precifica">
+  <meta property="og:description" content="Margem líquida após taxa + frete + DAS. Preço mínimo, quanto o DAS come do lucro bruto e badge VERDE/AMARELO/VERMELHO. ESTIMATIVA.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/imposto-simples.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"O que é Imposto Simples no preço?","acceptedAnswer":{"@type":"Answer","text":"É uma estimativa da margem líquida após taxa do marketplace, frete absorvido, outros custos e o DAS (alíquota efetiva do Simples Nacional informada por você). Também calcula o preço mínimo para a margem alvo não ser engolida pelo DAS. ESTIMATIVA."}},
+    {"@type":"Question","name":"Como o DAS entra no cálculo?","acceptedAnswer":{"@type":"Answer","text":"DAS ≈ preço de venda × alíquota efetiva (%). A alíquota é informada pelo seller (anexo/faixa). Não calculamos a tabela completa do Simples Nacional. ESTIMATIVA — não é conselho fiscal."}},
+    {"@type":"Question","name":"Como calcular o preço mínimo com margem líquida alvo?","acceptedAnswer":{"@type":"Answer","text":"Preço mínimo = (custo do produto + frete absorvido + outros custos) ÷ (1 − taxa% − alíquota DAS% − margem mínima%). Se a soma de taxa + DAS + margem ≥ 100%, a combinação é impossível. ESTIMATIVA."}},
+    {"@type":"Question","name":"Como interpretar VERDE, AMARELO e VERMELHO?","acceptedAnswer":{"@type":"Answer","text":"VERMELHO se a margem líquida for negativa ou os inputs forem inválidos; AMARELO se a margem ≥ 0 mas abaixo da mínima desejada; VERDE se a margem líquida ≥ margem mínima desejada. ESTIMATIVA."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="shopee.html">Shopee</a>
+        <a href="amazon.html">Amazon</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html" aria-current="page">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · ESTIMATIVA</p>
+      <h1>Imposto Simples no preço</h1>
+      <p>Responda: <strong>depois da taxa do marketplace, frete e DAS (Simples Nacional), qual a margem líquida real — e qual preço preciso para o DAS não comer o lucro?</strong> Alíquota informada por você. Sem cadastro. Sem hype.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-precifica-imposto-simples></div>
+    </div>
+
+    <section class="section wrap" id="dicas">
+      <h2>Três passos</h2>
+      <div class="steps">
+        <article class="step">
+          <p class="step__n">01</p>
+          <h3>Coloque preço, custo e taxa</h3>
+          <p>Preço de venda, custo do produto e a comissão do marketplace (ML, Amazon, Magalu, Shopee).</p>
+        </article>
+        <article class="step">
+          <p class="step__n">02</p>
+          <h3>Informe frete, outros custos e a alíquota do DAS</h3>
+          <p>Frete que você absorve, embalagem etc. e a alíquota efetiva do seu Simples (anexo/faixa — você informa).</p>
+        </article>
+        <article class="step">
+          <p class="step__n">03</p>
+          <h3>Veja margem líquida e preço mínimo</h3>
+          <p>Quanto o DAS come do lucro bruto, gap vs preço atual e badge. Copie o resumo.</p>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:16px;max-width:62ch">Fecha o loop com <a href="estoque-minimo.html">Estoque mín.</a> · <a href="meta-lucro.html">Meta lucro</a> · <a href="desconto-maximo.html">Desconto máx.</a> · <a href="equilibrio.html">Equilíbrio</a> · <a href="index.html">Precifica</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o Imposto Simples no preço te salvou de anunciar no vermelho, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>O que é Imposto Simples no preço?</summary>
+        <p>Estimativa da margem líquida após taxa, frete, outros custos e DAS (alíquota que você informa). Também mostra o preço mínimo para a margem alvo. ESTIMATIVA.</p>
+      </details>
+      <details>
+        <summary>Como o DAS entra no cálculo?</summary>
+        <p>DAS ≈ preço × alíquota efetiva (%). Você informa a alíquota do seu anexo/faixa — não calculamos a tabela completa do Simples. Não é conselho fiscal.</p>
+      </details>
+      <details>
+        <summary>Como calcular o preço mínimo?</summary>
+        <p>Preço mín. = (custo + frete + outros) ÷ (1 − taxa% − DAS% − margem%). Se taxa+DAS+margem ≥ 100%, a combinação é impossível.</p>
+      </details>
+      <details>
+        <summary>Como interpretar VERDE, AMARELO e VERMELHO?</summary>
+        <p>VERMELHO se margem líquida &lt; 0 ou inputs inválidos; AMARELO se margem ≥ 0 mas abaixo da mínima; VERDE se margem ≥ alvo.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Estimativa. Confirme taxas no Seller Center / simulador oficial e o seu regime tributário. O Precifica não é conselho contábil, fiscal ou financeiro. A alíquota do DAS é informada por você — não substituímos a tabela do Simples Nacional nem um contador.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="taxa-mercado-livre.html">Taxa ML</a>
+        <a href="taxa-shopee.html">Taxa Shopee</a>
+        <a href="taxa-amazon.html">Taxa Amazon</a>
+        <a href="taxa-magalu.html">Taxa Magalu</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+</body>
+</html>
