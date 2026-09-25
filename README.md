@@ -3,7 +3,7 @@
 Calculadora de preço para Mercado Livre, Shopee e Amazon. Site estático: HTML, CSS e um `js/precifica.js` que monta a UI sozinho. Sem bundler, sem cadastro, sem servidor de cálculo.
 
 **No ar (canônico, durável):** https://mellow-quarry-n7jk.here.now/
-Espelho no GitHub Pages: https://felandim.github.io/precifica/ (as páginas apontam `canonical` pro here.now).
+Código-fonte aqui; o site público é só o do here.now.
 
 ## Abrir no computador
 
@@ -47,6 +47,6 @@ Taxas são **estimativa**. Confirme no Seller Center / simulador oficial.
 2. Publica no here.now (slug permanente `mellow-quarry-n7jk`).
 3. Atualiza `site-manifest.txt` (`cd /tmp/precifica-pub && find . -type f | sed 's#^\./##' | sort | xargs sha256sum`) e commita na `main`
    junto com as fontes alteradas. O workflow `sync-from-live` baixa cada arquivo do here.now, confere o sha256,
-   commita na `main` e espelha o site em `gh-pages`.
+   e commita na `main`.
 
 Nunca versionar: credenciais do here.now, `herenow.json`, claims, `LIVE_URL.txt`, logs, `keepalive.*`, `cloudflared*` (ver `.gitignore`).
