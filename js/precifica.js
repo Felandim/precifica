@@ -3211,6 +3211,154 @@
     });
 
 
+
+    /* 134) custo-embalagem: happy path VERDE — defaults */
+    push(134, function () {
+      // preco=89, taxa=16, custo=35, frete=12, emb=3.5, vendas=200, meta=15
+      // liquido=74.76; varSemEmb=47; margemSem=27.76; margemCom=24.26
+      // emb%preco≈3.93; emb%margem≈12.61; impacto=700; tetoZero=27.76; tetoMeta=14.41
+      var r = calculateCustoEmbalagem({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        custoEmbalagemUnit: 3.5,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (Math.abs(r.liquidoAposTaxa - 74.76) > 1e-9) throw new Error("liquido " + r.liquidoAposTaxa);
+      if (Math.abs(r.custoVariavelSemEmbalagem - 47) > 1e-9) throw new Error("var " + r.custoVariavelSemEmbalagem);
+      if (Math.abs(r.margemSemEmbalagem - 27.76) > 1e-9) throw new Error("margemSem " + r.margemSemEmbalagem);
+      if (Math.abs(r.margemComEmbalagem - 24.26) > 1e-9) throw new Error("margemCom " + r.margemComEmbalagem);
+      if (Math.abs(r.embalagemPctSobrePreco - (3.5 / 89) * 100) > 1e-9) throw new Error("pctPreco " + r.embalagemPctSobrePreco);
+      if (Math.abs(r.embalagemPctSobreMargem - (3.5 / 27.76) * 100) > 1e-9) throw new Error("pctMargem " + r.embalagemPctSobreMargem);
+      if (Math.abs(r.impactoMes - 700) > 1e-9) throw new Error("impacto " + r.impactoMes);
+      if (Math.abs(r.tetoEmbalagemParaMargemZero - 27.76) > 1e-9) throw new Error("tetoZero " + r.tetoEmbalagemParaMargemZero);
+      if (Math.abs(r.tetoEmbalagemParaMetaPct - 14.41) > 1e-9) throw new Error("tetoMeta " + r.tetoEmbalagemParaMetaPct);
+      if (r.badge !== "VERDE") throw new Error("badge " + r.badge);
+      return "happy verde margemCom=" + r.margemComEmbalagem;
+    });
+
+    /* 135) custo-embalagem: AMARELO — % margem ≥ 20 OU % preço ≥ 5 */
+    push(135, function () {
+      var byMargem = calculateCustoEmbalagem({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        custoEmbalagemUnit: 6,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // 6/27.76 ≈ 21.61% ≥ 20 → AMARELO
+      if (!byMargem.ok) throw new Error(byMargem.error || "fail");
+      if (!(byMargem.embalagemPctSobreMargem >= 20)) throw new Error("pctMargem " + byMargem.embalagemPctSobreMargem);
+      if (byMargem.badge !== "AMARELO") throw new Error("badge margem " + byMargem.badge);
+      var byPreco = calculateCustoEmbalagem({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        custoEmbalagemUnit: 4.5,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // 4.5/89 ≈ 5.06% ≥ 5 → AMARELO (and 4.5/27.76 ≈ 16.2% < 20)
+      if (!byPreco.ok) throw new Error(byPreco.error || "fail preco");
+      if (!(byPreco.embalagemPctSobrePreco >= 5)) throw new Error("pctPreco " + byPreco.embalagemPctSobrePreco);
+      if (byPreco.badge !== "AMARELO") throw new Error("badge preco " + byPreco.badge);
+      return "amarelo pctM=" + byMargem.embalagemPctSobreMargem.toFixed(2) + " pctP=" + byPreco.embalagemPctSobrePreco.toFixed(2);
+    });
+
+    /* 136) custo-embalagem: VERMELHO — margem ≤ 0 OU % margem ≥ 40 */
+    push(136, function () {
+      var neg = calculateCustoEmbalagem({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        custoEmbalagemUnit: 30,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // margemCom = 27.76-30 < 0 → VERMELHO
+      if (!neg.ok) throw new Error(neg.error || "fail neg");
+      if (!(neg.margemComEmbalagem <= 0)) throw new Error("expected non-pos " + neg.margemComEmbalagem);
+      if (neg.badge !== "VERMELHO") throw new Error("badge neg " + neg.badge);
+      var high = calculateCustoEmbalagem({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        custoEmbalagemUnit: 12,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // 12/27.76 ≈ 43.2% ≥ 40 → VERMELHO
+      if (!high.ok) throw new Error(high.error || "fail high");
+      if (!(high.embalagemPctSobreMargem >= 40)) throw new Error("pct " + high.embalagemPctSobreMargem);
+      if (high.badge !== "VERMELHO") throw new Error("badge high " + high.badge);
+      return "vermelho margemCom=" + neg.margemComEmbalagem;
+    });
+
+    /* 137) custo-embalagem: inputs inválidos → error VERMELHO */
+    push(137, function () {
+      var r = calculateCustoEmbalagem({
+        precoVenda: 0,
+        custoProduto: 35,
+        custoEmbalagemUnit: 3.5
+      });
+      if (r.ok) throw new Error("expected fail zero preco");
+      if (r.badge !== "VERMELHO") throw new Error("badge " + r.badge);
+      var neg = calculateCustoEmbalagem({
+        precoVenda: 89,
+        custoProduto: -1,
+        custoEmbalagemUnit: 3.5
+      });
+      if (neg.ok) throw new Error("expected fail neg custo");
+      return "invalid ok";
+    });
+
+    /* 138) custo-embalagem: defaults + breakdown sum + join copy */
+    push(138, function () {
+      var empty = calculateCustoEmbalagem({});
+      if (empty.ok) throw new Error("empty should fail (missing preco/custo/emb)");
+      var r = calculateCustoEmbalagem({
+        precoVenda: 89,
+        custoProduto: 35,
+        custoEmbalagemUnit: 3.5
+        // defaults: taxa 16, frete 12, vendas 200, meta 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.taxaMarketplacePct !== 16) throw new Error("default taxa " + r.taxaMarketplacePct);
+      if (r.fretePagoPeloSeller !== 12) throw new Error("default frete " + r.fretePagoPeloSeller);
+      if (r.vendasPorMes !== 200) throw new Error("default vendas " + r.vendasPorMes);
+      if (r.metaMargemPct !== 15) throw new Error("default meta " + r.metaMargemPct);
+      var parts = calculateCustoEmbalagem({
+        precoVenda: 89,
+        custoProduto: 35,
+        caixa: 2,
+        fita: 0.5,
+        protecao: 0.7,
+        etiqueta: 0.3
+        // sum = 3.5 → same as main default
+      });
+      if (!parts.ok) throw new Error(parts.error || "fail parts");
+      if (Math.abs(parts.custoEmbalagemUnit - 3.5) > 1e-9) throw new Error("sum parts " + parts.custoEmbalagemUnit);
+      var joined = joinCustoEmbalagemCopy(r);
+      if (!joined || joined.indexOf("ESTIMATIVA") === -1) throw new Error("join");
+      if (joined !== r.copyText) throw new Error("copyText mismatch");
+      if (badgeCustoEmbalagem(r) !== r.badge) throw new Error("badge helper");
+      if (
+        joined.toLowerCase().indexOf("embalagem") === -1 &&
+        joined.toLowerCase().indexOf("embalag") === -1
+      ) {
+        throw new Error("missing topic");
+      }
+      return "defaults+join+parts badge=" + r.badge;
+    });
+
     var passed = results.filter(function (r) { return r.ok; }).length;
     results.forEach(function (r) {
       console.log("[" + (r.ok ? "PASS" : "FAIL") + "] teste " + r.id + " — " + r.detail);
@@ -14664,6 +14812,624 @@
   }
 
 
+
+  function badgeCustoEmbalagem(r) {
+    if (!r || !r.ok) return "VERMELHO";
+    if (!(r.margemComEmbalagem === r.margemComEmbalagem) || r.margemComEmbalagem <= 0) return "VERMELHO";
+    if (
+      r.margemSemEmbalagem > 0 &&
+      r.embalagemPctSobreMargem === r.embalagemPctSobreMargem &&
+      r.embalagemPctSobreMargem >= 40
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.margemSemEmbalagem > 0 &&
+      r.embalagemPctSobreMargem === r.embalagemPctSobreMargem &&
+      r.embalagemPctSobreMargem >= 20
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.embalagemPctSobrePreco === r.embalagemPctSobrePreco &&
+      r.embalagemPctSobrePreco >= 5
+    ) {
+      return "AMARELO";
+    }
+    return "VERDE";
+  }
+
+  function buildCustoEmbalagemAdvice(r) {
+    if (!r.ok) return r.error || "Dados incompletos.";
+    var base =
+      "Embalagem de " +
+      formatBRL(r.custoEmbalagemUnit) +
+      " por pedido come ~" +
+      (Math.round(r.embalagemPctSobrePreco * 100) / 100) +
+      "% do preço";
+    if (r.embalagemPctSobreMargem != null && r.embalagemPctSobreMargem === r.embalagemPctSobreMargem) {
+      base +=
+        " e ~" +
+        (Math.round(r.embalagemPctSobreMargem * 100) / 100) +
+        "% da margem antes da embalagem";
+    }
+    base +=
+      ". Margem com embalagem: " +
+      formatBRL(r.margemComEmbalagem) +
+      ". Impacto/mês (~" +
+      r.vendasPorMes +
+      " vendas): " +
+      formatBRL(r.impactoMes) +
+      ". Teto p/ margem zero: " +
+      formatBRL(r.tetoEmbalagemParaMargemZero) +
+      "; teto p/ meta " +
+      (Math.round(r.metaMargemPct * 100) / 100) +
+      "%: " +
+      formatBRL(r.tetoEmbalagemParaMetaPct) +
+      ". ";
+    if (r.margemComEmbalagem <= 0) {
+      base += "Margem com embalagem ≤ 0 — embalagem fura o lucro: reduza caixa/proteção ou suba o preço. ";
+    } else if (
+      r.margemSemEmbalagem > 0 &&
+      r.embalagemPctSobreMargem >= 40
+    ) {
+      base += "Embalagem ≥ 40% da margem — risco alto de erodir o lucro. ";
+    } else if (
+      r.margemSemEmbalagem > 0 &&
+      r.embalagemPctSobreMargem >= 20
+    ) {
+      base += "Embalagem ≥ 20% da margem — revise fornecedor de caixa ou padronize kit. ";
+    } else if (r.embalagemPctSobrePreco >= 5) {
+      base += "Embalagem ≥ 5% do preço — peso alto no ticket; busque alternativa mais barata. ";
+    } else {
+      base += "Custo de embalagem sob controle vs margem. ";
+    }
+    return (
+      base +
+      "ESTIMATIVA — confira preços reais de caixa, fita, plástico e etiqueta com o seu fornecedor."
+    );
+  }
+
+  function joinCustoEmbalagemCopy(r) {
+    r = r || {};
+    var lines = [];
+    lines.push("Custo de embalagem no marketplace · Precifica");
+    if (r.ok) {
+      lines.push("Preço de venda: " + formatBRL(r.precoVenda));
+      lines.push("Taxa marketplace: " + (Math.round(r.taxaMarketplacePct * 100) / 100) + "%");
+      lines.push("Custo produto: " + formatBRL(r.custoProduto));
+      lines.push("Frete pago pelo seller: " + formatBRL(r.fretePagoPeloSeller));
+      lines.push("Custo embalagem / un: " + formatBRL(r.custoEmbalagemUnit));
+      if (r.caixa != null || r.fita != null || r.protecao != null || r.etiqueta != null) {
+        lines.push(
+          "Breakdown: caixa " +
+            formatBRL(r.caixa || 0) +
+            " · fita " +
+            formatBRL(r.fita || 0) +
+            " · proteção " +
+            formatBRL(r.protecao || 0) +
+            " · etiqueta " +
+            formatBRL(r.etiqueta || 0)
+        );
+      }
+      lines.push("Vendas/mês: " + r.vendasPorMes);
+      lines.push("Meta margem %: " + (Math.round(r.metaMargemPct * 100) / 100) + "%");
+      lines.push("Líquido após taxa: " + formatBRL(r.liquidoAposTaxa));
+      lines.push("Custo variável s/ embalagem: " + formatBRL(r.custoVariavelSemEmbalagem));
+      lines.push("Margem s/ embalagem: " + formatBRL(r.margemSemEmbalagem));
+      lines.push("Margem c/ embalagem: " + formatBRL(r.margemComEmbalagem));
+      lines.push(
+        "Embalagem % preço: " + (Math.round(r.embalagemPctSobrePreco * 100) / 100) + "%"
+      );
+      if (r.embalagemPctSobreMargem != null && r.embalagemPctSobreMargem === r.embalagemPctSobreMargem) {
+        lines.push(
+          "Embalagem % margem: " + (Math.round(r.embalagemPctSobreMargem * 100) / 100) + "%"
+        );
+      }
+      lines.push("Impacto / mês: " + formatBRL(r.impactoMes));
+      lines.push("Teto embalagem (margem zero): " + formatBRL(r.tetoEmbalagemParaMargemZero));
+      lines.push("Teto embalagem (meta): " + formatBRL(r.tetoEmbalagemParaMetaPct));
+      lines.push("Badge: " + (r.badge || "—"));
+      if (r.advice) lines.push(r.advice);
+    } else {
+      lines.push("Erro: " + (r.error || "dados inválidos"));
+    }
+    lines.push(
+      r.disclaimer ||
+        "ESTIMATIVA — Custo de embalagem no marketplace. Não é conselho financeiro."
+    );
+    return lines.join("\n");
+  }
+
+  function calculateCustoEmbalagem(input) {
+    input = input || {};
+    var precoVenda = toNumber(input.precoVenda);
+    var custoProduto = toNumber(input.custoProduto);
+
+    var taxaMarketplacePct;
+    if (input.taxaMarketplacePct == null || input.taxaMarketplacePct === "") {
+      taxaMarketplacePct = 16;
+    } else {
+      taxaMarketplacePct = toNumber(input.taxaMarketplacePct);
+    }
+
+    var fretePagoPeloSeller;
+    if (input.fretePagoPeloSeller == null || input.fretePagoPeloSeller === "") {
+      fretePagoPeloSeller = 12;
+    } else {
+      fretePagoPeloSeller = toNumber(input.fretePagoPeloSeller);
+    }
+
+    var vendasPorMes;
+    if (input.vendasPorMes == null || input.vendasPorMes === "") {
+      vendasPorMes = 200;
+    } else {
+      vendasPorMes = toNumber(input.vendasPorMes);
+    }
+
+    var metaMargemPct;
+    if (input.metaMargemPct == null || input.metaMargemPct === "") {
+      metaMargemPct = 15;
+    } else {
+      metaMargemPct = toNumber(input.metaMargemPct);
+    }
+
+    var caixa = null;
+    var fita = null;
+    var protecao = null;
+    var etiqueta = null;
+    var hasParts = false;
+    if (input.caixa != null && input.caixa !== "") {
+      caixa = toNumber(input.caixa);
+      hasParts = true;
+    }
+    if (input.fita != null && input.fita !== "") {
+      fita = toNumber(input.fita);
+      hasParts = true;
+    }
+    if (input.protecao != null && input.protecao !== "") {
+      protecao = toNumber(input.protecao);
+      hasParts = true;
+    }
+    if (input.etiqueta != null && input.etiqueta !== "") {
+      etiqueta = toNumber(input.etiqueta);
+      hasParts = true;
+    }
+
+    var custoEmbalagemUnit;
+    if (hasParts) {
+      custoEmbalagemUnit =
+        (caixa === caixa && caixa != null ? caixa : 0) +
+        (fita === fita && fita != null ? fita : 0) +
+        (protecao === protecao && protecao != null ? protecao : 0) +
+        (etiqueta === etiqueta && etiqueta != null ? etiqueta : 0);
+    } else if (input.custoEmbalagemUnit == null || input.custoEmbalagemUnit === "") {
+      custoEmbalagemUnit = NaN;
+    } else {
+      custoEmbalagemUnit = toNumber(input.custoEmbalagemUnit);
+    }
+
+    var disclaimer =
+      "ESTIMATIVA — Custo de embalagem no marketplace no navegador. Modelo: líquido após taxa = preço × (1 − taxa%); margem s/ embalagem = líquido − (produto+frete); margem c/ embalagem = margem s/ embalagem − embalagem/un; teto meta = líquido − (produto+frete) − (preço × meta%). Não inclui ads, impostos extras nem perda/quebra. Não é conselho financeiro.";
+
+    function fail(msg) {
+      var f = {
+        ok: false,
+        error: msg,
+        precoVenda: precoVenda,
+        taxaMarketplacePct: taxaMarketplacePct,
+        custoProduto: custoProduto,
+        fretePagoPeloSeller: fretePagoPeloSeller,
+        custoEmbalagemUnit: custoEmbalagemUnit,
+        vendasPorMes: vendasPorMes,
+        metaMargemPct: metaMargemPct,
+        caixa: caixa,
+        fita: fita,
+        protecao: protecao,
+        etiqueta: etiqueta,
+        liquidoAposTaxa: null,
+        custoVariavelSemEmbalagem: null,
+        margemSemEmbalagem: null,
+        margemComEmbalagem: null,
+        embalagemPctSobrePreco: null,
+        embalagemPctSobreMargem: null,
+        impactoMes: null,
+        perdaMargemMes: null,
+        tetoEmbalagemParaMargemZero: null,
+        tetoEmbalagemParaMetaPct: null,
+        badge: "VERMELHO",
+        advice: msg,
+        disclaimer: disclaimer,
+        copyText: ""
+      };
+      f.copyText = joinCustoEmbalagemCopy(f);
+      return f;
+    }
+
+    if (!(precoVenda > 0) || precoVenda !== precoVenda) {
+      return fail("Informe o preço de venda (R$) maior que zero.");
+    }
+    if (!(custoProduto >= 0) || custoProduto !== custoProduto) {
+      return fail("Informe o custo do produto (R$) ≥ 0.");
+    }
+    if (!(taxaMarketplacePct >= 0) || taxaMarketplacePct !== taxaMarketplacePct) {
+      return fail("Informe a taxa do marketplace (%) ≥ 0.");
+    }
+    if (!(fretePagoPeloSeller >= 0) || fretePagoPeloSeller !== fretePagoPeloSeller) {
+      return fail("Informe o frete pago pelo seller (R$) ≥ 0.");
+    }
+    if (!(custoEmbalagemUnit >= 0) || custoEmbalagemUnit !== custoEmbalagemUnit) {
+      return fail("Informe o custo de embalagem por unidade (R$) ≥ 0.");
+    }
+    if (!(vendasPorMes > 0) || vendasPorMes !== vendasPorMes) {
+      return fail("Informe vendas por mês maior que zero.");
+    }
+    if (!(metaMargemPct >= 0) || metaMargemPct !== metaMargemPct) {
+      return fail("Informe a meta de margem (%) ≥ 0.");
+    }
+    if (hasParts) {
+      if (caixa != null && (!(caixa >= 0) || caixa !== caixa)) {
+        return fail("Informe o custo da caixa (R$) ≥ 0.");
+      }
+      if (fita != null && (!(fita >= 0) || fita !== fita)) {
+        return fail("Informe o custo da fita (R$) ≥ 0.");
+      }
+      if (protecao != null && (!(protecao >= 0) || protecao !== protecao)) {
+        return fail("Informe o custo da proteção (R$) ≥ 0.");
+      }
+      if (etiqueta != null && (!(etiqueta >= 0) || etiqueta !== etiqueta)) {
+        return fail("Informe o custo da etiqueta (R$) ≥ 0.");
+      }
+    }
+
+    var liquidoAposTaxa = precoVenda * (1 - taxaMarketplacePct / 100);
+    var custoVariavelSemEmbalagem = custoProduto + fretePagoPeloSeller;
+    var margemSemEmbalagem = liquidoAposTaxa - custoVariavelSemEmbalagem;
+    var margemComEmbalagem = margemSemEmbalagem - custoEmbalagemUnit;
+    var embalagemPctSobrePreco = (custoEmbalagemUnit / precoVenda) * 100;
+    var embalagemPctSobreMargem =
+      margemSemEmbalagem > 0 ? (custoEmbalagemUnit / margemSemEmbalagem) * 100 : null;
+    var impactoMes = vendasPorMes * custoEmbalagemUnit;
+    var perdaMargemMes = impactoMes;
+    var tetoEmbalagemParaMargemZero = margemSemEmbalagem;
+    var tetoEmbalagemParaMetaPct =
+      liquidoAposTaxa - custoVariavelSemEmbalagem - precoVenda * (metaMargemPct / 100);
+
+    var result = {
+      ok: true,
+      error: null,
+      precoVenda: precoVenda,
+      taxaMarketplacePct: taxaMarketplacePct,
+      custoProduto: custoProduto,
+      fretePagoPeloSeller: fretePagoPeloSeller,
+      custoEmbalagemUnit: custoEmbalagemUnit,
+      vendasPorMes: vendasPorMes,
+      metaMargemPct: metaMargemPct,
+      caixa: caixa,
+      fita: fita,
+      protecao: protecao,
+      etiqueta: etiqueta,
+      liquidoAposTaxa: liquidoAposTaxa,
+      custoVariavelSemEmbalagem: custoVariavelSemEmbalagem,
+      margemSemEmbalagem: margemSemEmbalagem,
+      margemComEmbalagem: margemComEmbalagem,
+      embalagemPctSobrePreco: embalagemPctSobrePreco,
+      embalagemPctSobreMargem: embalagemPctSobreMargem,
+      impactoMes: impactoMes,
+      perdaMargemMes: perdaMargemMes,
+      tetoEmbalagemParaMargemZero: tetoEmbalagemParaMargemZero,
+      tetoEmbalagemParaMetaPct: tetoEmbalagemParaMetaPct,
+      badge: "AMARELO",
+      advice: "",
+      disclaimer: disclaimer,
+      copyText: ""
+    };
+    result.badge = badgeCustoEmbalagem(result);
+    result.advice = buildCustoEmbalagemAdvice(result);
+    result.copyText = joinCustoEmbalagemCopy(result);
+    return result;
+  }
+
+  function mountCustoEmbalagem(root) {
+    if (!root || typeof document === "undefined") return;
+    root.innerHTML = "";
+    root.classList.add("freightgen", "tacosgen", "custoembalagemgen");
+
+    var panel = el("div", { class: "freightgen__panel titlegen__panel" });
+    panel.appendChild(
+      el("p", { class: "freightgen__kicker titlegen__kicker" }, "Custo de embalagem · ESTIMATIVA")
+    );
+    panel.appendChild(
+      el(
+        "h2",
+        { class: "freightgen__title titlegen__title" },
+        "Quanto a embalagem come da margem — e qual o teto para não furar o lucro?"
+      )
+    );
+
+    var fields = el("div", { class: "freightgen__fields titlegen__fields" });
+    fields.appendChild(
+      field({
+        id: "ce-preco",
+        label: "Preço de venda (R$)",
+        value: "89",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-taxa",
+        label: "Taxa do marketplace (%)",
+        value: "16",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 16%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-custo",
+        label: "Custo do produto (R$)",
+        value: "35",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-frete",
+        label: "Frete pago pelo seller (R$)",
+        value: "12",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 12"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-emb",
+        label: "Custo embalagem / un (R$)",
+        value: "3.5",
+        step: "0.01",
+        min: "0",
+        placeholder: "caixa+fita+plástico+etiqueta"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-vendas",
+        label: "Vendas por mês",
+        value: "200",
+        step: "1",
+        min: "0",
+        placeholder: "padrão 200"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-meta",
+        label: "Meta de margem (% do preço)",
+        value: "15",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 15%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-caixa",
+        label: "Caixa / saco (R$) — opcional",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "soma no total"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-fita",
+        label: "Fita (R$) — opcional",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "soma no total"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-protecao",
+        label: "Proteção / plástico (R$) — opcional",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "soma no total"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ce-etiqueta",
+        label: "Etiqueta (R$) — opcional",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "soma no total"
+      })
+    );
+    panel.appendChild(fields);
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__hint titlegen__hint" },
+        "Se preencher o breakdown (caixa/fita/proteção/etiqueta), o total de embalagem vira a soma. Margem c/ embalagem = (líquido após taxa − produto − frete) − embalagem. ESTIMATIVA."
+      )
+    );
+    root.appendChild(panel);
+
+    var out = el("div", { class: "freightgen__out", "aria-live": "polite" });
+    root.appendChild(out);
+
+    function anyPartsFilled() {
+      return ["ce-caixa", "ce-fita", "ce-protecao", "ce-etiqueta"].some(function (id) {
+        var n = document.getElementById(id);
+        return n && String(n.value).trim() !== "";
+      });
+    }
+
+    function syncFromParts() {
+      if (!anyPartsFilled()) return;
+      var sum = 0;
+      ["ce-caixa", "ce-fita", "ce-protecao", "ce-etiqueta"].forEach(function (id) {
+        var n = document.getElementById(id);
+        var v = n && String(n.value).trim() !== "" ? toNumber(n.value) : 0;
+        if (v === v) sum += v;
+      });
+      var emb = document.getElementById("ce-emb");
+      if (emb) emb.value = String(Math.round(sum * 100) / 100);
+    }
+
+    function read() {
+      var taxaRaw = document.getElementById("ce-taxa").value;
+      var freteRaw = document.getElementById("ce-frete").value;
+      var vendasRaw = document.getElementById("ce-vendas").value;
+      var metaRaw = document.getElementById("ce-meta").value;
+      var payload = {
+        precoVenda: document.getElementById("ce-preco").value,
+        taxaMarketplacePct: taxaRaw === "" ? undefined : taxaRaw,
+        custoProduto: document.getElementById("ce-custo").value,
+        fretePagoPeloSeller: freteRaw === "" ? undefined : freteRaw,
+        vendasPorMes: vendasRaw === "" ? undefined : vendasRaw,
+        metaMargemPct: metaRaw === "" ? undefined : metaRaw
+      };
+      if (anyPartsFilled()) {
+        var caixa = document.getElementById("ce-caixa").value;
+        var fita = document.getElementById("ce-fita").value;
+        var protecao = document.getElementById("ce-protecao").value;
+        var etiqueta = document.getElementById("ce-etiqueta").value;
+        if (caixa !== "") payload.caixa = caixa;
+        if (fita !== "") payload.fita = fita;
+        if (protecao !== "") payload.protecao = protecao;
+        if (etiqueta !== "") payload.etiqueta = etiqueta;
+      } else {
+        payload.custoEmbalagemUnit = document.getElementById("ce-emb").value;
+      }
+      return payload;
+    }
+
+    function render() {
+      var r = calculateCustoEmbalagem(read());
+      out.innerHTML = "";
+      var loss = !r.ok || r.badge === "VERMELHO";
+      var card = el(
+        "article",
+        { class: "result-card" + (loss ? " result-card--loss" : "") }
+      );
+      card.appendChild(
+        el(
+          "p",
+          { class: "result-card__label" },
+          "Custo de embalagem · " + (r.badge || "—") + " · ESTIMATIVA"
+        )
+      );
+      if (!r.ok) {
+        card.appendChild(el("p", { class: "result-card__price is-loss" }, "—"));
+        card.appendChild(el("p", { class: "result-card__hint" }, r.error || "Dados incompletos"));
+      } else {
+        var headline =
+          formatBRL(r.margemComEmbalagem) +
+          " margem · " +
+          (Math.round(r.embalagemPctSobrePreco * 100) / 100).toLocaleString("pt-BR") +
+          "% do preço";
+        card.appendChild(
+          el(
+            "p",
+            { class: "result-card__price" + (loss ? " is-loss" : "") },
+            headline
+          )
+        );
+        var grid = el("div", { class: "result-card__grid" });
+        function row(k, v) {
+          var d = el("div");
+          d.appendChild(el("span", { class: "muted" }, k));
+          d.appendChild(el("strong", null, v));
+          grid.appendChild(d);
+        }
+        row("Líquido após taxa", formatBRL(r.liquidoAposTaxa));
+        row("Custo variável s/ embalagem", formatBRL(r.custoVariavelSemEmbalagem));
+        row("Margem s/ embalagem", formatBRL(r.margemSemEmbalagem));
+        row("Custo embalagem / un", formatBRL(r.custoEmbalagemUnit));
+        row("Margem c/ embalagem", formatBRL(r.margemComEmbalagem));
+        row(
+          "Embalagem % preço",
+          (Math.round(r.embalagemPctSobrePreco * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row(
+          "Embalagem % margem",
+          r.embalagemPctSobreMargem == null
+            ? "—"
+            : (Math.round(r.embalagemPctSobreMargem * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row("Impacto / mês", formatBRL(r.impactoMes));
+        row("Teto (margem zero)", formatBRL(r.tetoEmbalagemParaMargemZero));
+        row(
+          "Teto (meta " + (Math.round(r.metaMargemPct * 100) / 100) + "%)",
+          formatBRL(r.tetoEmbalagemParaMetaPct)
+        );
+        row("Badge", r.badge || "—");
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "result-card__hint" }, r.advice));
+      }
+      out.appendChild(card);
+
+      var actions = el("div", { class: "freightgen__actions" });
+      var btn = el("button", { type: "button", class: "btn btn--solid" }, "Copiar resumo");
+      btn.addEventListener("click", function () {
+        var text = r.copyText || joinCustoEmbalagemCopy(r);
+        copyText(text)
+          .then(function () {
+            toast("Resumo copiado.");
+          })
+          .catch(function () {
+            toast("Copia o resumo na mão.");
+          });
+      });
+      actions.appendChild(btn);
+      out.appendChild(actions);
+    }
+
+    ["ce-caixa", "ce-fita", "ce-protecao", "ce-etiqueta"].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", function () {
+          syncFromParts();
+          render();
+        });
+        node.addEventListener("change", function () {
+          syncFromParts();
+          render();
+        });
+      }
+    });
+
+    [
+      "ce-preco",
+      "ce-taxa",
+      "ce-custo",
+      "ce-frete",
+      "ce-emb",
+      "ce-vendas",
+      "ce-meta"
+    ].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", render);
+        node.addEventListener("change", render);
+      }
+    });
+    render();
+  }
+
+
   function wireGlobalUi() {
     document.querySelectorAll("[data-precifica-calc]").forEach(function (node) {
       mountCalculator(node, { preset: node.getAttribute("data-preset") || "" });
@@ -14771,6 +15537,10 @@
 
     document.querySelectorAll("[data-precifica-prazo-repasse]").forEach(function (node) {
       mountPrazoRepasse(node);
+    });
+
+    document.querySelectorAll("[data-precifica-custo-embalagem]").forEach(function (node) {
+      mountCustoEmbalagem(node);
     });
 
 
@@ -14933,6 +15703,11 @@
     joinPrazoRepasseCopy: joinPrazoRepasseCopy,
     badgePrazoRepasse: badgePrazoRepasse,
     buildPrazoRepasseAdvice: buildPrazoRepasseAdvice,
+    calculateCustoEmbalagem: calculateCustoEmbalagem,
+    mountCustoEmbalagem: mountCustoEmbalagem,
+    joinCustoEmbalagemCopy: joinCustoEmbalagemCopy,
+    badgeCustoEmbalagem: badgeCustoEmbalagem,
+    buildCustoEmbalagemAdvice: buildCustoEmbalagemAdvice,
     HOOK_MAX: HOOK_MAX,
     AMAZON_BULLET_SOFT: AMAZON_BULLET_SOFT,
     AMAZON_BULLET_HARD: AMAZON_BULLET_HARD,
