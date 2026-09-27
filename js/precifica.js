@@ -3359,6 +3359,183 @@
       return "defaults+join+parts badge=" + r.badge;
     });
 
+
+    /* 139) parcelamento: happy path VERDE — 6x com custo baixo */
+    push(139, function () {
+      // preco=89, taxa=16, custo=35, frete=12, parcelas=6, custoPct=3, vendas=200, meta=15
+      // liquido=74.76; varBase=47; margemSem=27.76; custoParc=2.67; margemCom=25.09
+      // pctPreco=3; pctMargem≈9.62; impacto=534; tetoZero=27.76; tetoMeta=14.41
+      var r = calculateParcelamento({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        parcelas: 6,
+        custoParcelamentoPct: 3,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (Math.abs(r.liquidoAposTaxa - 74.76) > 1e-9) throw new Error("liquido " + r.liquidoAposTaxa);
+      if (Math.abs(r.custoVariavelBase - 47) > 1e-9) throw new Error("var " + r.custoVariavelBase);
+      if (Math.abs(r.margemSemParcelamento - 27.76) > 1e-9) throw new Error("margemSem " + r.margemSemParcelamento);
+      if (Math.abs(r.custoParcelamentoUnit - 2.67) > 1e-9) throw new Error("custoParc " + r.custoParcelamentoUnit);
+      if (Math.abs(r.margemComParcelamento - 25.09) > 1e-9) throw new Error("margemCom " + r.margemComParcelamento);
+      if (Math.abs(r.parcelamentoPctSobrePreco - 3) > 1e-9) throw new Error("pctPreco " + r.parcelamentoPctSobrePreco);
+      if (Math.abs(r.parcelamentoPctSobreMargem - (2.67 / 27.76) * 100) > 1e-9) throw new Error("pctMargem " + r.parcelamentoPctSobreMargem);
+      if (Math.abs(r.impactoMes - 534) > 1e-9) throw new Error("impacto " + r.impactoMes);
+      if (Math.abs(r.tetoParcelamentoParaMargemZero - 27.76) > 1e-9) throw new Error("tetoZero " + r.tetoParcelamentoParaMargemZero);
+      if (Math.abs(r.tetoParcelamentoParaMetaPct - 14.41) > 1e-9) throw new Error("tetoMeta " + r.tetoParcelamentoParaMetaPct);
+      if (Math.abs(r.tetoCustoPctParaMargemZero - (27.76 / 89) * 100) > 1e-9) throw new Error("tetoPct " + r.tetoCustoPctParaMargemZero);
+      if (Math.abs(r.custoPorParcelaApprox - 2.67 / 6) > 1e-9) throw new Error("porParc " + r.custoPorParcelaApprox);
+      if (r.badge !== "VERDE") throw new Error("badge " + r.badge);
+      return "happy verde margemCom=" + r.margemComParcelamento;
+    });
+
+    /* 140) parcelamento: AMARELO — % margem ≥ 20 OU % preço ≥ 6 OU (parcelas≥12 E %≥4) */
+    push(140, function () {
+      var byMargem = calculateParcelamento({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        parcelas: 6,
+        custoParcelamentoPct: 7,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // 7% → custo=6.23; 6.23/27.76 ≈ 22.44% ≥ 20 → AMARELO
+      if (!byMargem.ok) throw new Error(byMargem.error || "fail");
+      if (!(byMargem.parcelamentoPctSobreMargem >= 20)) throw new Error("pctMargem " + byMargem.parcelamentoPctSobreMargem);
+      if (byMargem.badge !== "AMARELO") throw new Error("badge margem " + byMargem.badge);
+      var byPreco = calculateParcelamento({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        parcelas: 3,
+        custoParcelamentoPct: 6.5,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // 6.5% ≥ 6 → AMARELO (and 6.5/27.76 wait: custo=5.785; 5.785/27.76≈20.8 — still amarelo)
+      if (!byPreco.ok) throw new Error(byPreco.error || "fail preco");
+      if (!(byPreco.parcelamentoPctSobrePreco >= 6)) throw new Error("pctPreco " + byPreco.parcelamentoPctSobrePreco);
+      if (byPreco.badge !== "AMARELO") throw new Error("badge preco " + byPreco.badge);
+      var byParcelas = calculateParcelamento({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        parcelas: 12,
+        custoParcelamentoPct: 4.5,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // defaults-ish: 12x e 4.5% ≥ 4 → AMARELO
+      if (!byParcelas.ok) throw new Error(byParcelas.error || "fail parcelas");
+      if (byParcelas.badge !== "AMARELO") throw new Error("badge parcelas " + byParcelas.badge);
+      return "amarelo pctM=" + byMargem.parcelamentoPctSobreMargem.toFixed(2) + " pctP=" + byPreco.parcelamentoPctSobrePreco.toFixed(2);
+    });
+
+    /* 141) parcelamento: VERMELHO — margem ≤ 0 OU % margem ≥ 40 */
+    push(141, function () {
+      var neg = calculateParcelamento({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        parcelas: 12,
+        custoParcelamentoPct: 35,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // custo=31.15; margemCom=27.76-31.15 < 0 → VERMELHO
+      if (!neg.ok) throw new Error(neg.error || "fail neg");
+      if (!(neg.margemComParcelamento <= 0)) throw new Error("expected non-pos " + neg.margemComParcelamento);
+      if (neg.badge !== "VERMELHO") throw new Error("badge neg " + neg.badge);
+      var high = calculateParcelamento({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        fretePagoPeloSeller: 12,
+        parcelas: 6,
+        custoParcelamentoPct: 13,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // custo=11.57; 11.57/27.76 ≈ 41.7% ≥ 40 → VERMELHO
+      if (!high.ok) throw new Error(high.error || "fail high");
+      if (!(high.parcelamentoPctSobreMargem >= 40)) throw new Error("pct " + high.parcelamentoPctSobreMargem);
+      if (high.badge !== "VERMELHO") throw new Error("badge high " + high.badge);
+      return "vermelho margemCom=" + neg.margemComParcelamento;
+    });
+
+    /* 142) parcelamento: inputs inválidos → error VERMELHO */
+    push(142, function () {
+      var r = calculateParcelamento({
+        precoVenda: 0,
+        custoProduto: 35,
+        custoParcelamentoPct: 4.5
+      });
+      if (r.ok) throw new Error("expected fail zero preco");
+      if (r.badge !== "VERMELHO") throw new Error("badge " + r.badge);
+      var neg = calculateParcelamento({
+        precoVenda: 89,
+        custoProduto: -1,
+        custoParcelamentoPct: 4.5
+      });
+      if (neg.ok) throw new Error("expected fail neg custo");
+      var badParc = calculateParcelamento({
+        precoVenda: 89,
+        custoProduto: 35,
+        parcelas: 0
+      });
+      if (badParc.ok) throw new Error("expected fail parcelas 0");
+      return "invalid ok";
+    });
+
+    /* 143) parcelamento: defaults + copy + custoParcelamentoReais override */
+    push(143, function () {
+      var empty = calculateParcelamento({});
+      if (empty.ok) throw new Error("empty should fail (missing preco/custo)");
+      var r = calculateParcelamento({
+        precoVenda: 89,
+        custoProduto: 35
+        // defaults: taxa 16, frete 12, parcelas 12, custoPct 4.5, vendas 200, meta 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.taxaMarketplacePct !== 16) throw new Error("default taxa " + r.taxaMarketplacePct);
+      if (r.fretePagoPeloSeller !== 12) throw new Error("default frete " + r.fretePagoPeloSeller);
+      if (r.parcelas !== 12) throw new Error("default parcelas " + r.parcelas);
+      if (r.custoParcelamentoPct !== 4.5) throw new Error("default custoPct " + r.custoParcelamentoPct);
+      if (Math.abs(r.custoParcelamentoUnit - 4.005) > 1e-9) throw new Error("unit " + r.custoParcelamentoUnit);
+      if (r.vendasPorMes !== 200) throw new Error("default vendas " + r.vendasPorMes);
+      if (r.metaMargemPct !== 15) throw new Error("default meta " + r.metaMargemPct);
+      if (r.badge !== "AMARELO") throw new Error("default badge " + r.badge);
+      var ov = calculateParcelamento({
+        precoVenda: 89,
+        custoProduto: 35,
+        parcelas: 6,
+        custoParcelamentoPct: 10,
+        custoParcelamentoReais: 2.5
+      });
+      if (!ov.ok) throw new Error(ov.error || "fail override");
+      if (Math.abs(ov.custoParcelamentoUnit - 2.5) > 1e-9) throw new Error("override unit " + ov.custoParcelamentoUnit);
+      if (ov.usedCustoReais !== true) throw new Error("usedCustoReais");
+      var joined = joinParcelamentoCopy(r);
+      if (!joined || joined.indexOf("ESTIMATIVA") === -1) throw new Error("join");
+      if (joined !== r.copyText) throw new Error("copyText mismatch");
+      if (badgeParcelamento(r) !== r.badge) throw new Error("badge helper");
+      if (
+        joined.toLowerCase().indexOf("parcelamento") === -1 &&
+        joined.toLowerCase().indexOf("parcel") === -1
+      ) {
+        throw new Error("missing topic");
+      }
+      return "defaults+join+override badge=" + r.badge;
+    });
+
     var passed = results.filter(function (r) { return r.ok; }).length;
     results.forEach(function (r) {
       console.log("[" + (r.ok ? "PASS" : "FAIL") + "] teste " + r.id + " — " + r.detail);
@@ -15430,6 +15607,590 @@
   }
 
 
+
+  function badgeParcelamento(r) {
+    if (!r || !r.ok) return "VERMELHO";
+    if (!(r.margemComParcelamento === r.margemComParcelamento) || r.margemComParcelamento <= 0) {
+      return "VERMELHO";
+    }
+    if (
+      r.margemSemParcelamento > 0 &&
+      r.parcelamentoPctSobreMargem === r.parcelamentoPctSobreMargem &&
+      r.parcelamentoPctSobreMargem >= 40
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.margemSemParcelamento > 0 &&
+      r.parcelamentoPctSobreMargem === r.parcelamentoPctSobreMargem &&
+      r.parcelamentoPctSobreMargem >= 20
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.parcelamentoPctSobrePreco === r.parcelamentoPctSobrePreco &&
+      r.parcelamentoPctSobrePreco >= 6
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.parcelas >= 12 &&
+      r.parcelamentoPctSobrePreco === r.parcelamentoPctSobrePreco &&
+      r.parcelamentoPctSobrePreco >= 4
+    ) {
+      return "AMARELO";
+    }
+    return "VERDE";
+  }
+
+  function buildParcelamentoAdvice(r) {
+    if (!r.ok) return r.error || "Dados incompletos.";
+    var base =
+      "Parcelamento sem juros (" +
+      r.parcelas +
+      "x) custa " +
+      formatBRL(r.custoParcelamentoUnit) +
+      " por venda (~" +
+      (Math.round(r.parcelamentoPctSobrePreco * 100) / 100) +
+      "% do preço";
+    if (r.parcelamentoPctSobreMargem != null && r.parcelamentoPctSobreMargem === r.parcelamentoPctSobreMargem) {
+      base +=
+        " e ~" +
+        (Math.round(r.parcelamentoPctSobreMargem * 100) / 100) +
+        "% da margem antes do parcelamento";
+    }
+    base +=
+      "). Margem com parcelamento: " +
+      formatBRL(r.margemComParcelamento) +
+      ". Impacto/mês (~" +
+      r.vendasPorMes +
+      " vendas): " +
+      formatBRL(r.impactoMes) +
+      ". Teto p/ margem zero: " +
+      formatBRL(r.tetoParcelamentoParaMargemZero) +
+      " (~" +
+      (r.tetoCustoPctParaMargemZero == null
+        ? "—"
+        : Math.round(r.tetoCustoPctParaMargemZero * 100) / 100 + "%") +
+      "); teto p/ meta " +
+      (Math.round(r.metaMargemPct * 100) / 100) +
+      "%: " +
+      formatBRL(r.tetoParcelamentoParaMetaPct) +
+      ". ";
+    if (r.margemComParcelamento <= 0) {
+      base +=
+        "Margem com parcelamento ≤ 0 — o sem juros fura o lucro: reduza parcelas, negociar taxa ou subir o preço. ";
+    } else if (
+      r.margemSemParcelamento > 0 &&
+      r.parcelamentoPctSobreMargem >= 40
+    ) {
+      base += "Custo de parcelamento ≥ 40% da margem — risco alto de erodir o lucro. ";
+    } else if (
+      r.margemSemParcelamento > 0 &&
+      r.parcelamentoPctSobreMargem >= 20
+    ) {
+      base += "Custo ≥ 20% da margem — revise nº de parcelas ou taxa de antecipação. ";
+    } else if (r.parcelamentoPctSobrePreco >= 6) {
+      base += "Custo ≥ 6% do preço — peso alto no ticket; considere menos parcelas. ";
+    } else if (r.parcelas >= 12 && r.parcelamentoPctSobrePreco >= 4) {
+      base += "12x+ com custo ≥ 4% do preço — comum, mas come margem; monitore. ";
+    } else {
+      base += "Custo de parcelamento sob controle vs margem. ";
+    }
+    return (
+      base +
+      "ESTIMATIVA — confira a taxa real de antecipação/desconto embutido no ML, adquirente ou tabela do marketplace."
+    );
+  }
+
+  function joinParcelamentoCopy(r) {
+    r = r || {};
+    var lines = [];
+    lines.push("Parcelamento sem juros no marketplace · Precifica");
+    if (r.ok) {
+      lines.push("Preço de venda: " + formatBRL(r.precoVenda));
+      lines.push("Taxa marketplace: " + (Math.round(r.taxaMarketplacePct * 100) / 100) + "%");
+      lines.push("Custo produto: " + formatBRL(r.custoProduto));
+      lines.push("Frete pago pelo seller: " + formatBRL(r.fretePagoPeloSeller));
+      lines.push("Parcelas: " + r.parcelas + "x");
+      if (r.usedCustoReais) {
+        lines.push("Custo parcelamento (R$ override): " + formatBRL(r.custoParcelamentoUnit));
+      } else {
+        lines.push(
+          "Custo parcelamento %: " + (Math.round(r.custoParcelamentoPct * 100) / 100) + "%"
+        );
+        lines.push("Custo parcelamento / un: " + formatBRL(r.custoParcelamentoUnit));
+      }
+      lines.push("Vendas/mês: " + r.vendasPorMes);
+      lines.push("Meta margem %: " + (Math.round(r.metaMargemPct * 100) / 100) + "%");
+      lines.push("Líquido após taxa: " + formatBRL(r.liquidoAposTaxa));
+      lines.push("Custo variável base: " + formatBRL(r.custoVariavelBase));
+      lines.push("Margem s/ parcelamento: " + formatBRL(r.margemSemParcelamento));
+      lines.push("Margem c/ parcelamento: " + formatBRL(r.margemComParcelamento));
+      lines.push(
+        "Parcelamento % preço: " + (Math.round(r.parcelamentoPctSobrePreco * 100) / 100) + "%"
+      );
+      if (r.parcelamentoPctSobreMargem != null && r.parcelamentoPctSobreMargem === r.parcelamentoPctSobreMargem) {
+        lines.push(
+          "Parcelamento % margem: " + (Math.round(r.parcelamentoPctSobreMargem * 100) / 100) + "%"
+        );
+      }
+      lines.push("Impacto / mês: " + formatBRL(r.impactoMes));
+      lines.push("Teto parcelamento (margem zero): " + formatBRL(r.tetoParcelamentoParaMargemZero));
+      lines.push("Teto parcelamento (meta): " + formatBRL(r.tetoParcelamentoParaMetaPct));
+      if (r.tetoCustoPctParaMargemZero != null && r.tetoCustoPctParaMargemZero === r.tetoCustoPctParaMargemZero) {
+        lines.push(
+          "Teto custo % (margem zero): " +
+            (Math.round(r.tetoCustoPctParaMargemZero * 100) / 100) +
+            "%"
+        );
+      }
+      if (r.custoPorParcelaApprox != null && r.custoPorParcelaApprox === r.custoPorParcelaApprox) {
+        lines.push("Custo / parcela (approx): " + formatBRL(r.custoPorParcelaApprox));
+      }
+      lines.push("Badge: " + (r.badge || "—"));
+      if (r.advice) lines.push(r.advice);
+    } else {
+      lines.push("Erro: " + (r.error || "dados inválidos"));
+    }
+    lines.push(
+      r.disclaimer ||
+        "ESTIMATIVA — Parcelamento sem juros no marketplace. Não é conselho financeiro."
+    );
+    return lines.join("\n");
+  }
+
+  function calculateParcelamento(input) {
+    input = input || {};
+    var precoVenda = toNumber(input.precoVenda);
+    var custoProduto = toNumber(input.custoProduto);
+
+    var taxaMarketplacePct;
+    if (input.taxaMarketplacePct == null || input.taxaMarketplacePct === "") {
+      taxaMarketplacePct = 16;
+    } else {
+      taxaMarketplacePct = toNumber(input.taxaMarketplacePct);
+    }
+
+    var fretePagoPeloSeller;
+    if (input.fretePagoPeloSeller == null || input.fretePagoPeloSeller === "") {
+      fretePagoPeloSeller = 12;
+    } else {
+      fretePagoPeloSeller = toNumber(input.fretePagoPeloSeller);
+    }
+
+    var parcelas;
+    if (input.parcelas == null || input.parcelas === "") {
+      parcelas = 12;
+    } else {
+      parcelas = toNumber(input.parcelas);
+      if (parcelas === parcelas) parcelas = Math.floor(parcelas);
+    }
+
+    var custoParcelamentoPct;
+    if (input.custoParcelamentoPct == null || input.custoParcelamentoPct === "") {
+      custoParcelamentoPct = 4.5;
+    } else {
+      custoParcelamentoPct = toNumber(input.custoParcelamentoPct);
+    }
+
+    var vendasPorMes;
+    if (input.vendasPorMes == null || input.vendasPorMes === "") {
+      vendasPorMes = 200;
+    } else {
+      vendasPorMes = toNumber(input.vendasPorMes);
+    }
+
+    var metaMargemPct;
+    if (input.metaMargemPct == null || input.metaMargemPct === "") {
+      metaMargemPct = 15;
+    } else {
+      metaMargemPct = toNumber(input.metaMargemPct);
+    }
+
+    var usedCustoReais = false;
+    var custoParcelamentoReais = null;
+    if (input.custoParcelamentoReais != null && input.custoParcelamentoReais !== "") {
+      custoParcelamentoReais = toNumber(input.custoParcelamentoReais);
+      usedCustoReais = true;
+    }
+
+    var disclaimer =
+      "ESTIMATIVA — Parcelamento sem juros no marketplace no navegador. Modelo: líquido após taxa = preço × (1 − taxa%); margem s/ parcelamento = líquido − (produto+frete); custo parcelamento = R$ informado ou preço × (custo%/100); margem c/ parcelamento = margem s/ − custo; teto meta = líquido − (produto+frete) − (preço × meta%). Não inclui ads, impostos extras nem spread real do adquirente. Não é conselho financeiro.";
+
+    function fail(msg) {
+      var f = {
+        ok: false,
+        error: msg,
+        precoVenda: precoVenda,
+        taxaMarketplacePct: taxaMarketplacePct,
+        custoProduto: custoProduto,
+        fretePagoPeloSeller: fretePagoPeloSeller,
+        parcelas: parcelas,
+        custoParcelamentoPct: custoParcelamentoPct,
+        custoParcelamentoReais: custoParcelamentoReais,
+        usedCustoReais: usedCustoReais,
+        custoParcelamentoUnit: null,
+        vendasPorMes: vendasPorMes,
+        metaMargemPct: metaMargemPct,
+        liquidoAposTaxa: null,
+        custoVariavelBase: null,
+        margemSemParcelamento: null,
+        margemComParcelamento: null,
+        parcelamentoPctSobrePreco: null,
+        parcelamentoPctSobreMargem: null,
+        impactoMes: null,
+        tetoParcelamentoParaMargemZero: null,
+        tetoParcelamentoParaMetaPct: null,
+        tetoCustoPctParaMargemZero: null,
+        custoPorParcelaApprox: null,
+        badge: "VERMELHO",
+        advice: msg,
+        disclaimer: disclaimer,
+        copyText: ""
+      };
+      f.copyText = joinParcelamentoCopy(f);
+      return f;
+    }
+
+    if (!(precoVenda > 0) || precoVenda !== precoVenda) {
+      return fail("Informe o preço de venda (R$) maior que zero.");
+    }
+    if (!(custoProduto >= 0) || custoProduto !== custoProduto) {
+      return fail("Informe o custo do produto (R$) ≥ 0.");
+    }
+    if (!(taxaMarketplacePct >= 0) || taxaMarketplacePct !== taxaMarketplacePct) {
+      return fail("Informe a taxa do marketplace (%) ≥ 0.");
+    }
+    if (!(fretePagoPeloSeller >= 0) || fretePagoPeloSeller !== fretePagoPeloSeller) {
+      return fail("Informe o frete pago pelo seller (R$) ≥ 0.");
+    }
+    if (!(parcelas >= 1) || parcelas !== parcelas) {
+      return fail("Informe o número de parcelas (≥ 1).");
+    }
+    if (!(custoParcelamentoPct >= 0) || custoParcelamentoPct !== custoParcelamentoPct) {
+      return fail("Informe o custo de parcelamento (%) ≥ 0.");
+    }
+    if (usedCustoReais && (!(custoParcelamentoReais >= 0) || custoParcelamentoReais !== custoParcelamentoReais)) {
+      return fail("Informe o custo de parcelamento em R$ ≥ 0.");
+    }
+    if (!(vendasPorMes > 0) || vendasPorMes !== vendasPorMes) {
+      return fail("Informe vendas por mês maior que zero.");
+    }
+    if (!(metaMargemPct >= 0) || metaMargemPct !== metaMargemPct) {
+      return fail("Informe a meta de margem (%) ≥ 0.");
+    }
+
+    var liquidoAposTaxa = precoVenda * (1 - taxaMarketplacePct / 100);
+    var custoVariavelBase = custoProduto + fretePagoPeloSeller;
+    var margemSemParcelamento = liquidoAposTaxa - custoVariavelBase;
+    var custoParcelamentoUnit = usedCustoReais
+      ? custoParcelamentoReais
+      : precoVenda * (custoParcelamentoPct / 100);
+    var margemComParcelamento = margemSemParcelamento - custoParcelamentoUnit;
+    var parcelamentoPctSobrePreco = (custoParcelamentoUnit / precoVenda) * 100;
+    var parcelamentoPctSobreMargem =
+      margemSemParcelamento > 0 ? (custoParcelamentoUnit / margemSemParcelamento) * 100 : null;
+    var impactoMes = vendasPorMes * custoParcelamentoUnit;
+    var tetoParcelamentoParaMargemZero = margemSemParcelamento;
+    var tetoParcelamentoParaMetaPct =
+      liquidoAposTaxa - custoVariavelBase - precoVenda * (metaMargemPct / 100);
+    var tetoCustoPctParaMargemZero =
+      precoVenda > 0 ? (tetoParcelamentoParaMargemZero / precoVenda) * 100 : null;
+    var custoPorParcelaApprox = parcelas > 0 ? custoParcelamentoUnit / parcelas : null;
+
+    var result = {
+      ok: true,
+      error: null,
+      precoVenda: precoVenda,
+      taxaMarketplacePct: taxaMarketplacePct,
+      custoProduto: custoProduto,
+      fretePagoPeloSeller: fretePagoPeloSeller,
+      parcelas: parcelas,
+      custoParcelamentoPct: custoParcelamentoPct,
+      custoParcelamentoReais: custoParcelamentoReais,
+      usedCustoReais: usedCustoReais,
+      custoParcelamentoUnit: custoParcelamentoUnit,
+      vendasPorMes: vendasPorMes,
+      metaMargemPct: metaMargemPct,
+      liquidoAposTaxa: liquidoAposTaxa,
+      custoVariavelBase: custoVariavelBase,
+      margemSemParcelamento: margemSemParcelamento,
+      margemComParcelamento: margemComParcelamento,
+      parcelamentoPctSobrePreco: parcelamentoPctSobrePreco,
+      parcelamentoPctSobreMargem: parcelamentoPctSobreMargem,
+      impactoMes: impactoMes,
+      tetoParcelamentoParaMargemZero: tetoParcelamentoParaMargemZero,
+      tetoParcelamentoParaMetaPct: tetoParcelamentoParaMetaPct,
+      tetoCustoPctParaMargemZero: tetoCustoPctParaMargemZero,
+      custoPorParcelaApprox: custoPorParcelaApprox,
+      badge: "AMARELO",
+      advice: "",
+      disclaimer: disclaimer,
+      copyText: ""
+    };
+    result.badge = badgeParcelamento(result);
+    result.advice = buildParcelamentoAdvice(result);
+    result.copyText = joinParcelamentoCopy(result);
+    return result;
+  }
+
+  function mountParcelamento(root) {
+    if (!root || typeof document === "undefined") return;
+    root.innerHTML = "";
+    root.classList.add("freightgen", "tacosgen", "parcelamentogen");
+
+    var panel = el("div", { class: "freightgen__panel titlegen__panel" });
+    panel.appendChild(
+      el("p", { class: "freightgen__kicker titlegen__kicker" }, "Parcelamento sem juros · ESTIMATIVA")
+    );
+    panel.appendChild(
+      el(
+        "h2",
+        { class: "freightgen__title titlegen__title" },
+        "Quanto o parcelamento sem juros come da margem — e qual o teto para não furar o lucro?"
+      )
+    );
+
+    var fields = el("div", { class: "freightgen__fields titlegen__fields" });
+    fields.appendChild(
+      field({
+        id: "parc-preco",
+        label: "Preço de venda (R$)",
+        value: "89",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-taxa",
+        label: "Taxa do marketplace (%)",
+        value: "16",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 16%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-custo",
+        label: "Custo do produto (R$)",
+        value: "35",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-frete",
+        label: "Frete pago pelo seller (R$)",
+        value: "12",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 12"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-parcelas",
+        label: "Nº de parcelas",
+        value: "12",
+        step: "1",
+        min: "1",
+        placeholder: "padrão 12"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-custo-pct",
+        label: "Custo parcelamento (% do preço)",
+        value: "4.5",
+        step: "0.01",
+        min: "0",
+        placeholder: "taxa antecipação / desconto embutido"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-vendas",
+        label: "Vendas por mês",
+        value: "200",
+        step: "1",
+        min: "0",
+        placeholder: "padrão 200"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-meta",
+        label: "Meta de margem (% do preço)",
+        value: "15",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 15%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "parc-custo-reais",
+        label: "Custo parcelamento (R$) — opcional, sobrescreve %",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "se preencher, usa R$ em vez de %"
+      })
+    );
+    panel.appendChild(fields);
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__hint titlegen__hint" },
+        "Custo de parcelamento = R$ informado ou preço × (%). Margem c/ parcelamento = (líquido após taxa − produto − frete) − custo. ESTIMATIVA — confira a taxa real no ML/adquirente."
+      )
+    );
+    root.appendChild(panel);
+
+    var out = el("div", { class: "freightgen__out", "aria-live": "polite" });
+    root.appendChild(out);
+
+    function read() {
+      var taxaRaw = document.getElementById("parc-taxa").value;
+      var freteRaw = document.getElementById("parc-frete").value;
+      var parcelasRaw = document.getElementById("parc-parcelas").value;
+      var custoPctRaw = document.getElementById("parc-custo-pct").value;
+      var vendasRaw = document.getElementById("parc-vendas").value;
+      var metaRaw = document.getElementById("parc-meta").value;
+      var custoReaisRaw = document.getElementById("parc-custo-reais").value;
+      var payload = {
+        precoVenda: document.getElementById("parc-preco").value,
+        taxaMarketplacePct: taxaRaw === "" ? undefined : taxaRaw,
+        custoProduto: document.getElementById("parc-custo").value,
+        fretePagoPeloSeller: freteRaw === "" ? undefined : freteRaw,
+        parcelas: parcelasRaw === "" ? undefined : parcelasRaw,
+        custoParcelamentoPct: custoPctRaw === "" ? undefined : custoPctRaw,
+        vendasPorMes: vendasRaw === "" ? undefined : vendasRaw,
+        metaMargemPct: metaRaw === "" ? undefined : metaRaw
+      };
+      if (custoReaisRaw !== "") {
+        payload.custoParcelamentoReais = custoReaisRaw;
+      }
+      return payload;
+    }
+
+    function render() {
+      var r = calculateParcelamento(read());
+      out.innerHTML = "";
+      var loss = !r.ok || r.badge === "VERMELHO";
+      var card = el(
+        "article",
+        { class: "result-card" + (loss ? " result-card--loss" : "") }
+      );
+      card.appendChild(
+        el(
+          "p",
+          { class: "result-card__label" },
+          "Parcelamento sem juros · " + (r.badge || "—") + " · ESTIMATIVA"
+        )
+      );
+      if (!r.ok) {
+        card.appendChild(el("p", { class: "result-card__price is-loss" }, "—"));
+        card.appendChild(el("p", { class: "result-card__hint" }, r.error || "Dados incompletos"));
+      } else {
+        var headline =
+          formatBRL(r.margemComParcelamento) +
+          " margem · " +
+          (Math.round(r.parcelamentoPctSobrePreco * 100) / 100).toLocaleString("pt-BR") +
+          "% do preço";
+        card.appendChild(
+          el(
+            "p",
+            { class: "result-card__price" + (loss ? " is-loss" : "") },
+            headline
+          )
+        );
+        var grid = el("div", { class: "result-card__grid" });
+        function row(k, v) {
+          var d = el("div");
+          d.appendChild(el("span", { class: "muted" }, k));
+          d.appendChild(el("strong", null, v));
+          grid.appendChild(d);
+        }
+        row("Líquido após taxa", formatBRL(r.liquidoAposTaxa));
+        row("Custo variável base", formatBRL(r.custoVariavelBase));
+        row("Margem s/ parcelamento", formatBRL(r.margemSemParcelamento));
+        row("Parcelas", r.parcelas + "x");
+        row("Custo parcelamento / un", formatBRL(r.custoParcelamentoUnit));
+        row("Margem c/ parcelamento", formatBRL(r.margemComParcelamento));
+        row(
+          "Parcelamento % preço",
+          (Math.round(r.parcelamentoPctSobrePreco * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row(
+          "Parcelamento % margem",
+          r.parcelamentoPctSobreMargem == null
+            ? "—"
+            : (Math.round(r.parcelamentoPctSobreMargem * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row("Impacto / mês", formatBRL(r.impactoMes));
+        row("Teto (margem zero)", formatBRL(r.tetoParcelamentoParaMargemZero));
+        row(
+          "Teto custo % (margem zero)",
+          r.tetoCustoPctParaMargemZero == null
+            ? "—"
+            : (Math.round(r.tetoCustoPctParaMargemZero * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row(
+          "Teto (meta " + (Math.round(r.metaMargemPct * 100) / 100) + "%)",
+          formatBRL(r.tetoParcelamentoParaMetaPct)
+        );
+        row(
+          "Custo / parcela (approx)",
+          r.custoPorParcelaApprox == null ? "—" : formatBRL(r.custoPorParcelaApprox)
+        );
+        row("Badge", r.badge || "—");
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "result-card__hint" }, r.advice));
+      }
+      out.appendChild(card);
+
+      var actions = el("div", { class: "freightgen__actions" });
+      var btn = el("button", { type: "button", class: "btn btn--solid" }, "Copiar resumo");
+      btn.addEventListener("click", function () {
+        var text = r.copyText || joinParcelamentoCopy(r);
+        copyText(text)
+          .then(function () {
+            toast("Resumo copiado.");
+          })
+          .catch(function () {
+            toast("Copia o resumo na mão.");
+          });
+      });
+      actions.appendChild(btn);
+      out.appendChild(actions);
+    }
+
+    [
+      "parc-preco",
+      "parc-taxa",
+      "parc-custo",
+      "parc-frete",
+      "parc-parcelas",
+      "parc-custo-pct",
+      "parc-vendas",
+      "parc-meta",
+      "parc-custo-reais"
+    ].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", render);
+        node.addEventListener("change", render);
+      }
+    });
+    render();
+  }
+
+
   function wireGlobalUi() {
     document.querySelectorAll("[data-precifica-calc]").forEach(function (node) {
       mountCalculator(node, { preset: node.getAttribute("data-preset") || "" });
@@ -15541,6 +16302,10 @@
 
     document.querySelectorAll("[data-precifica-custo-embalagem]").forEach(function (node) {
       mountCustoEmbalagem(node);
+    });
+
+    document.querySelectorAll("[data-precifica-parcelamento]").forEach(function (node) {
+      mountParcelamento(node);
     });
 
 
@@ -15708,6 +16473,11 @@
     joinCustoEmbalagemCopy: joinCustoEmbalagemCopy,
     badgeCustoEmbalagem: badgeCustoEmbalagem,
     buildCustoEmbalagemAdvice: buildCustoEmbalagemAdvice,
+    calculateParcelamento: calculateParcelamento,
+    mountParcelamento: mountParcelamento,
+    joinParcelamentoCopy: joinParcelamentoCopy,
+    badgeParcelamento: badgeParcelamento,
+    buildParcelamentoAdvice: buildParcelamentoAdvice,
     HOOK_MAX: HOOK_MAX,
     AMAZON_BULLET_SOFT: AMAZON_BULLET_SOFT,
     AMAZON_BULLET_HARD: AMAZON_BULLET_HARD,

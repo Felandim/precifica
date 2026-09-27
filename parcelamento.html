@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Teste A/B de título Mercado Livre | Precifica</title>
-  <meta name="description" content="Compare título A vs B no Mercado Livre: score heurístico, palavra-chave no início, dias de amostra e checklist A/B. ESTIMATIVA. Sem cadastro.">
-  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/teste-ab-titulo.html">
-  <meta property="og:title" content="Teste A/B de título Mercado Livre | Precifica">
-  <meta property="og:description" content="Como testar título de anúncio ML: compare A vs B, score e checklist. ESTIMATIVA.">
-  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/teste-ab-titulo.html">
+  <title>Parcelamento sem juros no marketplace | Precifica</title>
+  <meta name="description" content="Quanto o parcelamento sem juros (taxa de antecipação ou desconto embutido) come da margem, e qual o teto de custo para não furar o lucro. ESTIMATIVA. Sem cadastro.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/parcelamento.html">
+  <meta property="og:title" content="Parcelamento sem juros no marketplace | Precifica">
+  <meta property="og:description" content="Impacto do parcelamento sem juros na margem, % do preço, teto para margem zero e para meta. Badges VERDE/AMARELO/VERMELHO. ESTIMATIVA.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/parcelamento.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta name="twitter:card" content="summary">
@@ -20,10 +20,10 @@
   <link rel="stylesheet" href="css/app.css">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-    {"@type":"Question","name":"Como fazer teste A/B de título no Mercado Livre?","acceptedAnswer":{"@type":"Answer","text":"Escolha dois títulos, publique um de cada vez (ou anúncios paralelos da mesma oferta), espere ~100 cliques por braço e compare CTR e conversão. Mude só o título. ESTIMATIVA — confirme no anúncio oficial."}},
-    {"@type":"Question","name":"O que comparar em um teste A/B de título ML?","acceptedAnswer":{"@type":"Answer","text":"CTR (cliques ÷ impressões), conversão (vendas ÷ visitas) e, se usar ads, custo por venda. O Precifica só dá score heurístico e checklist — não prevê ranking."}},
-    {"@type":"Question","name":"Quantos dias dura um teste A/B de título?","acceptedAnswer":{"@type":"Answer","text":"Depende do tráfego. Fórmula usada aqui: sampleDays = ceil(100 ÷ (visitas/dia × CTR)), com CTR padrão 3%. Com 50 visitas/dia ≈ 67 dias para ~100 cliques; na prática muitos vendedores usam 7–14 dias se o volume for alto."}},
-    {"@type":"Question","name":"Essa ferramenta substitui o Ads ou o anúncio do ML?","acceptedAnswer":{"@type":"Answer","text":"Não. É ESTIMATIVA no navegador para comparar títulos (comprimento, keyword, dígitos, CAPS/hype) e montar um checklist. Confira políticas e métricas no Mercado Livre."}}
+    {"@type":"Question","name":"Por que calcular o custo do parcelamento sem juros?","acceptedAnswer":{"@type":"Answer","text":"Oferecer 12x sem juros custa: taxa de antecipação, desconto embutido no preço ou spread do adquirente. Se esse custo come demais da margem, o anúncio parece ok e fura no caixa. ESTIMATIVA."}},
+    {"@type":"Question","name":"Como o Precifica calcula o impacto do parcelamento?","acceptedAnswer":{"@type":"Answer","text":"líquido após taxa = preço × (1 − taxa%); margem s/ parcelamento = líquido − (produto+frete); custo = R$ informado ou preço × (custo%/100); margem c/ = margem s/ − custo; impacto/mês = vendas × custo; teto margem zero = margem s/; teto meta = líquido − (produto+frete) − (preço × meta%). ESTIMATIVA."}},
+    {"@type":"Question","name":"O que é o teto de custo de parcelamento?","acceptedAnswer":{"@type":"Answer","text":"É o máximo que você pode pagar (em R$ ou %) por venda em parcelamento sem juros sem zerar a margem (teto zero) ou sem ficar abaixo da meta de margem % do preço. Acima disso, o sem juros fura o lucro. ESTIMATIVA."}},
+    {"@type":"Question","name":"Como interpretar VERDE, AMARELO e VERMELHO?","acceptedAnswer":{"@type":"Answer","text":"VERMELHO se inputs inválidos, margem com parcelamento ≤ 0 ou custo ≥ 40% da margem; AMARELO se custo ≥ 20% da margem, ≥ 6% do preço, ou 12x+ com custo ≥ 4% do preço; VERDE caso contrário. ESTIMATIVA."}}
   ]}
   </script>
 </head>
@@ -47,7 +47,7 @@
         <a href="bullets-amazon.html">Bullets</a>
         <a href="bid-ml.html">Bid ML</a>
         <a href="variacoes.html">Variações</a>
-        <a href="teste-ab-titulo.html" aria-current="page">Teste A/B</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
         <a href="faq-anuncio.html">FAQ anúncio</a>
         <a href="campanhas-ads.html">Campanhas Ads</a>
         <a href="preco-minimo-ads.html">Preço mín. Ads</a>
@@ -62,7 +62,7 @@
         <a href="custo-devolucao.html">Custo devolução</a>
         <a href="prazo-repasse.html">Prazo repasse</a>
         <a href="custo-embalagem.html">Custo embalagem</a>
-        <a href="parcelamento.html">Parcelamento</a>
+        <a href="parcelamento.html" aria-current="page">Parcelamento</a>
         <a href="tacos.html">TACOS</a>
         <a href="blog/">Blog</a>
         <a class="nav-pix" href="apoiar.html">Apoiar</a>
@@ -73,12 +73,12 @@
   <main>
     <section class="page-intro wrap">
       <p class="hero__kicker">Nova ferramenta · ESTIMATIVA</p>
-      <h1>Teste A/B de título Mercado Livre</h1>
-      <p>Cole o <strong>título A</strong> e o <strong>título B</strong>, opcionalmente a palavra-chave principal e as visitas/dia. Saem scores lado a lado, vencedor heurístico, dias de amostra e checklist para rodar o A/B no ML. Sem cadastro. Sem hype.</p>
+      <h1>Parcelamento sem juros no marketplace</h1>
+      <p>Responda: <strong>quanto o parcelamento sem juros (custo/taxa de antecipação ou desconto embutido) come da margem, e qual o teto de custo de parcelamento para não furar o lucro?</strong> Sem cadastro. Sem hype.</p>
     </section>
 
     <div class="wrap">
-      <div data-precifica-ab-titulo></div>
+      <div data-precifica-parcelamento></div>
     </div>
 
     <section class="section wrap" id="dicas">
@@ -86,26 +86,26 @@
       <div class="steps">
         <article class="step">
           <p class="step__n">01</p>
-          <h3>Escreva A e B</h3>
-          <p>Dois títulos ≤60. Mude um ângulo (atributo vs benefício). Evite CAPS e claims (“cura”, “melhor do Brasil”).</p>
+          <h3>Preço, taxa, produto e frete</h3>
+          <p>O que entra e o que já sai antes do custo de parcelamento — base da margem limpa.</p>
         </article>
         <article class="step">
           <p class="step__n">02</p>
-          <h3>Olhe o score</h3>
-          <p>Doce 45–60 caracteres, keyword nos primeiros 40, dígitos/medidas, pouco CAPS. ESTIMATIVA — não é ranking do ML.</p>
+          <h3>Parcelas e custo do sem juros</h3>
+          <p>Nº de parcelas + % do preço (antecipação/desconto embutido) ou valor absoluto em R$.</p>
         </article>
         <article class="step">
           <p class="step__n">03</p>
-          <h3>Rode no ar</h3>
-          <p>Copie o checklist. Publique um braço, meça ~100 cliques, troque só o título. Compare CTR e conversão.</p>
+          <h3>Veja margem, % e tetos</h3>
+          <p>Quanto sobra, quanto o parcelamento come da margem, impacto/mês e teto para não zerar o lucro. Copie o resumo.</p>
         </article>
       </div>
-      <p class="muted" style="margin-top:16px;max-width:62ch">Fecha o texto com <a href="titulo.html">título ML</a> · <a href="variacoes.html">variações</a> · <a href="palavras-chave.html">palavras-chave</a> · <a href="bid-ml.html">bid ML Ads</a> · <a href="index.html">Precifica</a>.</p>
+      <p class="muted" style="margin-top:16px;max-width:62ch">Fecha o loop com <a href="custo-embalagem.html">Custo embalagem</a> · <a href="desconto-maximo.html">Desconto máx.</a> · <a href="meta-lucro.html">Meta lucro</a> · <a href="prazo-repasse.html">Prazo repasse</a> · <a href="index.html">Precifica</a>.</p>
     </section>
 
     <section class="wrap pix" id="pix">
       <h2>O site fica no ar com PIX</h2>
-      <p>Sem paywall. Se o comparador A/B te poupou um título fraco no ar, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <p>Sem paywall. Se o Parcelamento te mostrou quanto o sem juros come da margem, um café no PIX ajuda a manter o Precifica no ar.</p>
       <div class="pix__key">
         <span data-pix-key></span>
         <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
@@ -115,27 +115,27 @@
     <section class="section wrap faq" id="faq">
       <h2>Perguntas frequentes</h2>
       <details open>
-        <summary>Como fazer teste A/B de título no Mercado Livre?</summary>
-        <p>Dois títulos, um de cada vez (ou anúncios paralelos), ~100 cliques por braço, compare CTR e conversão. Mude só o título. ESTIMATIVA.</p>
+        <summary>Por que calcular o custo do parcelamento sem juros?</summary>
+        <p>Oferecer 12x sem juros custa: taxa de antecipação, desconto embutido ou spread do adquirente. Se come demais da margem, o anúncio parece ok e fura no caixa. ESTIMATIVA.</p>
       </details>
       <details>
-        <summary>O que comparar em um teste A/B de título ML?</summary>
-        <p>CTR, conversão e, se usar ads, custo por venda. O score daqui é só heurística de rascunho.</p>
+        <summary>Como o Precifica calcula?</summary>
+        <p>Líquido após taxa = preço × (1 − taxa%); margem s/ parcelamento = líquido − (produto+frete); custo = R$ ou preço × (%); margem c/ = margem s/ − custo; impacto/mês = vendas × custo.</p>
       </details>
       <details>
-        <summary>Quantos dias dura um teste A/B de título?</summary>
-        <p>sampleDays = ceil(100 ÷ (visitas/dia × CTR)), CTR padrão 3%. Ou 7–14 dias se o volume for alto.</p>
+        <summary>O que é o teto de custo de parcelamento?</summary>
+        <p>Máximo (R$ ou %) por venda sem zerar a margem (teto zero) ou sem ficar abaixo da meta % do preço. Acima disso, o sem juros fura o lucro.</p>
       </details>
       <details>
-        <summary>Substitui o Ads ou o anúncio do ML?</summary>
-        <p>Não. Só rascunha comparação e checklist no navegador. Confira métricas e políticas no Mercado Livre.</p>
+        <summary>Como interpretar VERDE, AMARELO e VERMELHO?</summary>
+        <p>VERMELHO se inputs inválidos, margem c/ parcelamento ≤ 0 ou custo ≥ 40% da margem; AMARELO se ≥ 20% da margem, ≥ 6% do preço, ou 12x+ com ≥ 4% do preço; VERDE caso contrário.</p>
       </details>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap">
-      <p>Estimativa. Confirme taxas no Seller Center / simulador oficial e o seu regime tributário. O Precifica não é conselho contábil, fiscal ou financeiro.</p>
+      <p>Estimativa. Confirme a taxa real de antecipação/desconto embutido no ML, adquirente ou tabela do marketplace. O Precifica não é conselho contábil, fiscal ou financeiro. O modelo não inclui ads, impostos extras nem spread real variável.</p>
       <p>© <span id="year">2026</span> Precifica</p>
       <nav aria-label="Rodapé">
         <a href="index.html">Início</a>
