@@ -3536,6 +3536,197 @@
       return "defaults+join+override badge=" + r.badge;
     });
 
+
+    /* 144) custo-full: happy path VERDE — Full barato vs envio próprio */
+    push(144, function () {
+      // preco=89, taxa=16, custo=35, freteProprio=18, fullUnit=8, storage=40, vendas=200, meta=15
+      // liquido=74.76; armazUn=0.2; fullTotal=8.2; margemSemLog=39.76
+      // margemProprio=21.76; margemFull=31.56; delta=9.8
+      // pctPreco≈9.21; pctMargem≈20.62; tetoZero=39.76; tetoMeta=26.41
+      var r = calculateCustoFull({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteEnvioProprio: 18,
+        custoFullUnit: 8,
+        armazenamentoMes: 40,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (Math.abs(r.liquidoAposTaxa - 74.76) > 1e-9) throw new Error("liquido " + r.liquidoAposTaxa);
+      if (Math.abs(r.armazenamentoPorUnidade - 0.2) > 1e-9) throw new Error("armaz " + r.armazenamentoPorUnidade);
+      if (Math.abs(r.custoFullTotalUnit - 8.2) > 1e-9) throw new Error("fullTotal " + r.custoFullTotalUnit);
+      if (Math.abs(r.margemSemLogistica - 39.76) > 1e-9) throw new Error("semLog " + r.margemSemLogistica);
+      if (Math.abs(r.margemEnvioProprio - 21.76) > 1e-9) throw new Error("margemProprio " + r.margemEnvioProprio);
+      if (Math.abs(r.margemFull - 31.56) > 1e-9) throw new Error("margemFull " + r.margemFull);
+      if (Math.abs(r.deltaMargemUnit - 9.8) > 1e-9) throw new Error("delta " + r.deltaMargemUnit);
+      if (Math.abs(r.fullPctSobrePreco - (8.2 / 89) * 100) > 1e-9) throw new Error("pctPreco " + r.fullPctSobrePreco);
+      if (Math.abs(r.fullPctSobreMargem - (8.2 / 39.76) * 100) > 1e-9) throw new Error("pctMargem " + r.fullPctSobreMargem);
+      if (Math.abs(r.impactoMesFull - 1640) > 1e-9) throw new Error("impactoFull " + r.impactoMesFull);
+      if (Math.abs(r.impactoMesEnvioProprio - 3600) > 1e-9) throw new Error("impactoProprio " + r.impactoMesEnvioProprio);
+      if (Math.abs(r.economiaOuCustoExtraMes - 1960) > 1e-9) throw new Error("economia " + r.economiaOuCustoExtraMes);
+      if (Math.abs(r.tetoFullParaMargemZero - 39.76) > 1e-9) throw new Error("tetoZero " + r.tetoFullParaMargemZero);
+      if (Math.abs(r.tetoFullParaMetaPct - 26.41) > 1e-9) throw new Error("tetoMeta " + r.tetoFullParaMetaPct);
+      if (Math.abs(r.freteProprioBreakEvenVsFull - 8.2) > 1e-9) throw new Error("be " + r.freteProprioBreakEvenVsFull);
+      if (r.badge !== "VERDE") throw new Error("badge " + r.badge);
+      return "happy verde margemFull=" + r.margemFull;
+    });
+
+    /* 145) custo-full: VERMELHO — margemFull ≤ 0 OU fullPctSobreMargem ≥ 50 */
+    push(145, function () {
+      var neg = calculateCustoFull({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteEnvioProprio: 18,
+        custoFullUnit: 40,
+        armazenamentoMes: 80,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // fullTotal=40.4; margemFull=74.76-35-40.4 < 0 → VERMELHO
+      if (!neg.ok) throw new Error(neg.error || "fail neg");
+      if (!(neg.margemFull <= 0)) throw new Error("expected non-pos " + neg.margemFull);
+      if (neg.badge !== "VERMELHO") throw new Error("badge neg " + neg.badge);
+      var high = calculateCustoFull({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteEnvioProprio: 18,
+        custoFullUnit: 22,
+        armazenamentoMes: 0,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // fullTotal=22; 22/39.76 ≈ 55.3% ≥ 50 → VERMELHO
+      if (!high.ok) throw new Error(high.error || "fail high");
+      if (!(high.fullPctSobreMargem >= 50)) throw new Error("pct " + high.fullPctSobreMargem);
+      if (high.badge !== "VERMELHO") throw new Error("badge high " + high.badge);
+      return "vermelho margemFull=" + neg.margemFull;
+    });
+
+    /* 146) custo-full: inputs inválidos → error VERMELHO */
+    push(146, function () {
+      var r = calculateCustoFull({
+        precoVenda: 0,
+        custoProduto: 35,
+        custoFullUnit: 14
+      });
+      if (r.ok) throw new Error("expected fail zero preco");
+      if (r.badge !== "VERMELHO") throw new Error("badge " + r.badge);
+      var neg = calculateCustoFull({
+        precoVenda: 89,
+        custoProduto: -1,
+        custoFullUnit: 14
+      });
+      if (neg.ok) throw new Error("expected fail neg custo");
+      var badVendas = calculateCustoFull({
+        precoVenda: 89,
+        custoProduto: 35,
+        custoFullUnit: 14,
+        vendasPorMes: 0
+      });
+      if (badVendas.ok) throw new Error("expected fail vendas 0");
+      return "invalid ok";
+    });
+
+    /* 147) custo-full: storage split + custoFullPct path + absolute prefer */
+    push(147, function () {
+      var stor = calculateCustoFull({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteEnvioProprio: 18,
+        custoFullUnit: 10,
+        armazenamentoMes: 100,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      if (!stor.ok) throw new Error(stor.error || "fail stor");
+      if (Math.abs(stor.armazenamentoPorUnidade - 0.5) > 1e-9) throw new Error("split " + stor.armazenamentoPorUnidade);
+      if (Math.abs(stor.custoFullTotalUnit - 10.5) > 1e-9) throw new Error("total " + stor.custoFullTotalUnit);
+      var byPct = calculateCustoFull({
+        precoVenda: 100,
+        taxaMarketplacePct: 16,
+        custoProduto: 30,
+        freteEnvioProprio: 20,
+        custoFullPct: 10,
+        armazenamentoMes: 0,
+        vendasPorMes: 100,
+        metaMargemPct: 15
+      });
+      // no unit → fee = 100*0.10 = 10
+      if (!byPct.ok) throw new Error(byPct.error || "fail pct");
+      if (Math.abs(byPct.custoFullUnitResolved - 10) > 1e-9) throw new Error("pct unit " + byPct.custoFullUnitResolved);
+      if (byPct.usedCustoFullPct !== true) throw new Error("usedCustoFullPct");
+      var both = calculateCustoFull({
+        precoVenda: 100,
+        taxaMarketplacePct: 16,
+        custoProduto: 30,
+        freteEnvioProprio: 20,
+        custoFullUnit: 7,
+        custoFullPct: 10,
+        armazenamentoMes: 0,
+        vendasPorMes: 100,
+        metaMargemPct: 15
+      });
+      // both → prefer absolute 7
+      if (!both.ok) throw new Error(both.error || "fail both");
+      if (Math.abs(both.custoFullUnitResolved - 7) > 1e-9) throw new Error("prefer abs " + both.custoFullUnitResolved);
+      if (both.usedCustoFullPct !== false) throw new Error("should prefer unit");
+      return "storage+pct ok";
+    });
+
+    /* 148) custo-full: Full vs envio próprio delta + defaults + copy + badge helper */
+    push(148, function () {
+      var empty = calculateCustoFull({});
+      if (empty.ok) throw new Error("empty should fail (missing preco/custo)");
+      var r = calculateCustoFull({
+        precoVenda: 89,
+        custoProduto: 35
+        // defaults: taxa 16, freteProprio 18, fullUnit 14, storage 80, vendas 200, meta 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.taxaMarketplacePct !== 16) throw new Error("default taxa " + r.taxaMarketplacePct);
+      if (r.freteEnvioProprio !== 18) throw new Error("default frete " + r.freteEnvioProprio);
+      if (r.custoFullUnitResolved !== 14) throw new Error("default full " + r.custoFullUnitResolved);
+      if (r.armazenamentoMes !== 80) throw new Error("default storage " + r.armazenamentoMes);
+      if (Math.abs(r.custoFullTotalUnit - 14.4) > 1e-9) throw new Error("default total " + r.custoFullTotalUnit);
+      if (Math.abs(r.deltaMargemUnit - 3.6) > 1e-9) throw new Error("default delta " + r.deltaMargemUnit);
+      if (r.vendasPorMes !== 200) throw new Error("default vendas " + r.vendasPorMes);
+      if (r.metaMargemPct !== 15) throw new Error("default meta " + r.metaMargemPct);
+      // fullPctSobreMargem = 14.4/39.76 ≈ 36.2 ≥ 30 → AMARELO
+      if (r.badge !== "AMARELO") throw new Error("default badge " + r.badge);
+      var worse = calculateCustoFull({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteEnvioProprio: 10,
+        custoFullUnit: 18,
+        armazenamentoMes: 0,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // delta = margemFull - margemProprio = (74.76-35-18) - (74.76-35-10) = 21.76 - 29.76 = -8
+      if (!worse.ok) throw new Error(worse.error || "fail worse");
+      if (!(worse.deltaMargemUnit < 0)) throw new Error("expected neg delta " + worse.deltaMargemUnit);
+      if (Math.abs(worse.deltaMargemUnit + 8) > 1e-9) throw new Error("delta " + worse.deltaMargemUnit);
+      // fullPctSobreMargem = 18/39.76 ≈ 45.3 ≥ 30 → AMARELO (or VERMELHO if ≥50 — 45.3 is AMARELO)
+      if (worse.badge !== "AMARELO" && worse.badge !== "VERMELHO") throw new Error("badge worse " + worse.badge);
+      var joined = joinCustoFullCopy(r);
+      if (!joined || joined.indexOf("ESTIMATIVA") === -1) throw new Error("join");
+      if (joined !== r.copyText) throw new Error("copyText mismatch");
+      if (badgeCustoFull(r) !== r.badge) throw new Error("badge helper");
+      if (
+        joined.toLowerCase().indexOf("full") === -1 &&
+        joined.toLowerCase().indexOf("fulfillment") === -1
+      ) {
+        throw new Error("missing topic");
+      }
+      return "defaults+delta+join badge=" + r.badge;
+    });
+
     var passed = results.filter(function (r) { return r.ok; }).length;
     results.forEach(function (r) {
       console.log("[" + (r.ok ? "PASS" : "FAIL") + "] teste " + r.id + " — " + r.detail);
@@ -16191,6 +16382,618 @@
   }
 
 
+
+  function badgeCustoFull(r) {
+    if (!r || !r.ok) return "VERMELHO";
+    if (!(r.margemFull === r.margemFull) || r.margemFull <= 0) {
+      return "VERMELHO";
+    }
+    if (
+      r.fullPctSobreMargem === r.fullPctSobreMargem &&
+      r.fullPctSobreMargem != null &&
+      r.fullPctSobreMargem >= 50
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.fullPctSobreMargem === r.fullPctSobreMargem &&
+      r.fullPctSobreMargem != null &&
+      r.fullPctSobreMargem >= 30
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.fullPctSobrePreco === r.fullPctSobrePreco &&
+      r.fullPctSobrePreco >= 20
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.deltaMargemUnit === r.deltaMargemUnit &&
+      r.deltaMargemUnit < 0 &&
+      Math.abs(r.deltaMargemUnit) >= 3
+    ) {
+      return "AMARELO";
+    }
+    return "VERDE";
+  }
+
+  function buildCustoFullAdvice(r) {
+    if (!r.ok) return r.error || "Dados incompletos.";
+    var base =
+      "Custo Full total/un: " +
+      formatBRL(r.custoFullTotalUnit) +
+      " (fee " +
+      formatBRL(r.custoFullUnitResolved) +
+      " + armazenamento " +
+      formatBRL(r.armazenamentoPorUnidade) +
+      "; ~" +
+      (Math.round(r.fullPctSobrePreco * 100) / 100) +
+      "% do preço";
+    if (r.fullPctSobreMargem != null && r.fullPctSobreMargem === r.fullPctSobreMargem) {
+      base +=
+        " e ~" +
+        (Math.round(r.fullPctSobreMargem * 100) / 100) +
+        "% da margem sem logística";
+    }
+    base +=
+      "). Margem envio próprio: " +
+      formatBRL(r.margemEnvioProprio) +
+      "; margem Full: " +
+      formatBRL(r.margemFull) +
+      "; delta/un: " +
+      formatBRL(r.deltaMargemUnit) +
+      ". Economia/custo extra/mês (~" +
+      r.vendasPorMes +
+      " vendas): " +
+      formatBRL(r.economiaOuCustoExtraMes) +
+      ". Teto Full p/ margem zero: " +
+      formatBRL(r.tetoFullParaMargemZero) +
+      "; teto p/ meta " +
+      (Math.round(r.metaMargemPct * 100) / 100) +
+      "%: " +
+      formatBRL(r.tetoFullParaMetaPct) +
+      ". ";
+    if (r.margemFull <= 0) {
+      base +=
+        "Margem Full ≤ 0 — fulfillment fura o lucro: reduza fee/estoque ou suba o preço. ";
+    } else if (
+      r.fullPctSobreMargem != null &&
+      r.fullPctSobreMargem >= 50
+    ) {
+      base += "Full ≥ 50% da margem sem logística — risco alto. ";
+    } else if (
+      r.fullPctSobreMargem != null &&
+      r.fullPctSobreMargem >= 30
+    ) {
+      base += "Full ≥ 30% da margem sem logística — revise fee e armazenamento. ";
+    } else if (r.fullPctSobrePreco >= 20) {
+      base += "Full ≥ 20% do preço — peso alto no ticket. ";
+    } else if (r.deltaMargemUnit < 0 && Math.abs(r.deltaMargemUnit) >= 3) {
+      base +=
+        "Envio próprio rende ≥ R$ 3 a mais por unidade — Full só vale se volume/tempo compensar. ";
+    } else if (r.deltaMargemUnit > 0) {
+      base += "Full melhora a margem vs envio próprio neste cenário. ";
+    } else {
+      base += "Full e envio próprio estão próximos — escolha pelo operacional. ";
+    }
+    return (
+      base +
+      "ESTIMATIVA — confira fee Full/FBA, armazenamento e frete real no Seller Center."
+    );
+  }
+
+  function joinCustoFullCopy(r) {
+    r = r || {};
+    var lines = [];
+    lines.push("Custo Full / fulfillment no marketplace · Precifica");
+    if (r.ok) {
+      lines.push("Preço de venda: " + formatBRL(r.precoVenda));
+      lines.push("Taxa marketplace: " + (Math.round(r.taxaMarketplacePct * 100) / 100) + "%");
+      lines.push("Custo produto: " + formatBRL(r.custoProduto));
+      lines.push("Frete envio próprio: " + formatBRL(r.freteEnvioProprio));
+      if (r.usedCustoFullPct) {
+        lines.push(
+          "Custo Full %: " + (Math.round(r.custoFullPct * 100) / 100) + "%"
+        );
+      }
+      lines.push("Custo Full fee / un: " + formatBRL(r.custoFullUnitResolved));
+      lines.push("Armazenamento / mês: " + formatBRL(r.armazenamentoMes));
+      lines.push("Armazenamento / un: " + formatBRL(r.armazenamentoPorUnidade));
+      lines.push("Custo Full total / un: " + formatBRL(r.custoFullTotalUnit));
+      lines.push("Vendas/mês: " + r.vendasPorMes);
+      lines.push("Meta margem %: " + (Math.round(r.metaMargemPct * 100) / 100) + "%");
+      lines.push("Líquido após taxa: " + formatBRL(r.liquidoAposTaxa));
+      lines.push("Margem sem logística: " + formatBRL(r.margemSemLogistica));
+      lines.push("Margem envio próprio: " + formatBRL(r.margemEnvioProprio));
+      lines.push("Margem Full: " + formatBRL(r.margemFull));
+      lines.push("Delta margem / un (Full − próprio): " + formatBRL(r.deltaMargemUnit));
+      lines.push(
+        "Full % preço: " + (Math.round(r.fullPctSobrePreco * 100) / 100) + "%"
+      );
+      if (r.fullPctSobreMargem != null && r.fullPctSobreMargem === r.fullPctSobreMargem) {
+        lines.push(
+          "Full % margem s/ logística: " +
+            (Math.round(r.fullPctSobreMargem * 100) / 100) +
+            "%"
+        );
+      }
+      lines.push("Impacto Full / mês: " + formatBRL(r.impactoMesFull));
+      lines.push("Impacto envio próprio / mês: " + formatBRL(r.impactoMesEnvioProprio));
+      lines.push("Economia ou custo extra / mês: " + formatBRL(r.economiaOuCustoExtraMes));
+      lines.push("Teto Full (margem zero): " + formatBRL(r.tetoFullParaMargemZero));
+      lines.push("Teto Full (meta): " + formatBRL(r.tetoFullParaMetaPct));
+      lines.push(
+        "Frete próprio break-even vs Full: " + formatBRL(r.freteProprioBreakEvenVsFull)
+      );
+      lines.push("Badge: " + (r.badge || "—"));
+      if (r.advice) lines.push(r.advice);
+    } else {
+      lines.push("Erro: " + (r.error || "dados inválidos"));
+    }
+    lines.push(
+      r.disclaimer ||
+        "ESTIMATIVA — Custo Full / fulfillment no marketplace. Não é conselho financeiro."
+    );
+    return lines.join("\n");
+  }
+
+  function calculateCustoFull(input) {
+    input = input || {};
+    var precoVenda = toNumber(input.precoVenda);
+    var custoProduto = toNumber(input.custoProduto);
+
+    var taxaMarketplacePct;
+    if (input.taxaMarketplacePct == null || input.taxaMarketplacePct === "") {
+      taxaMarketplacePct = 16;
+    } else {
+      taxaMarketplacePct = toNumber(input.taxaMarketplacePct);
+    }
+
+    var freteEnvioProprio;
+    if (input.freteEnvioProprio == null || input.freteEnvioProprio === "") {
+      freteEnvioProprio = 18;
+    } else {
+      freteEnvioProprio = toNumber(input.freteEnvioProprio);
+    }
+
+    var armazenamentoMes;
+    if (input.armazenamentoMes == null || input.armazenamentoMes === "") {
+      armazenamentoMes = 80;
+    } else {
+      armazenamentoMes = toNumber(input.armazenamentoMes);
+    }
+
+    var vendasPorMes;
+    if (input.vendasPorMes == null || input.vendasPorMes === "") {
+      vendasPorMes = 200;
+    } else {
+      vendasPorMes = toNumber(input.vendasPorMes);
+    }
+
+    var metaMargemPct;
+    if (input.metaMargemPct == null || input.metaMargemPct === "") {
+      metaMargemPct = 15;
+    } else {
+      metaMargemPct = toNumber(input.metaMargemPct);
+    }
+
+    var usedCustoFullPct = false;
+    var custoFullPct = null;
+    var custoFullUnitResolved = null;
+    var hasUnit =
+      input.custoFullUnit != null && input.custoFullUnit !== "";
+    var hasPct =
+      input.custoFullPct != null && input.custoFullPct !== "";
+
+    if (hasUnit) {
+      custoFullUnitResolved = toNumber(input.custoFullUnit);
+      usedCustoFullPct = false;
+      if (hasPct) custoFullPct = toNumber(input.custoFullPct);
+    } else if (hasPct) {
+      custoFullPct = toNumber(input.custoFullPct);
+      usedCustoFullPct = true;
+      // resolved after preco validation; placeholder for fail object
+      custoFullUnitResolved = null;
+    } else {
+      custoFullUnitResolved = 14;
+      usedCustoFullPct = false;
+    }
+
+    var disclaimer =
+      "ESTIMATIVA — Custo Full / fulfillment no marketplace no navegador. Modelo: líquido após taxa = preço × (1 − taxa%); armazenamento/un = armazenamento/mês ÷ vendas/mês; custo Full total/un = fee Full + armazenamento/un; margem envio próprio = líquido − (produto + frete próprio); margem Full = líquido − (produto + Full total); teto meta = líquido − produto − (preço × meta%). Não inclui ads, impostos extras nem fee real variável do ML Full/FBA. Não é conselho financeiro.";
+
+    function fail(msg) {
+      var f = {
+        ok: false,
+        error: msg,
+        precoVenda: precoVenda,
+        taxaMarketplacePct: taxaMarketplacePct,
+        custoProduto: custoProduto,
+        freteEnvioProprio: freteEnvioProprio,
+        custoFullUnit: hasUnit ? toNumber(input.custoFullUnit) : null,
+        custoFullPct: custoFullPct,
+        usedCustoFullPct: usedCustoFullPct,
+        custoFullUnitResolved: custoFullUnitResolved,
+        armazenamentoMes: armazenamentoMes,
+        vendasPorMes: vendasPorMes,
+        metaMargemPct: metaMargemPct,
+        liquidoAposTaxa: null,
+        armazenamentoPorUnidade: null,
+        custoFullTotalUnit: null,
+        margemSemLogistica: null,
+        margemEnvioProprio: null,
+        margemFull: null,
+        deltaMargemUnit: null,
+        fullPctSobrePreco: null,
+        fullPctSobreMargem: null,
+        impactoMesFull: null,
+        impactoMesEnvioProprio: null,
+        economiaOuCustoExtraMes: null,
+        tetoFullParaMargemZero: null,
+        tetoFullParaMetaPct: null,
+        freteProprioBreakEvenVsFull: null,
+        badge: "VERMELHO",
+        advice: msg,
+        disclaimer: disclaimer,
+        copyText: ""
+      };
+      f.copyText = joinCustoFullCopy(f);
+      return f;
+    }
+
+    if (!(precoVenda > 0) || precoVenda !== precoVenda) {
+      return fail("Informe o preço de venda (R$) maior que zero.");
+    }
+    if (!(custoProduto >= 0) || custoProduto !== custoProduto) {
+      return fail("Informe o custo do produto (R$) ≥ 0.");
+    }
+    if (!(taxaMarketplacePct >= 0) || taxaMarketplacePct !== taxaMarketplacePct) {
+      return fail("Informe a taxa do marketplace (%) ≥ 0.");
+    }
+    if (!(freteEnvioProprio >= 0) || freteEnvioProprio !== freteEnvioProprio) {
+      return fail("Informe o frete de envio próprio (R$) ≥ 0.");
+    }
+    if (!(armazenamentoMes >= 0) || armazenamentoMes !== armazenamentoMes) {
+      return fail("Informe o armazenamento mensal (R$) ≥ 0.");
+    }
+    if (!(vendasPorMes > 0) || vendasPorMes !== vendasPorMes) {
+      return fail("Informe vendas por mês maior que zero.");
+    }
+    if (!(metaMargemPct >= 0) || metaMargemPct !== metaMargemPct) {
+      return fail("Informe a meta de margem (%) ≥ 0.");
+    }
+
+    if (usedCustoFullPct) {
+      if (!(custoFullPct >= 0) || custoFullPct !== custoFullPct) {
+        return fail("Informe o custo Full (%) ≥ 0.");
+      }
+      custoFullUnitResolved = precoVenda * (custoFullPct / 100);
+    } else {
+      if (!(custoFullUnitResolved >= 0) || custoFullUnitResolved !== custoFullUnitResolved) {
+        return fail("Informe o custo Full por unidade (R$) ≥ 0.");
+      }
+    }
+
+    var liquidoAposTaxa = precoVenda * (1 - taxaMarketplacePct / 100);
+    var armazenamentoPorUnidade =
+      vendasPorMes > 0 ? armazenamentoMes / vendasPorMes : 0;
+    var custoFullTotalUnit = custoFullUnitResolved + armazenamentoPorUnidade;
+    var margemSemLogistica = liquidoAposTaxa - custoProduto;
+    var margemEnvioProprio = liquidoAposTaxa - (custoProduto + freteEnvioProprio);
+    var margemFull = liquidoAposTaxa - (custoProduto + custoFullTotalUnit);
+    var deltaMargemUnit = margemFull - margemEnvioProprio;
+    var fullPctSobrePreco = (custoFullTotalUnit / precoVenda) * 100;
+    var fullPctSobreMargem =
+      margemSemLogistica > 0
+        ? (custoFullTotalUnit / margemSemLogistica) * 100
+        : null;
+    var impactoMesFull = vendasPorMes * custoFullTotalUnit;
+    var impactoMesEnvioProprio = vendasPorMes * freteEnvioProprio;
+    var economiaOuCustoExtraMes = vendasPorMes * deltaMargemUnit;
+    var tetoFullParaMargemZero = margemSemLogistica;
+    var tetoFullParaMetaPct =
+      liquidoAposTaxa - custoProduto - precoVenda * (metaMargemPct / 100);
+    var freteProprioBreakEvenVsFull = custoFullTotalUnit;
+
+    var result = {
+      ok: true,
+      error: null,
+      precoVenda: precoVenda,
+      taxaMarketplacePct: taxaMarketplacePct,
+      custoProduto: custoProduto,
+      freteEnvioProprio: freteEnvioProprio,
+      custoFullUnit: hasUnit ? toNumber(input.custoFullUnit) : null,
+      custoFullPct: custoFullPct,
+      usedCustoFullPct: usedCustoFullPct,
+      custoFullUnitResolved: custoFullUnitResolved,
+      armazenamentoMes: armazenamentoMes,
+      vendasPorMes: vendasPorMes,
+      metaMargemPct: metaMargemPct,
+      liquidoAposTaxa: liquidoAposTaxa,
+      armazenamentoPorUnidade: armazenamentoPorUnidade,
+      custoFullTotalUnit: custoFullTotalUnit,
+      margemSemLogistica: margemSemLogistica,
+      margemEnvioProprio: margemEnvioProprio,
+      margemFull: margemFull,
+      deltaMargemUnit: deltaMargemUnit,
+      fullPctSobrePreco: fullPctSobrePreco,
+      fullPctSobreMargem: fullPctSobreMargem,
+      impactoMesFull: impactoMesFull,
+      impactoMesEnvioProprio: impactoMesEnvioProprio,
+      economiaOuCustoExtraMes: economiaOuCustoExtraMes,
+      tetoFullParaMargemZero: tetoFullParaMargemZero,
+      tetoFullParaMetaPct: tetoFullParaMetaPct,
+      freteProprioBreakEvenVsFull: freteProprioBreakEvenVsFull,
+      badge: "AMARELO",
+      advice: "",
+      disclaimer: disclaimer,
+      copyText: ""
+    };
+    result.badge = badgeCustoFull(result);
+    result.advice = buildCustoFullAdvice(result);
+    result.copyText = joinCustoFullCopy(result);
+    return result;
+  }
+
+  function mountCustoFull(root) {
+    if (!root || typeof document === "undefined") return;
+    root.innerHTML = "";
+    root.classList.add("freightgen", "tacosgen", "custofullgen");
+
+    var panel = el("div", { class: "freightgen__panel titlegen__panel" });
+    panel.appendChild(
+      el("p", { class: "freightgen__kicker titlegen__kicker" }, "Custo Full / fulfillment · ESTIMATIVA")
+    );
+    panel.appendChild(
+      el(
+        "h2",
+        { class: "freightgen__title titlegen__title" },
+        "Envio próprio vs Full: quanto o fulfillment come da margem — e qual o teto para não furar o lucro?"
+      )
+    );
+
+    var fields = el("div", { class: "freightgen__fields titlegen__fields" });
+    fields.appendChild(
+      field({
+        id: "cfull-preco",
+        label: "Preço de venda (R$)",
+        value: "89",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-taxa",
+        label: "Taxa do marketplace (%)",
+        value: "16",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 16%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-custo",
+        label: "Custo do produto (R$)",
+        value: "35",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-frete",
+        label: "Frete envio próprio (R$ / un)",
+        value: "18",
+        step: "0.01",
+        min: "0",
+        placeholder: "o que você paga enviando sozinho"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-fee",
+        label: "Custo Full / fulfillment (R$ / un)",
+        value: "14",
+        step: "0.01",
+        min: "0",
+        placeholder: "fee por unidade (ML Full / FBA-like)"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-fee-pct",
+        label: "Custo Full (% do preço) — opcional se fee R$ vazio",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "só se deixar fee R$ em branco"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-storage",
+        label: "Armazenamento Full / mês (R$)",
+        value: "80",
+        step: "0.01",
+        min: "0",
+        placeholder: "0 permitido"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-vendas",
+        label: "Vendas por mês",
+        value: "200",
+        step: "1",
+        min: "0",
+        placeholder: "padrão 200"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cfull-meta",
+        label: "Meta de margem (% do preço)",
+        value: "15",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 15%"
+      })
+    );
+    panel.appendChild(fields);
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__hint titlegen__hint" },
+        "Full total/un = fee Full + (armazenamento/mês ÷ vendas/mês). Compare com frete de envio próprio. ESTIMATIVA — confira fee e storage reais no Seller Center."
+      )
+    );
+    root.appendChild(panel);
+
+    var out = el("div", { class: "freightgen__out", "aria-live": "polite" });
+    root.appendChild(out);
+
+    function read() {
+      var taxaRaw = document.getElementById("cfull-taxa").value;
+      var freteRaw = document.getElementById("cfull-frete").value;
+      var feeRaw = document.getElementById("cfull-fee").value;
+      var feePctRaw = document.getElementById("cfull-fee-pct").value;
+      var storageRaw = document.getElementById("cfull-storage").value;
+      var vendasRaw = document.getElementById("cfull-vendas").value;
+      var metaRaw = document.getElementById("cfull-meta").value;
+      var payload = {
+        precoVenda: document.getElementById("cfull-preco").value,
+        taxaMarketplacePct: taxaRaw === "" ? undefined : taxaRaw,
+        custoProduto: document.getElementById("cfull-custo").value,
+        freteEnvioProprio: freteRaw === "" ? undefined : freteRaw,
+        armazenamentoMes: storageRaw === "" ? undefined : storageRaw,
+        vendasPorMes: vendasRaw === "" ? undefined : vendasRaw,
+        metaMargemPct: metaRaw === "" ? undefined : metaRaw
+      };
+      if (feeRaw !== "") {
+        payload.custoFullUnit = feeRaw;
+      }
+      if (feePctRaw !== "") {
+        payload.custoFullPct = feePctRaw;
+      }
+      return payload;
+    }
+
+    function render() {
+      var r = calculateCustoFull(read());
+      out.innerHTML = "";
+      var loss = !r.ok || r.badge === "VERMELHO";
+      var card = el(
+        "article",
+        { class: "result-card" + (loss ? " result-card--loss" : "") }
+      );
+      card.appendChild(
+        el(
+          "p",
+          { class: "result-card__label" },
+          "Custo Full · " + (r.badge || "—") + " · ESTIMATIVA"
+        )
+      );
+      if (!r.ok) {
+        card.appendChild(el("p", { class: "result-card__price is-loss" }, "—"));
+        card.appendChild(el("p", { class: "result-card__hint" }, r.error || "Dados incompletos"));
+      } else {
+        var deltaLabel =
+          r.deltaMargemUnit > 0
+            ? "Full +" + formatBRL(r.deltaMargemUnit) + "/un"
+            : r.deltaMargemUnit < 0
+              ? "Próprio +" + formatBRL(Math.abs(r.deltaMargemUnit)) + "/un"
+              : "empate";
+        var headline =
+          formatBRL(r.margemFull) +
+          " margem Full · " +
+          deltaLabel;
+        card.appendChild(
+          el(
+            "p",
+            { class: "result-card__price" + (loss ? " is-loss" : "") },
+            headline
+          )
+        );
+        var grid = el("div", { class: "result-card__grid" });
+        function row(k, v) {
+          var d = el("div");
+          d.appendChild(el("span", { class: "muted" }, k));
+          d.appendChild(el("strong", null, v));
+          grid.appendChild(d);
+        }
+        row("Líquido após taxa", formatBRL(r.liquidoAposTaxa));
+        row("Margem sem logística", formatBRL(r.margemSemLogistica));
+        row("Margem envio próprio", formatBRL(r.margemEnvioProprio));
+        row("Fee Full / un", formatBRL(r.custoFullUnitResolved));
+        row("Armazenamento / un", formatBRL(r.armazenamentoPorUnidade));
+        row("Full total / un", formatBRL(r.custoFullTotalUnit));
+        row("Margem Full", formatBRL(r.margemFull));
+        row("Delta (Full − próprio)", formatBRL(r.deltaMargemUnit));
+        row(
+          "Full % preço",
+          (Math.round(r.fullPctSobrePreco * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row(
+          "Full % margem s/ logística",
+          r.fullPctSobreMargem == null
+            ? "—"
+            : (Math.round(r.fullPctSobreMargem * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row("Impacto Full / mês", formatBRL(r.impactoMesFull));
+        row("Impacto envio próprio / mês", formatBRL(r.impactoMesEnvioProprio));
+        row("Economia ou custo extra / mês", formatBRL(r.economiaOuCustoExtraMes));
+        row("Teto Full (margem zero)", formatBRL(r.tetoFullParaMargemZero));
+        row(
+          "Teto Full (meta " + (Math.round(r.metaMargemPct * 100) / 100) + "%)",
+          formatBRL(r.tetoFullParaMetaPct)
+        );
+        row("Frete próprio break-even vs Full", formatBRL(r.freteProprioBreakEvenVsFull));
+        row("Badge", r.badge || "—");
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "result-card__hint" }, r.advice));
+      }
+      out.appendChild(card);
+
+      var actions = el("div", { class: "freightgen__actions" });
+      var btn = el("button", { type: "button", class: "btn btn--solid" }, "Copiar resumo");
+      btn.addEventListener("click", function () {
+        var text = r.copyText || joinCustoFullCopy(r);
+        copyText(text)
+          .then(function () {
+            toast("Resumo copiado.");
+          })
+          .catch(function () {
+            toast("Copia o resumo na mão.");
+          });
+      });
+      actions.appendChild(btn);
+      out.appendChild(actions);
+    }
+
+    [
+      "cfull-preco",
+      "cfull-taxa",
+      "cfull-custo",
+      "cfull-frete",
+      "cfull-fee",
+      "cfull-fee-pct",
+      "cfull-storage",
+      "cfull-vendas",
+      "cfull-meta"
+    ].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", render);
+        node.addEventListener("change", render);
+      }
+    });
+    render();
+  }
+
+
   function wireGlobalUi() {
     document.querySelectorAll("[data-precifica-calc]").forEach(function (node) {
       mountCalculator(node, { preset: node.getAttribute("data-preset") || "" });
@@ -16306,6 +17109,10 @@
 
     document.querySelectorAll("[data-precifica-parcelamento]").forEach(function (node) {
       mountParcelamento(node);
+    });
+
+    document.querySelectorAll("[data-precifica-custo-full]").forEach(function (node) {
+      mountCustoFull(node);
     });
 
 
@@ -16478,6 +17285,11 @@
     joinParcelamentoCopy: joinParcelamentoCopy,
     badgeParcelamento: badgeParcelamento,
     buildParcelamentoAdvice: buildParcelamentoAdvice,
+    calculateCustoFull: calculateCustoFull,
+    mountCustoFull: mountCustoFull,
+    joinCustoFullCopy: joinCustoFullCopy,
+    badgeCustoFull: badgeCustoFull,
+    buildCustoFullAdvice: buildCustoFullAdvice,
     HOOK_MAX: HOOK_MAX,
     AMAZON_BULLET_SOFT: AMAZON_BULLET_SOFT,
     AMAZON_BULLET_HARD: AMAZON_BULLET_HARD,
