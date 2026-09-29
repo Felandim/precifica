@@ -3727,6 +3727,166 @@
       return "defaults+delta+join badge=" + r.badge;
     });
 
+
+    /* 149) margem-liquida-pos-ads: happy path VERDE */
+    push(149, function () {
+      // preco=89, taxa=16, custo=35, frete=12, ads=5
+      // liquido=74.76; custoOp=47; margemAntes=27.76; margemPos=22.76
+      // ads%preco≈5.62; ads%margem≈18.01 → VERDE
+      var r = calculateMargemLiquidaPosAds({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteUnit: 12,
+        adsCustoPorUnidade: 5,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (Math.abs(r.liquidoAposTaxa - 74.76) > 1e-9) throw new Error("liquido " + r.liquidoAposTaxa);
+      if (Math.abs(r.custoOperacional - 47) > 1e-9) throw new Error("custoOp " + r.custoOperacional);
+      if (Math.abs(r.margemAntesAds - 27.76) > 1e-9) throw new Error("antes " + r.margemAntesAds);
+      if (Math.abs(r.adsUnitResolved - 5) > 1e-9) throw new Error("ads " + r.adsUnitResolved);
+      if (Math.abs(r.margemPosAds - 22.76) > 1e-9) throw new Error("pos " + r.margemPosAds);
+      if (Math.abs(r.adsPctSobrePreco - (5 / 89) * 100) > 1e-9) throw new Error("pctPreco " + r.adsPctSobrePreco);
+      if (Math.abs(r.adsPctSobreMargemAntes - (5 / 27.76) * 100) > 1e-9) throw new Error("pctMargem " + r.adsPctSobreMargemAntes);
+      if (Math.abs(r.impactoMesAds - 1000) > 1e-9) throw new Error("impacto " + r.impactoMesAds);
+      if (Math.abs(r.lucroMesAntesAds - 5552) > 1e-9) throw new Error("lucroAntes " + r.lucroMesAntesAds);
+      if (Math.abs(r.lucroMesPosAds - 4552) > 1e-9) throw new Error("lucroPos " + r.lucroMesPosAds);
+      if (Math.abs(r.tetoAdsParaMargemZero - 27.76) > 1e-9) throw new Error("tetoZero " + r.tetoAdsParaMargemZero);
+      if (Math.abs(r.tetoAdsParaMetaPct - (27.76 - 89 * 0.15)) > 1e-9) throw new Error("tetoMeta " + r.tetoAdsParaMetaPct);
+      if (Math.abs(r.margemPosAdsPctPreco - (22.76 / 89) * 100) > 1e-9) throw new Error("posPct " + r.margemPosAdsPctPreco);
+      if (r.badge !== "VERDE") throw new Error("badge " + r.badge);
+      return "happy verde margemPos=" + r.margemPosAds;
+    });
+
+    /* 150) margem-liquida-pos-ads: VERMELHO — margemPos≤0 OU ads%margem≥50 */
+    push(150, function () {
+      var neg = calculateMargemLiquidaPosAds({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteUnit: 12,
+        adsCustoPorUnidade: 30,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // margemAntes=27.76; pós=−2.24 ≤ 0 → VERMELHO
+      if (!neg.ok) throw new Error(neg.error || "fail neg");
+      if (!(neg.margemPosAds <= 0)) throw new Error("expected non-pos " + neg.margemPosAds);
+      if (neg.badge !== "VERMELHO") throw new Error("badge neg " + neg.badge);
+      var high = calculateMargemLiquidaPosAds({
+        precoVenda: 89,
+        taxaMarketplacePct: 16,
+        custoProduto: 35,
+        freteUnit: 12,
+        adsCustoPorUnidade: 15,
+        vendasPorMes: 200,
+        metaMargemPct: 15
+      });
+      // 15/27.76 ≈ 54.0% ≥ 50 → VERMELHO
+      if (!high.ok) throw new Error(high.error || "fail high");
+      if (!(high.adsPctSobreMargemAntes >= 50)) throw new Error("pct " + high.adsPctSobreMargemAntes);
+      if (high.badge !== "VERMELHO") throw new Error("badge high " + high.badge);
+      return "vermelho margemPos=" + neg.margemPosAds;
+    });
+
+    /* 151) margem-liquida-pos-ads: inputs inválidos → error VERMELHO */
+    push(151, function () {
+      var r = calculateMargemLiquidaPosAds({
+        precoVenda: 0,
+        custoProduto: 35,
+        adsCustoPorUnidade: 5
+      });
+      if (r.ok) throw new Error("expected fail zero preco");
+      if (r.badge !== "VERMELHO") throw new Error("badge " + r.badge);
+      var neg = calculateMargemLiquidaPosAds({
+        precoVenda: 89,
+        custoProduto: -1,
+        adsCustoPorUnidade: 5
+      });
+      if (neg.ok) throw new Error("expected fail neg custo");
+      var badVendas = calculateMargemLiquidaPosAds({
+        precoVenda: 89,
+        custoProduto: 35,
+        adsCustoPorUnidade: 5,
+        vendasPorMes: 0
+      });
+      if (badVendas.ok) throw new Error("expected fail vendas 0");
+      var badAds = calculateMargemLiquidaPosAds({
+        precoVenda: 89,
+        custoProduto: 35,
+        adsCustoPorUnidade: -2
+      });
+      if (badAds.ok) throw new Error("expected fail neg ads");
+      return "invalid ok";
+    });
+
+    /* 152) margem-liquida-pos-ads: adsPct path + prefer R$ when both */
+    push(152, function () {
+      var byPct = calculateMargemLiquidaPosAds({
+        precoVenda: 100,
+        taxaMarketplacePct: 16,
+        custoProduto: 30,
+        freteUnit: 10,
+        adsPctSobreReceita: 10,
+        vendasPorMes: 100,
+        metaMargemPct: 15
+      });
+      // no unit → ads = 100*0.10 = 10
+      if (!byPct.ok) throw new Error(byPct.error || "fail pct");
+      if (Math.abs(byPct.adsUnitResolved - 10) > 1e-9) throw new Error("pct unit " + byPct.adsUnitResolved);
+      if (byPct.usedAdsPct !== true) throw new Error("usedAdsPct");
+      var both = calculateMargemLiquidaPosAds({
+        precoVenda: 100,
+        taxaMarketplacePct: 16,
+        custoProduto: 30,
+        freteUnit: 10,
+        adsCustoPorUnidade: 7,
+        adsPctSobreReceita: 10,
+        vendasPorMes: 100,
+        metaMargemPct: 15
+      });
+      // both → prefer absolute 7
+      if (!both.ok) throw new Error(both.error || "fail both");
+      if (Math.abs(both.adsUnitResolved - 7) > 1e-9) throw new Error("prefer abs " + both.adsUnitResolved);
+      if (both.usedAdsPct !== false) throw new Error("should prefer unit");
+      return "adsPct+prefer ok";
+    });
+
+    /* 153) margem-liquida-pos-ads: defaults + join copy + badge helper */
+    push(153, function () {
+      var empty = calculateMargemLiquidaPosAds({});
+      if (empty.ok) throw new Error("empty should fail (missing preco/custo)");
+      var r = calculateMargemLiquidaPosAds({
+        precoVenda: 89,
+        custoProduto: 35
+        // defaults: taxa 16, frete 12, ads 8, vendas 200, meta 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.taxaMarketplacePct !== 16) throw new Error("default taxa " + r.taxaMarketplacePct);
+      if (r.freteUnit !== 12) throw new Error("default frete " + r.freteUnit);
+      if (r.adsUnitResolved !== 8) throw new Error("default ads " + r.adsUnitResolved);
+      if (r.vendasPorMes !== 200) throw new Error("default vendas " + r.vendasPorMes);
+      if (r.metaMargemPct !== 15) throw new Error("default meta " + r.metaMargemPct);
+      // ads%margem = 8/27.76 ≈ 28.8 < 30; ads%preco≈9; margemPosPct≈22.2 > 15 → VERDE
+      if (r.badge !== "VERDE") throw new Error("default badge " + r.badge);
+      var joined = joinMargemLiquidaPosAdsCopy(r);
+      if (!joined || joined.indexOf("ESTIMATIVA") === -1) throw new Error("join");
+      if (joined !== r.copyText) throw new Error("copyText mismatch");
+      if (badgeMargemLiquidaPosAds(r) !== r.badge) throw new Error("badge helper");
+      var low = joined.toLowerCase();
+      if (
+        low.indexOf("pós-ads") === -1 &&
+        low.indexOf("pos-ads") === -1 &&
+        low.indexOf("margem líquida") === -1 &&
+        low.indexOf("margem liquida") === -1
+      ) {
+        throw new Error("missing topic");
+      }
+      return "defaults+join badge=" + r.badge;
+    });
+
     var passed = results.filter(function (r) { return r.ok; }).length;
     results.forEach(function (r) {
       console.log("[" + (r.ok ? "PASS" : "FAIL") + "] teste " + r.id + " — " + r.detail);
@@ -16994,6 +17154,575 @@
   }
 
 
+
+  function badgeMargemLiquidaPosAds(r) {
+    if (!r || !r.ok) return "VERMELHO";
+    if (!(r.margemPosAds === r.margemPosAds) || r.margemPosAds <= 0) {
+      return "VERMELHO";
+    }
+    if (
+      r.adsPctSobreMargemAntes === r.adsPctSobreMargemAntes &&
+      r.adsPctSobreMargemAntes != null &&
+      r.adsPctSobreMargemAntes >= 50
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.adsPctSobreMargemAntes === r.adsPctSobreMargemAntes &&
+      r.adsPctSobreMargemAntes != null &&
+      r.adsPctSobreMargemAntes >= 30
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.adsPctSobrePreco === r.adsPctSobrePreco &&
+      r.adsPctSobrePreco >= 15
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.margemPosAdsPctPreco === r.margemPosAdsPctPreco &&
+      r.margemPosAdsPctPreco < r.metaMargemPct &&
+      r.margemPosAds > 0
+    ) {
+      return "AMARELO";
+    }
+    return "VERDE";
+  }
+
+  function buildMargemLiquidaPosAdsAdvice(r) {
+    if (!r.ok) return r.error || "Dados incompletos.";
+    var base =
+      "Ads/un: " +
+      formatBRL(r.adsUnitResolved) +
+      " (~" +
+      (Math.round(r.adsPctSobrePreco * 100) / 100) +
+      "% do preço";
+    if (r.adsPctSobreMargemAntes != null && r.adsPctSobreMargemAntes === r.adsPctSobreMargemAntes) {
+      base +=
+        " e ~" +
+        (Math.round(r.adsPctSobreMargemAntes * 100) / 100) +
+        "% da margem antes dos ads";
+    }
+    base +=
+      "). Margem antes: " +
+      formatBRL(r.margemAntesAds) +
+      "; margem pós-ads: " +
+      formatBRL(r.margemPosAds) +
+      " (~" +
+      (Math.round(r.margemPosAdsPctPreco * 100) / 100) +
+      "% do preço). Impacto ads/mês (~" +
+      r.vendasPorMes +
+      " vendas): " +
+      formatBRL(r.impactoMesAds) +
+      ". Lucro/mês antes: " +
+      formatBRL(r.lucroMesAntesAds) +
+      "; pós: " +
+      formatBRL(r.lucroMesPosAds) +
+      ". Teto ads p/ margem zero: " +
+      formatBRL(r.tetoAdsParaMargemZero) +
+      "; teto p/ meta " +
+      (Math.round(r.metaMargemPct * 100) / 100) +
+      "%: " +
+      formatBRL(r.tetoAdsParaMetaPct) +
+      ". ";
+    if (r.margemPosAds <= 0) {
+      base +=
+        "Margem pós-ads ≤ 0 — ads furam o lucro: reduza TACOS/custo por venda ou suba o preço. ";
+    } else if (
+      r.adsPctSobreMargemAntes != null &&
+      r.adsPctSobreMargemAntes >= 50
+    ) {
+      base += "Ads ≥ 50% da margem antes — risco alto. ";
+    } else if (
+      r.adsPctSobreMargemAntes != null &&
+      r.adsPctSobreMargemAntes >= 30
+    ) {
+      base += "Ads ≥ 30% da margem antes — revise bid e targeting. ";
+    } else if (r.adsPctSobrePreco >= 15) {
+      base += "Ads ≥ 15% do preço — peso alto no ticket. ";
+    } else if (r.margemPosAdsPctPreco < r.metaMargemPct) {
+      base +=
+        "Margem pós-ads abaixo da meta " +
+        (Math.round(r.metaMargemPct * 100) / 100) +
+        "% — ajuste ads ou preço. ";
+    } else {
+      base += "Margem pós-ads saudável neste cenário. ";
+    }
+    return (
+      base +
+      "ESTIMATIVA — confira gasto real de ads e receita no Seller Center / Ads Manager."
+    );
+  }
+
+  function joinMargemLiquidaPosAdsCopy(r) {
+    r = r || {};
+    var lines = [];
+    lines.push("Margem líquida pós-ads no marketplace · Precifica");
+    if (r.ok) {
+      lines.push("Preço de venda: " + formatBRL(r.precoVenda));
+      lines.push("Taxa marketplace: " + (Math.round(r.taxaMarketplacePct * 100) / 100) + "%");
+      lines.push("Custo produto: " + formatBRL(r.custoProduto));
+      lines.push("Frete / un: " + formatBRL(r.freteUnit));
+      if (r.usedAdsPct) {
+        lines.push(
+          "Ads % sobre receita: " + (Math.round(r.adsPctSobreReceita * 100) / 100) + "%"
+        );
+      }
+      lines.push("Ads / un: " + formatBRL(r.adsUnitResolved));
+      lines.push("Vendas/mês: " + r.vendasPorMes);
+      lines.push("Meta margem %: " + (Math.round(r.metaMargemPct * 100) / 100) + "%");
+      lines.push("Líquido após taxa: " + formatBRL(r.liquidoAposTaxa));
+      lines.push("Custo operacional: " + formatBRL(r.custoOperacional));
+      lines.push("Margem antes dos ads: " + formatBRL(r.margemAntesAds));
+      lines.push("Margem pós-ads: " + formatBRL(r.margemPosAds));
+      lines.push(
+        "Ads % preço: " + (Math.round(r.adsPctSobrePreco * 100) / 100) + "%"
+      );
+      if (r.adsPctSobreMargemAntes != null && r.adsPctSobreMargemAntes === r.adsPctSobreMargemAntes) {
+        lines.push(
+          "Ads % margem antes: " +
+            (Math.round(r.adsPctSobreMargemAntes * 100) / 100) +
+            "%"
+        );
+      }
+      lines.push(
+        "Margem pós-ads % preço: " +
+          (Math.round(r.margemPosAdsPctPreco * 100) / 100) +
+          "%"
+      );
+      lines.push("Lucro/mês antes ads: " + formatBRL(r.lucroMesAntesAds));
+      lines.push("Lucro/mês pós-ads: " + formatBRL(r.lucroMesPosAds));
+      lines.push("Impacto ads / mês: " + formatBRL(r.impactoMesAds));
+      lines.push("Teto ads (margem zero): " + formatBRL(r.tetoAdsParaMargemZero));
+      lines.push("Teto ads (meta): " + formatBRL(r.tetoAdsParaMetaPct));
+      lines.push("Badge: " + (r.badge || "—"));
+      if (r.advice) lines.push(r.advice);
+    } else {
+      lines.push("Erro: " + (r.error || "dados inválidos"));
+    }
+    lines.push(
+      r.disclaimer ||
+        "ESTIMATIVA — Margem líquida pós-ads no marketplace. Não é conselho financeiro."
+    );
+    return lines.join("\n");
+  }
+
+  function calculateMargemLiquidaPosAds(input) {
+    input = input || {};
+    var precoVenda = toNumber(input.precoVenda);
+    var custoProduto = toNumber(input.custoProduto);
+
+    var taxaMarketplacePct;
+    if (input.taxaMarketplacePct == null || input.taxaMarketplacePct === "") {
+      taxaMarketplacePct = 16;
+    } else {
+      taxaMarketplacePct = toNumber(input.taxaMarketplacePct);
+    }
+
+    var freteUnit;
+    if (input.freteUnit == null || input.freteUnit === "") {
+      freteUnit = 12;
+    } else {
+      freteUnit = toNumber(input.freteUnit);
+    }
+
+    var vendasPorMes;
+    if (input.vendasPorMes == null || input.vendasPorMes === "") {
+      vendasPorMes = 200;
+    } else {
+      vendasPorMes = toNumber(input.vendasPorMes);
+    }
+
+    var metaMargemPct;
+    if (input.metaMargemPct == null || input.metaMargemPct === "") {
+      metaMargemPct = 15;
+    } else {
+      metaMargemPct = toNumber(input.metaMargemPct);
+    }
+
+    var usedAdsPct = false;
+    var adsPctSobreReceita = null;
+    var adsUnitResolved = null;
+    var hasUnit =
+      input.adsCustoPorUnidade != null && input.adsCustoPorUnidade !== "";
+    var hasPct =
+      input.adsPctSobreReceita != null && input.adsPctSobreReceita !== "";
+
+    if (hasUnit) {
+      adsUnitResolved = toNumber(input.adsCustoPorUnidade);
+      usedAdsPct = false;
+      if (hasPct) adsPctSobreReceita = toNumber(input.adsPctSobreReceita);
+    } else if (hasPct) {
+      adsPctSobreReceita = toNumber(input.adsPctSobreReceita);
+      usedAdsPct = true;
+      adsUnitResolved = null;
+    } else {
+      adsUnitResolved = 8;
+      usedAdsPct = false;
+    }
+
+    var disclaimer =
+      "ESTIMATIVA — Margem líquida pós-ads no marketplace no navegador. Modelo: líquido após taxa = preço × (1 − taxa%); custo operacional = produto + frete/un; margem antes = líquido − operacional; ads/un = R$/un (preferido) ou preço × ads%; margem pós = margem antes − ads/un; teto meta = margem antes − (preço × meta%). Não inclui impostos extras nem fee real variável. Não é conselho financeiro.";
+
+    function fail(msg) {
+      var f = {
+        ok: false,
+        error: msg,
+        precoVenda: precoVenda,
+        taxaMarketplacePct: taxaMarketplacePct,
+        custoProduto: custoProduto,
+        freteUnit: freteUnit,
+        adsCustoPorUnidade: hasUnit ? toNumber(input.adsCustoPorUnidade) : null,
+        adsPctSobreReceita: adsPctSobreReceita,
+        usedAdsPct: usedAdsPct,
+        adsUnitResolved: adsUnitResolved,
+        vendasPorMes: vendasPorMes,
+        metaMargemPct: metaMargemPct,
+        liquidoAposTaxa: null,
+        custoOperacional: null,
+        margemAntesAds: null,
+        margemPosAds: null,
+        adsPctSobrePreco: null,
+        adsPctSobreMargemAntes: null,
+        impactoMesAds: null,
+        lucroMesAntesAds: null,
+        lucroMesPosAds: null,
+        tetoAdsParaMargemZero: null,
+        tetoAdsParaMetaPct: null,
+        margemPosAdsPctPreco: null,
+        badge: "VERMELHO",
+        advice: msg,
+        disclaimer: disclaimer,
+        copyText: ""
+      };
+      f.copyText = joinMargemLiquidaPosAdsCopy(f);
+      return f;
+    }
+
+    if (!(precoVenda > 0) || precoVenda !== precoVenda) {
+      return fail("Informe o preço de venda (R$) maior que zero.");
+    }
+    if (!(custoProduto >= 0) || custoProduto !== custoProduto) {
+      return fail("Informe o custo do produto (R$) ≥ 0.");
+    }
+    if (!(taxaMarketplacePct >= 0) || taxaMarketplacePct !== taxaMarketplacePct) {
+      return fail("Informe a taxa do marketplace (%) ≥ 0.");
+    }
+    if (!(freteUnit >= 0) || freteUnit !== freteUnit) {
+      return fail("Informe o frete por unidade (R$) ≥ 0.");
+    }
+    if (!(vendasPorMes > 0) || vendasPorMes !== vendasPorMes) {
+      return fail("Informe vendas por mês maior que zero.");
+    }
+    if (!(metaMargemPct >= 0) || metaMargemPct !== metaMargemPct) {
+      return fail("Informe a meta de margem (%) ≥ 0.");
+    }
+
+    if (usedAdsPct) {
+      if (!(adsPctSobreReceita >= 0) || adsPctSobreReceita !== adsPctSobreReceita) {
+        return fail("Informe o custo de ads (%) ≥ 0.");
+      }
+      adsUnitResolved = precoVenda * (adsPctSobreReceita / 100);
+    } else {
+      if (!(adsUnitResolved >= 0) || adsUnitResolved !== adsUnitResolved) {
+        return fail("Informe o custo de ads por unidade (R$) ≥ 0.");
+      }
+    }
+
+    var liquidoAposTaxa = precoVenda * (1 - taxaMarketplacePct / 100);
+    var custoOperacional = custoProduto + freteUnit;
+    var margemAntesAds = liquidoAposTaxa - custoOperacional;
+    var margemPosAds = margemAntesAds - adsUnitResolved;
+    var adsPctSobrePreco = (adsUnitResolved / precoVenda) * 100;
+    var adsPctSobreMargemAntes =
+      margemAntesAds > 0
+        ? (adsUnitResolved / margemAntesAds) * 100
+        : null;
+    var impactoMesAds = vendasPorMes * adsUnitResolved;
+    var lucroMesAntesAds = vendasPorMes * margemAntesAds;
+    var lucroMesPosAds = vendasPorMes * margemPosAds;
+    var tetoAdsParaMargemZero = margemAntesAds;
+    var tetoAdsParaMetaPct =
+      liquidoAposTaxa - custoOperacional - precoVenda * (metaMargemPct / 100);
+    var margemPosAdsPctPreco = (margemPosAds / precoVenda) * 100;
+
+    var result = {
+      ok: true,
+      error: null,
+      precoVenda: precoVenda,
+      taxaMarketplacePct: taxaMarketplacePct,
+      custoProduto: custoProduto,
+      freteUnit: freteUnit,
+      adsCustoPorUnidade: hasUnit ? toNumber(input.adsCustoPorUnidade) : null,
+      adsPctSobreReceita: adsPctSobreReceita,
+      usedAdsPct: usedAdsPct,
+      adsUnitResolved: adsUnitResolved,
+      vendasPorMes: vendasPorMes,
+      metaMargemPct: metaMargemPct,
+      liquidoAposTaxa: liquidoAposTaxa,
+      custoOperacional: custoOperacional,
+      margemAntesAds: margemAntesAds,
+      margemPosAds: margemPosAds,
+      adsPctSobrePreco: adsPctSobrePreco,
+      adsPctSobreMargemAntes: adsPctSobreMargemAntes,
+      impactoMesAds: impactoMesAds,
+      lucroMesAntesAds: lucroMesAntesAds,
+      lucroMesPosAds: lucroMesPosAds,
+      tetoAdsParaMargemZero: tetoAdsParaMargemZero,
+      tetoAdsParaMetaPct: tetoAdsParaMetaPct,
+      margemPosAdsPctPreco: margemPosAdsPctPreco,
+      badge: "AMARELO",
+      advice: "",
+      disclaimer: disclaimer,
+      copyText: ""
+    };
+    result.badge = badgeMargemLiquidaPosAds(result);
+    result.advice = buildMargemLiquidaPosAdsAdvice(result);
+    result.copyText = joinMargemLiquidaPosAdsCopy(result);
+    return result;
+  }
+
+  function mountMargemLiquidaPosAds(root) {
+    if (!root || typeof document === "undefined") return;
+    root.innerHTML = "";
+    root.classList.add("freightgen", "tacosgen", "mlposadsgen");
+
+    var panel = el("div", { class: "freightgen__panel titlegen__panel" });
+    panel.appendChild(
+      el("p", { class: "freightgen__kicker titlegen__kicker" }, "Margem líquida pós-ads · ESTIMATIVA")
+    );
+    panel.appendChild(
+      el(
+        "h2",
+        { class: "freightgen__title titlegen__title" },
+        "Quanto os ads comem da margem unitária e do lucro/mês — e qual o teto de ads para não furar o lucro?"
+      )
+    );
+
+    var fields = el("div", { class: "freightgen__fields titlegen__fields" });
+    fields.appendChild(
+      field({
+        id: "mlpa-preco",
+        label: "Preço de venda (R$)",
+        value: "89",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "mlpa-taxa",
+        label: "Taxa do marketplace (%)",
+        value: "16",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 16%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "mlpa-custo",
+        label: "Custo do produto (R$)",
+        value: "35",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "mlpa-frete",
+        label: "Frete / un (R$)",
+        value: "12",
+        step: "0.01",
+        min: "0",
+        placeholder: "frete do seller por unidade"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "mlpa-ads",
+        label: "Custo de ads (R$ / un)",
+        value: "8",
+        step: "0.01",
+        min: "0",
+        placeholder: "gasto ads ÷ unidades vendidas"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "mlpa-ads-pct",
+        label: "Ads % sobre receita (TACOS-like) — opcional se R$/un vazio",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "só se deixar ads R$ em branco"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "mlpa-vendas",
+        label: "Vendas por mês",
+        value: "200",
+        step: "1",
+        min: "0",
+        placeholder: "padrão 200"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "mlpa-meta",
+        label: "Meta de margem (% do preço)",
+        value: "15",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 15%"
+      })
+    );
+    panel.appendChild(fields);
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__hint titlegen__hint" },
+        "Margem pós-ads = (líquido após taxa − produto − frete) − ads/un. Prefira R$/un; se vazio, usa % da receita. ESTIMATIVA — confira gasto real de ads no Seller Center."
+      )
+    );
+    root.appendChild(panel);
+
+    var out = el("div", { class: "freightgen__out", "aria-live": "polite" });
+    root.appendChild(out);
+
+    function read() {
+      var taxaRaw = document.getElementById("mlpa-taxa").value;
+      var freteRaw = document.getElementById("mlpa-frete").value;
+      var adsRaw = document.getElementById("mlpa-ads").value;
+      var adsPctRaw = document.getElementById("mlpa-ads-pct").value;
+      var vendasRaw = document.getElementById("mlpa-vendas").value;
+      var metaRaw = document.getElementById("mlpa-meta").value;
+      var payload = {
+        precoVenda: document.getElementById("mlpa-preco").value,
+        taxaMarketplacePct: taxaRaw === "" ? undefined : taxaRaw,
+        custoProduto: document.getElementById("mlpa-custo").value,
+        freteUnit: freteRaw === "" ? undefined : freteRaw,
+        vendasPorMes: vendasRaw === "" ? undefined : vendasRaw,
+        metaMargemPct: metaRaw === "" ? undefined : metaRaw
+      };
+      if (adsRaw !== "") {
+        payload.adsCustoPorUnidade = adsRaw;
+      }
+      if (adsPctRaw !== "") {
+        payload.adsPctSobreReceita = adsPctRaw;
+      }
+      return payload;
+    }
+
+    function render() {
+      var r = calculateMargemLiquidaPosAds(read());
+      out.innerHTML = "";
+      var loss = !r.ok || r.badge === "VERMELHO";
+      var card = el(
+        "article",
+        { class: "result-card" + (loss ? " result-card--loss" : "") }
+      );
+      card.appendChild(
+        el(
+          "p",
+          { class: "result-card__label" },
+          "Margem pós-ads · " + (r.badge || "—") + " · ESTIMATIVA"
+        )
+      );
+      if (!r.ok) {
+        card.appendChild(el("p", { class: "result-card__price is-loss" }, "—"));
+        card.appendChild(el("p", { class: "result-card__hint" }, r.error || "Dados incompletos"));
+      } else {
+        var headline =
+          formatBRL(r.margemPosAds) +
+          " margem pós-ads · " +
+          formatBRL(r.adsUnitResolved) +
+          " ads/un";
+        card.appendChild(
+          el(
+            "p",
+            { class: "result-card__price" + (loss ? " is-loss" : "") },
+            headline
+          )
+        );
+        var grid = el("div", { class: "result-card__grid" });
+        function row(k, v) {
+          var d = el("div");
+          d.appendChild(el("span", { class: "muted" }, k));
+          d.appendChild(el("strong", null, v));
+          grid.appendChild(d);
+        }
+        row("Líquido após taxa", formatBRL(r.liquidoAposTaxa));
+        row("Custo operacional", formatBRL(r.custoOperacional));
+        row("Margem antes dos ads", formatBRL(r.margemAntesAds));
+        row("Ads / un", formatBRL(r.adsUnitResolved));
+        row("Margem pós-ads", formatBRL(r.margemPosAds));
+        row(
+          "Ads % preço",
+          (Math.round(r.adsPctSobrePreco * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row(
+          "Ads % margem antes",
+          r.adsPctSobreMargemAntes == null
+            ? "—"
+            : (Math.round(r.adsPctSobreMargemAntes * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row(
+          "Margem pós % preço",
+          (Math.round(r.margemPosAdsPctPreco * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row("Lucro/mês antes ads", formatBRL(r.lucroMesAntesAds));
+        row("Lucro/mês pós-ads", formatBRL(r.lucroMesPosAds));
+        row("Impacto ads / mês", formatBRL(r.impactoMesAds));
+        row("Teto ads (margem zero)", formatBRL(r.tetoAdsParaMargemZero));
+        row(
+          "Teto ads (meta " + (Math.round(r.metaMargemPct * 100) / 100) + "%)",
+          formatBRL(r.tetoAdsParaMetaPct)
+        );
+        row("Badge", r.badge || "—");
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "result-card__hint" }, r.advice));
+      }
+      out.appendChild(card);
+
+      var actions = el("div", { class: "freightgen__actions" });
+      var btn = el("button", { type: "button", class: "btn btn--solid" }, "Copiar resumo");
+      btn.addEventListener("click", function () {
+        var text = r.copyText || joinMargemLiquidaPosAdsCopy(r);
+        copyText(text)
+          .then(function () {
+            toast("Resumo copiado.");
+          })
+          .catch(function () {
+            toast("Copia o resumo na mão.");
+          });
+      });
+      actions.appendChild(btn);
+      out.appendChild(actions);
+    }
+
+    [
+      "mlpa-preco",
+      "mlpa-taxa",
+      "mlpa-custo",
+      "mlpa-frete",
+      "mlpa-ads",
+      "mlpa-ads-pct",
+      "mlpa-vendas",
+      "mlpa-meta"
+    ].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", render);
+        node.addEventListener("change", render);
+      }
+    });
+    render();
+  }
+
+
   function wireGlobalUi() {
     document.querySelectorAll("[data-precifica-calc]").forEach(function (node) {
       mountCalculator(node, { preset: node.getAttribute("data-preset") || "" });
@@ -17113,6 +17842,10 @@
 
     document.querySelectorAll("[data-precifica-custo-full]").forEach(function (node) {
       mountCustoFull(node);
+    });
+
+    document.querySelectorAll("[data-precifica-margem-liquida-pos-ads]").forEach(function (node) {
+      mountMargemLiquidaPosAds(node);
     });
 
 
@@ -17290,6 +18023,11 @@
     joinCustoFullCopy: joinCustoFullCopy,
     badgeCustoFull: badgeCustoFull,
     buildCustoFullAdvice: buildCustoFullAdvice,
+    calculateMargemLiquidaPosAds: calculateMargemLiquidaPosAds,
+    mountMargemLiquidaPosAds: mountMargemLiquidaPosAds,
+    joinMargemLiquidaPosAdsCopy: joinMargemLiquidaPosAdsCopy,
+    badgeMargemLiquidaPosAds: badgeMargemLiquidaPosAds,
+    buildMargemLiquidaPosAdsAdvice: buildMargemLiquidaPosAdsAdvice,
     HOOK_MAX: HOOK_MAX,
     AMAZON_BULLET_SOFT: AMAZON_BULLET_SOFT,
     AMAZON_BULLET_HARD: AMAZON_BULLET_HARD,
