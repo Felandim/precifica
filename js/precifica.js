@@ -3887,6 +3887,149 @@
       return "defaults+join badge=" + r.badge;
     });
 
+    /* 154) taxa-antecipacao: happy path VERDE */
+    push(154, function () {
+      // valor=5000, taxa=1.5, dias=14, oport=1.5%/mês, meta=2
+      // custo=75; liquido=4925; custo/dia≈5.357; taxaMes=(1.5/14)*30≈3.214
+      // oportEspera=5000*(1.5/100)*(14/30)=35; delta=75-35=40 > 0
+      // taxa 1.5 < 2.5 e < meta 2? 1.5 < 2 meta → but delta>0 → AMARELO
+      // For VERDE: need delta<=0 OR taxa low enough. Use taxa=1, oport=3
+      // custo=50; oport=5000*0.03*(14/30)=70; delta=-20; taxa 1 < 2.5; taxaMes≈2.14 < 5; 1 <= meta 2 → VERDE
+      var r = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: 1,
+        diasAntecipacao: 14,
+        custoOportunidadeMensalPct: 3,
+        metaCustoPct: 2
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (Math.abs(r.custoAntecipacao - 50) > 1e-9) throw new Error("custo " + r.custoAntecipacao);
+      if (Math.abs(r.valorLiquidoRecebido - 4950) > 1e-9) throw new Error("liq " + r.valorLiquidoRecebido);
+      if (Math.abs(r.custoPorDia - 50 / 14) > 1e-9) throw new Error("dia " + r.custoPorDia);
+      if (Math.abs(r.taxaEfetivaAoMes - (1 / 14) * 30) > 1e-9) throw new Error("mes " + r.taxaEfetivaAoMes);
+      if (Math.abs(r.taxaEfetivaAoAno - (1 / 14) * 30 * 12) > 1e-9) throw new Error("ano " + r.taxaEfetivaAoAno);
+      if (Math.abs(r.custoOportunidadeEspera - 5000 * 0.03 * (14 / 30)) > 1e-9) {
+        throw new Error("oport " + r.custoOportunidadeEspera);
+      }
+      if (Math.abs(r.deltaCustoVsOportunidade - (50 - 5000 * 0.03 * (14 / 30))) > 1e-9) {
+        throw new Error("delta " + r.deltaCustoVsOportunidade);
+      }
+      if (r.valeAntecipar !== true) throw new Error("vale " + r.valeAntecipar);
+      if (r.badge !== "VERDE") throw new Error("badge " + r.badge);
+      return "happy verde custo=" + r.custoAntecipacao;
+    });
+
+    /* 155) taxa-antecipacao: VERMELHO — taxa≥5 OU taxaMes≥10 OU (delta>0 e taxa≥3) */
+    push(155, function () {
+      var high = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: 5.5,
+        diasAntecipacao: 14,
+        custoOportunidadeMensalPct: 1.5,
+        metaCustoPct: 2
+      });
+      if (!high.ok) throw new Error(high.error || "fail high");
+      if (!(high.taxaAntecipacaoPct >= 5)) throw new Error("taxa " + high.taxaAntecipacaoPct);
+      if (high.badge !== "VERMELHO") throw new Error("badge high " + high.badge);
+      var mid = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: 3.5,
+        diasAntecipacao: 14,
+        custoOportunidadeMensalPct: 1.5,
+        metaCustoPct: 2
+      });
+      // custo=175; oport=35; delta>0 e taxa≥3 → VERMELHO
+      if (!mid.ok) throw new Error(mid.error || "fail mid");
+      if (!(mid.deltaCustoVsOportunidade > 0)) throw new Error("delta mid " + mid.deltaCustoVsOportunidade);
+      if (mid.badge !== "VERMELHO") throw new Error("badge mid " + mid.badge);
+      return "vermelho taxa=" + high.taxaAntecipacaoPct;
+    });
+
+    /* 156) taxa-antecipacao: inputs inválidos → error VERMELHO */
+    push(156, function () {
+      var r = calculateTaxaAntecipacao({
+        valorAntecipar: 0,
+        taxaAntecipacaoPct: 2
+      });
+      if (r.ok) throw new Error("expected fail zero valor");
+      if (r.badge !== "VERMELHO") throw new Error("badge " + r.badge);
+      var neg = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: -1
+      });
+      if (neg.ok) throw new Error("expected fail neg taxa");
+      var badDias = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: 2,
+        diasAntecipacao: 0
+      });
+      if (badDias.ok) throw new Error("expected fail dias 0");
+      var badOport = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: 2,
+        custoOportunidadeMensalPct: -0.5
+      });
+      if (badOport.ok) throw new Error("expected fail neg oport");
+      return "invalid ok";
+    });
+
+    /* 157) taxa-antecipacao: AMARELO — taxa≥2.5 OU delta>0 abaixo de 3 */
+    push(157, function () {
+      var r = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: 2.7,
+        diasAntecipacao: 14,
+        custoOportunidadeMensalPct: 1.5,
+        metaCustoPct: 2
+      });
+      // 2.7 >= 2.5 → AMARELO (and < 3 so not vermelho via delta+taxa)
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.badge !== "AMARELO") throw new Error("badge " + r.badge);
+      var d = calculateTaxaAntecipacao({
+        valorAntecipar: 5000,
+        taxaAntecipacaoPct: 2,
+        diasAntecipacao: 14,
+        custoOportunidadeMensalPct: 1.5,
+        metaCustoPct: 2
+      });
+      // custo=100; oport=35; delta>0; taxa 2 < 2.5 but > meta? 2==meta so not > meta; delta>0 → AMARELO
+      if (!d.ok) throw new Error(d.error || "fail d");
+      if (!(d.deltaCustoVsOportunidade > 0)) throw new Error("delta");
+      if (d.badge !== "AMARELO") throw new Error("badge d " + d.badge);
+      return "amarelo ok";
+    });
+
+    /* 158) taxa-antecipacao: defaults + join copy + badge helper */
+    push(158, function () {
+      var empty = calculateTaxaAntecipacao({});
+      if (empty.ok) throw new Error("empty should fail (missing valor)");
+      var r = calculateTaxaAntecipacao({
+        valorAntecipar: 5000
+        // defaults: taxa 2.99, dias 14, oport 1.5, meta 2
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.taxaAntecipacaoPct !== 2.99) throw new Error("default taxa " + r.taxaAntecipacaoPct);
+      if (r.diasAntecipacao !== 14) throw new Error("default dias " + r.diasAntecipacao);
+      if (r.custoOportunidadeMensalPct !== 1.5) throw new Error("default oport " + r.custoOportunidadeMensalPct);
+      if (r.metaCustoPct !== 2) throw new Error("default meta " + r.metaCustoPct);
+      // 2.99 >= 2.5 → AMARELO
+      if (r.badge !== "AMARELO") throw new Error("default badge " + r.badge);
+      var joined = joinTaxaAntecipacaoCopy(r);
+      if (!joined || joined.indexOf("ESTIMATIVA") === -1) throw new Error("join");
+      if (joined !== r.copyText) throw new Error("copyText mismatch");
+      if (badgeTaxaAntecipacao(r) !== r.badge) throw new Error("badge helper");
+      var low = joined.toLowerCase();
+      if (
+        low.indexOf("antecip") === -1 &&
+        low.indexOf("recebív") === -1 &&
+        low.indexOf("recebiv") === -1
+      ) {
+        throw new Error("missing topic");
+      }
+      return "defaults+join badge=" + r.badge;
+    });
+
+
     var passed = results.filter(function (r) { return r.ok; }).length;
     results.forEach(function (r) {
       console.log("[" + (r.ok ? "PASS" : "FAIL") + "] teste " + r.id + " — " + r.detail);
@@ -17723,6 +17866,482 @@
   }
 
 
+  function badgeTaxaAntecipacao(r) {
+    if (!r || !r.ok) return "VERMELHO";
+    if (!(r.custoAntecipacao === r.custoAntecipacao) || r.custoAntecipacao < 0) {
+      return "VERMELHO";
+    }
+    if (
+      r.taxaAntecipacaoPct === r.taxaAntecipacaoPct &&
+      r.taxaAntecipacaoPct >= 5
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.taxaEfetivaAoMes === r.taxaEfetivaAoMes &&
+      r.taxaEfetivaAoMes >= 10
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.deltaCustoVsOportunidade === r.deltaCustoVsOportunidade &&
+      r.deltaCustoVsOportunidade > 0 &&
+      r.taxaAntecipacaoPct >= 3
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.taxaAntecipacaoPct === r.taxaAntecipacaoPct &&
+      r.taxaAntecipacaoPct >= 2.5
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.taxaEfetivaAoMes === r.taxaEfetivaAoMes &&
+      r.taxaEfetivaAoMes >= 5
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.deltaCustoVsOportunidade === r.deltaCustoVsOportunidade &&
+      r.deltaCustoVsOportunidade > 0
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.taxaAntecipacaoPct === r.taxaAntecipacaoPct &&
+      r.taxaAntecipacaoPct > r.metaCustoPct
+    ) {
+      return "AMARELO";
+    }
+    return "VERDE";
+  }
+
+  function buildTaxaAntecipacaoAdvice(r) {
+    if (!r.ok) return r.error || "Dados incompletos.";
+    var base =
+      "Custo de antecipação: " +
+      formatBRL(r.custoAntecipacao) +
+      " (" +
+      (Math.round(r.taxaAntecipacaoPct * 100) / 100) +
+      "% de " +
+      formatBRL(r.valorAntecipar) +
+      "). Líquido recebido agora: " +
+      formatBRL(r.valorLiquidoRecebido) +
+      ". Custo/dia (~" +
+      r.diasAntecipacao +
+      " dias): " +
+      formatBRL(r.custoPorDia) +
+      ". Taxa efetiva ~" +
+      (Math.round(r.taxaEfetivaAoMes * 100) / 100) +
+      "% ao mês (~" +
+      (Math.round(r.taxaEfetivaAoAno * 100) / 100) +
+      "% a.a.). Custo de oportunidade de esperar: " +
+      formatBRL(r.custoOportunidadeEspera) +
+      ". Delta (antecipação − oportunidade): " +
+      formatBRL(r.deltaCustoVsOportunidade) +
+      ". ";
+    if (r.valeAntecipar) {
+      base +=
+        "Neste cenário, o custo de oportunidade de esperar supera a taxa — antecipar pode valer a pena. ";
+    } else if (r.taxaAntecipacaoPct >= 5) {
+      base += "Taxa ≥ 5% — caro demais na maioria dos casos; prefira esperar o prazo. ";
+    } else if (r.taxaEfetivaAoMes >= 10) {
+      base += "Taxa efetiva ≥ 10%/mês — caro frente ao capital de giro típico. ";
+    } else if (r.deltaCustoVsOportunidade > 0 && r.taxaAntecipacaoPct >= 3) {
+      base += "Antecipação mais cara que o custo de oportunidade e taxa ≥ 3% — espere o prazo se puder. ";
+    } else if (r.taxaAntecipacaoPct >= 2.5) {
+      base += "Taxa ≥ 2,5% — revise se o caixa urgente justifica. ";
+    } else if (r.taxaAntecipacaoPct > r.metaCustoPct) {
+      base +=
+        "Taxa acima da meta " +
+        (Math.round(r.metaCustoPct * 100) / 100) +
+        "% — só antecipe se o caixa for crítico. ";
+    } else {
+      base += "Custo de antecipação aceitável neste cenário (abaixo da meta e vs oportunidade). ";
+    }
+    return (
+      base +
+      "ESTIMATIVA — confira a taxa real de antecipação no Seller Center / financeiro do marketplace."
+    );
+  }
+
+  function joinTaxaAntecipacaoCopy(r) {
+    r = r || {};
+    var lines = [];
+    lines.push("Custo de antecipação de recebíveis · Precifica");
+    if (r.ok) {
+      lines.push("Valor a antecipar: " + formatBRL(r.valorAntecipar));
+      lines.push(
+        "Taxa de antecipação: " + (Math.round(r.taxaAntecipacaoPct * 100) / 100) + "%"
+      );
+      lines.push("Dias antecipados: " + r.diasAntecipacao);
+      lines.push(
+        "Custo oportunidade (% a.m.): " +
+          (Math.round(r.custoOportunidadeMensalPct * 100) / 100) +
+          "%"
+      );
+      lines.push(
+        "Meta custo máx. (%): " + (Math.round(r.metaCustoPct * 100) / 100) + "%"
+      );
+      lines.push("Custo antecipação: " + formatBRL(r.custoAntecipacao));
+      lines.push("Líquido recebido agora: " + formatBRL(r.valorLiquidoRecebido));
+      lines.push("Custo / dia: " + formatBRL(r.custoPorDia));
+      lines.push(
+        "Taxa efetiva a.m.: " + (Math.round(r.taxaEfetivaAoMes * 100) / 100) + "%"
+      );
+      lines.push(
+        "Taxa efetiva a.a.: " + (Math.round(r.taxaEfetivaAoAno * 100) / 100) + "%"
+      );
+      lines.push(
+        "Custo oportunidade de esperar: " + formatBRL(r.custoOportunidadeEspera)
+      );
+      lines.push(
+        "Delta (antec. − oport.): " + formatBRL(r.deltaCustoVsOportunidade)
+      );
+      lines.push("Vale antecipar?: " + (r.valeAntecipar ? "SIM" : "NÃO"));
+      lines.push("Badge: " + (r.badge || "—"));
+      if (r.advice) lines.push(r.advice);
+    } else {
+      lines.push("Erro: " + (r.error || "dados inválidos"));
+    }
+    lines.push(
+      r.disclaimer ||
+        "ESTIMATIVA — Custo de antecipação de recebíveis. Não é conselho financeiro."
+    );
+    return lines.join("\n");
+  }
+
+  function calculateTaxaAntecipacao(input) {
+    input = input || {};
+    var valorAntecipar = toNumber(input.valorAntecipar);
+
+    var taxaAntecipacaoPct;
+    if (input.taxaAntecipacaoPct == null || input.taxaAntecipacaoPct === "") {
+      taxaAntecipacaoPct = 2.99;
+    } else {
+      taxaAntecipacaoPct = toNumber(input.taxaAntecipacaoPct);
+    }
+
+    var diasAntecipacao;
+    if (input.diasAntecipacao == null || input.diasAntecipacao === "") {
+      diasAntecipacao = 14;
+    } else {
+      diasAntecipacao = toNumber(input.diasAntecipacao);
+    }
+
+    var custoOportunidadeMensalPct;
+    if (
+      input.custoOportunidadeMensalPct == null ||
+      input.custoOportunidadeMensalPct === ""
+    ) {
+      custoOportunidadeMensalPct = 1.5;
+    } else {
+      custoOportunidadeMensalPct = toNumber(input.custoOportunidadeMensalPct);
+    }
+
+    var metaCustoPct;
+    if (input.metaCustoPct == null || input.metaCustoPct === "") {
+      metaCustoPct = 2;
+    } else {
+      metaCustoPct = toNumber(input.metaCustoPct);
+    }
+
+    var disclaimer =
+      "ESTIMATIVA — Custo de antecipação de recebíveis no navegador. Modelo: custo = valor × (taxa%/100); líquido = valor − custo; custo/dia = custo ÷ dias; taxa efetiva a.m. = (taxa%/dias)×30; a.a. ≈ a.m.×12; custo oportunidade de esperar = valor × (oport.% a.m./100) × (dias/30); delta = custo antecipação − oportunidade; vale antecipar se oportunidade > custo. Não inclui IOF, spreads bancários nem regras reais do marketplace. Não é conselho financeiro.";
+
+    function fail(msg) {
+      var f = {
+        ok: false,
+        error: msg,
+        valorAntecipar: valorAntecipar,
+        taxaAntecipacaoPct: taxaAntecipacaoPct,
+        diasAntecipacao: diasAntecipacao,
+        custoOportunidadeMensalPct: custoOportunidadeMensalPct,
+        metaCustoPct: metaCustoPct,
+        custoAntecipacao: null,
+        valorLiquidoRecebido: null,
+        custoPorDia: null,
+        taxaEfetivaAoMes: null,
+        taxaEfetivaAoAno: null,
+        custoOportunidadeEspera: null,
+        deltaCustoVsOportunidade: null,
+        valeAntecipar: false,
+        badge: "VERMELHO",
+        advice: msg,
+        disclaimer: disclaimer,
+        copyText: ""
+      };
+      f.copyText = joinTaxaAntecipacaoCopy(f);
+      return f;
+    }
+
+    if (!(valorAntecipar > 0) || valorAntecipar !== valorAntecipar) {
+      return fail("Informe o valor a antecipar (R$) maior que zero.");
+    }
+    if (
+      !(taxaAntecipacaoPct >= 0) ||
+      taxaAntecipacaoPct !== taxaAntecipacaoPct
+    ) {
+      return fail("Informe a taxa de antecipação (%) ≥ 0.");
+    }
+    if (!(diasAntecipacao > 0) || diasAntecipacao !== diasAntecipacao) {
+      return fail("Informe os dias antecipados maior que zero.");
+    }
+    if (
+      !(custoOportunidadeMensalPct >= 0) ||
+      custoOportunidadeMensalPct !== custoOportunidadeMensalPct
+    ) {
+      return fail("Informe o custo de oportunidade (% a.m.) ≥ 0.");
+    }
+    if (!(metaCustoPct >= 0) || metaCustoPct !== metaCustoPct) {
+      return fail("Informe a meta de custo máximo (%) ≥ 0.");
+    }
+
+    var custoAntecipacao = valorAntecipar * (taxaAntecipacaoPct / 100);
+    var valorLiquidoRecebido = valorAntecipar - custoAntecipacao;
+    var custoPorDia = custoAntecipacao / diasAntecipacao;
+    var taxaEfetivaAoMes = (taxaAntecipacaoPct / diasAntecipacao) * 30;
+    var taxaEfetivaAoAno = taxaEfetivaAoMes * 12;
+    var custoOportunidadeEspera =
+      valorAntecipar *
+      (custoOportunidadeMensalPct / 100) *
+      (diasAntecipacao / 30);
+    var deltaCustoVsOportunidade =
+      custoAntecipacao - custoOportunidadeEspera;
+    var valeAntecipar = custoOportunidadeEspera > custoAntecipacao;
+
+    var result = {
+      ok: true,
+      error: null,
+      valorAntecipar: valorAntecipar,
+      taxaAntecipacaoPct: taxaAntecipacaoPct,
+      diasAntecipacao: diasAntecipacao,
+      custoOportunidadeMensalPct: custoOportunidadeMensalPct,
+      metaCustoPct: metaCustoPct,
+      custoAntecipacao: custoAntecipacao,
+      valorLiquidoRecebido: valorLiquidoRecebido,
+      custoPorDia: custoPorDia,
+      taxaEfetivaAoMes: taxaEfetivaAoMes,
+      taxaEfetivaAoAno: taxaEfetivaAoAno,
+      custoOportunidadeEspera: custoOportunidadeEspera,
+      deltaCustoVsOportunidade: deltaCustoVsOportunidade,
+      valeAntecipar: valeAntecipar,
+      badge: "AMARELO",
+      advice: "",
+      disclaimer: disclaimer,
+      copyText: ""
+    };
+    result.badge = badgeTaxaAntecipacao(result);
+    result.advice = buildTaxaAntecipacaoAdvice(result);
+    result.copyText = joinTaxaAntecipacaoCopy(result);
+    return result;
+  }
+
+  function mountTaxaAntecipacao(root) {
+    if (!root || typeof document === "undefined") return;
+    root.innerHTML = "";
+    root.classList.add("freightgen", "tacosgen", "taxaantecgen");
+
+    var panel = el("div", { class: "freightgen__panel titlegen__panel" });
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__kicker titlegen__kicker" },
+        "Antecipação de recebíveis · ESTIMATIVA"
+      )
+    );
+    panel.appendChild(
+      el(
+        "h2",
+        { class: "freightgen__title titlegen__title" },
+        "Quanto custa antecipar o repasse — e vale mais a pena que esperar o prazo?"
+      )
+    );
+
+    var fields = el("div", { class: "freightgen__fields titlegen__fields" });
+    fields.appendChild(
+      field({
+        id: "ta-valor",
+        label: "Valor a antecipar (R$)",
+        value: "5000",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ta-taxa",
+        label: "Taxa de antecipação (%)",
+        value: "2.99",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 2,99%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ta-dias",
+        label: "Dias antecipados (prazo de repasse)",
+        value: "14",
+        step: "1",
+        min: "1",
+        placeholder: "padrão 14"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ta-oport",
+        label: "Custo de oportunidade do capital (% a.m.)",
+        value: "1.5",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 1,5% a.m."
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "ta-meta",
+        label: "Meta de custo máximo da antecipação (%)",
+        value: "2",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 2%"
+      })
+    );
+    panel.appendChild(fields);
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__hint titlegen__hint" },
+        "Custo = valor × taxa%. Compare com o custo de oportunidade de esperar os dias do repasse. ESTIMATIVA — confira a taxa real no Seller Center."
+      )
+    );
+    root.appendChild(panel);
+
+    var out = el("div", { class: "freightgen__out", "aria-live": "polite" });
+    root.appendChild(out);
+
+    function read() {
+      var taxaRaw = document.getElementById("ta-taxa").value;
+      var diasRaw = document.getElementById("ta-dias").value;
+      var oportRaw = document.getElementById("ta-oport").value;
+      var metaRaw = document.getElementById("ta-meta").value;
+      return {
+        valorAntecipar: document.getElementById("ta-valor").value,
+        taxaAntecipacaoPct: taxaRaw === "" ? undefined : taxaRaw,
+        diasAntecipacao: diasRaw === "" ? undefined : diasRaw,
+        custoOportunidadeMensalPct: oportRaw === "" ? undefined : oportRaw,
+        metaCustoPct: metaRaw === "" ? undefined : metaRaw
+      };
+    }
+
+    function render() {
+      var r = calculateTaxaAntecipacao(read());
+      out.innerHTML = "";
+      var loss = !r.ok || r.badge === "VERMELHO";
+      var card = el(
+        "article",
+        { class: "result-card" + (loss ? " result-card--loss" : "") }
+      );
+      card.appendChild(
+        el(
+          "p",
+          { class: "result-card__label" },
+          "Antecipação · " + (r.badge || "—") + " · ESTIMATIVA"
+        )
+      );
+      if (!r.ok) {
+        card.appendChild(el("p", { class: "result-card__price is-loss" }, "—"));
+        card.appendChild(
+          el("p", { class: "result-card__hint" }, r.error || "Dados incompletos")
+        );
+      } else {
+        var headline =
+          formatBRL(r.custoAntecipacao) +
+          " custo · " +
+          formatBRL(r.valorLiquidoRecebido) +
+          " líquido agora";
+        card.appendChild(
+          el(
+            "p",
+            { class: "result-card__price" + (loss ? " is-loss" : "") },
+            headline
+          )
+        );
+        var grid = el("div", { class: "result-card__grid" });
+        function row(k, v) {
+          var d = el("div");
+          d.appendChild(el("span", { class: "muted" }, k));
+          d.appendChild(el("strong", null, v));
+          grid.appendChild(d);
+        }
+        row("Valor a antecipar", formatBRL(r.valorAntecipar));
+        row(
+          "Taxa antecipação",
+          (Math.round(r.taxaAntecipacaoPct * 100) / 100).toLocaleString("pt-BR") +
+            "%"
+        );
+        row("Dias antecipados", String(r.diasAntecipacao));
+        row("Custo antecipação", formatBRL(r.custoAntecipacao));
+        row("Líquido recebido agora", formatBRL(r.valorLiquidoRecebido));
+        row("Custo / dia", formatBRL(r.custoPorDia));
+        row(
+          "Taxa efetiva a.m.",
+          (Math.round(r.taxaEfetivaAoMes * 100) / 100).toLocaleString("pt-BR") +
+            "%"
+        );
+        row(
+          "Taxa efetiva a.a.",
+          (Math.round(r.taxaEfetivaAoAno * 100) / 100).toLocaleString("pt-BR") +
+            "%"
+        );
+        row("Custo oport. de esperar", formatBRL(r.custoOportunidadeEspera));
+        row("Delta (antec. − oport.)", formatBRL(r.deltaCustoVsOportunidade));
+        row("Vale antecipar?", r.valeAntecipar ? "SIM" : "NÃO");
+        row(
+          "Meta custo máx.",
+          (Math.round(r.metaCustoPct * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row("Badge", r.badge || "—");
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "result-card__hint" }, r.advice));
+      }
+      out.appendChild(card);
+
+      var actions = el("div", { class: "freightgen__actions" });
+      var btn = el(
+        "button",
+        { type: "button", class: "btn btn--solid" },
+        "Copiar resumo"
+      );
+      btn.addEventListener("click", function () {
+        var text = r.copyText || joinTaxaAntecipacaoCopy(r);
+        copyText(text)
+          .then(function () {
+            toast("Resumo copiado.");
+          })
+          .catch(function () {
+            toast("Copia o resumo na mão.");
+          });
+      });
+      actions.appendChild(btn);
+      out.appendChild(actions);
+    }
+
+    ["ta-valor", "ta-taxa", "ta-dias", "ta-oport", "ta-meta"].forEach(function (
+      id
+    ) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", render);
+        node.addEventListener("change", render);
+      }
+    });
+    render();
+  }
+
+
   function wireGlobalUi() {
     document.querySelectorAll("[data-precifica-calc]").forEach(function (node) {
       mountCalculator(node, { preset: node.getAttribute("data-preset") || "" });
@@ -17846,6 +18465,10 @@
 
     document.querySelectorAll("[data-precifica-margem-liquida-pos-ads]").forEach(function (node) {
       mountMargemLiquidaPosAds(node);
+    });
+
+    document.querySelectorAll("[data-precifica-taxa-antecipacao]").forEach(function (node) {
+      mountTaxaAntecipacao(node);
     });
 
 
@@ -18028,6 +18651,11 @@
     joinMargemLiquidaPosAdsCopy: joinMargemLiquidaPosAdsCopy,
     badgeMargemLiquidaPosAds: badgeMargemLiquidaPosAds,
     buildMargemLiquidaPosAdsAdvice: buildMargemLiquidaPosAdsAdvice,
+    calculateTaxaAntecipacao: calculateTaxaAntecipacao,
+    mountTaxaAntecipacao: mountTaxaAntecipacao,
+    joinTaxaAntecipacaoCopy: joinTaxaAntecipacaoCopy,
+    badgeTaxaAntecipacao: badgeTaxaAntecipacao,
+    buildTaxaAntecipacaoAdvice: buildTaxaAntecipacaoAdvice,
     HOOK_MAX: HOOK_MAX,
     AMAZON_BULLET_SOFT: AMAZON_BULLET_SOFT,
     AMAZON_BULLET_HARD: AMAZON_BULLET_HARD,
