@@ -4030,6 +4030,163 @@
     });
 
 
+
+    /* 159) custo-cupom: happy path VERDE — cupom baixo */
+    push(159, function () {
+      // preco=99.9, taxa=16, custo=45, frete=12, cupom=3, vendas=120, meta=15
+      // taxaR=15.984; receita=71.916; margemSem=26.916; margemCom=23.916
+      // pctPreco≈3.003; pctMargem≈11.15; impacto=360; tetoZero=26.916; tetoMeta=11.931
+      var r = calculateCustoCupom({
+        precoVenda: 99.9,
+        taxaMarketplacePct: 16,
+        custoProduto: 45,
+        freteCusto: 12,
+        cupomReais: 3,
+        vendasMes: 120,
+        metaMargemPct: 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (Math.abs(r.taxaReais - 15.984) > 1e-9) throw new Error("taxaReais " + r.taxaReais);
+      if (Math.abs(r.receitaLiquidaBase - 71.916) > 1e-9) throw new Error("receita " + r.receitaLiquidaBase);
+      if (Math.abs(r.margemSemCupom - 26.916) > 1e-9) throw new Error("margemSem " + r.margemSemCupom);
+      if (Math.abs(r.margemComCupom - 23.916) > 1e-9) throw new Error("margemCom " + r.margemComCupom);
+      if (Math.abs(r.cupomPctSobrePreco - (3 / 99.9) * 100) > 1e-9) throw new Error("pctPreco " + r.cupomPctSobrePreco);
+      if (Math.abs(r.cupomPctSobreMargem - (3 / 26.916) * 100) > 1e-9) throw new Error("pctMargem " + r.cupomPctSobreMargem);
+      if (Math.abs(r.impactoMes - 360) > 1e-9) throw new Error("impacto " + r.impactoMes);
+      if (Math.abs(r.tetoCupomMargemZero - 26.916) > 1e-9) throw new Error("tetoZero " + r.tetoCupomMargemZero);
+      if (Math.abs(r.tetoCupomMeta - (26.916 - 99.9 * 0.15)) > 1e-9) throw new Error("tetoMeta " + r.tetoCupomMeta);
+      if (r.badge !== "VERDE") throw new Error("badge " + r.badge);
+      return "happy verde margemCom=" + r.margemComCupom;
+    });
+
+    /* 160) custo-cupom: AMARELO — % margem ≥ 20 OU % preço ≥ 5 */
+    push(160, function () {
+      var byMargem = calculateCustoCupom({
+        precoVenda: 99.9,
+        taxaMarketplacePct: 16,
+        custoProduto: 45,
+        freteCusto: 12,
+        cupomReais: 6,
+        vendasMes: 120,
+        metaMargemPct: 15
+      });
+      // 6/26.916 ≈ 22.29% ≥ 20 → AMARELO
+      if (!byMargem.ok) throw new Error(byMargem.error || "fail");
+      if (!(byMargem.cupomPctSobreMargem >= 20)) throw new Error("pctMargem " + byMargem.cupomPctSobreMargem);
+      if (byMargem.badge !== "AMARELO") throw new Error("badge margem " + byMargem.badge);
+      var byPreco = calculateCustoCupom({
+        precoVenda: 99.9,
+        taxaMarketplacePct: 16,
+        custoProduto: 45,
+        freteCusto: 12,
+        cupomReais: 5,
+        vendasMes: 120,
+        metaMargemPct: 15
+      });
+      // 5/99.9 ≈ 5.005% ≥ 5 e 5/26.916 ≈ 18.58% < 20 → AMARELO
+      if (!byPreco.ok) throw new Error(byPreco.error || "fail preco");
+      if (!(byPreco.cupomPctSobrePreco >= 5)) throw new Error("pctPreco " + byPreco.cupomPctSobrePreco);
+      if (byPreco.badge !== "AMARELO") throw new Error("badge preco " + byPreco.badge);
+      return "amarelo pctM=" + byMargem.cupomPctSobreMargem.toFixed(2) + " pctP=" + byPreco.cupomPctSobrePreco.toFixed(2);
+    });
+
+    /* 161) custo-cupom: VERMELHO — margem ≤ 0 OU % margem ≥ 40 */
+    push(161, function () {
+      var neg = calculateCustoCupom({
+        precoVenda: 99.9,
+        taxaMarketplacePct: 16,
+        custoProduto: 45,
+        freteCusto: 12,
+        cupomReais: 30,
+        vendasMes: 120,
+        metaMargemPct: 15
+      });
+      // margemCom = 26.916-30 < 0 → VERMELHO
+      if (!neg.ok) throw new Error(neg.error || "fail neg");
+      if (!(neg.margemComCupom <= 0)) throw new Error("expected non-pos " + neg.margemComCupom);
+      if (neg.badge !== "VERMELHO") throw new Error("badge neg " + neg.badge);
+      var high = calculateCustoCupom({
+        precoVenda: 99.9,
+        taxaMarketplacePct: 16,
+        custoProduto: 45,
+        freteCusto: 12,
+        cupomReais: 11,
+        vendasMes: 120,
+        metaMargemPct: 15
+      });
+      // 11/26.916 ≈ 40.87% ≥ 40 → VERMELHO
+      if (!high.ok) throw new Error(high.error || "fail high");
+      if (!(high.cupomPctSobreMargem >= 40)) throw new Error("pct " + high.cupomPctSobreMargem);
+      if (high.badge !== "VERMELHO") throw new Error("badge high " + high.badge);
+      return "vermelho margemCom=" + neg.margemComCupom;
+    });
+
+    /* 162) custo-cupom: inputs inválidos → error VERMELHO */
+    push(162, function () {
+      var r = calculateCustoCupom({
+        precoVenda: 0,
+        custoProduto: 45,
+        cupomReais: 10
+      });
+      if (r.ok) throw new Error("expected fail zero preco");
+      if (r.badge !== "VERMELHO") throw new Error("badge " + r.badge);
+      var neg = calculateCustoCupom({
+        precoVenda: 99.9,
+        custoProduto: -1,
+        cupomReais: 10
+      });
+      if (neg.ok) throw new Error("expected fail neg custo");
+      var badCupom = calculateCustoCupom({
+        precoVenda: 99.9,
+        custoProduto: 45,
+        cupomReais: -2
+      });
+      if (badCupom.ok) throw new Error("expected fail neg cupom");
+      return "invalid ok";
+    });
+
+    /* 163) custo-cupom: defaults + cupomPct derive + join copy */
+    push(163, function () {
+      var empty = calculateCustoCupom({});
+      if (empty.ok) throw new Error("empty should fail (missing preco/custo)");
+      var r = calculateCustoCupom({
+        precoVenda: 99.9,
+        custoProduto: 45
+        // defaults: taxa 16, frete 12, cupom 10, vendas 120, meta 15
+      });
+      if (!r.ok) throw new Error(r.error || "fail");
+      if (r.taxaMarketplacePct !== 16) throw new Error("default taxa " + r.taxaMarketplacePct);
+      if (r.freteCusto !== 12) throw new Error("default frete " + r.freteCusto);
+      if (r.cupomReais !== 10) throw new Error("default cupom " + r.cupomReais);
+      if (r.vendasMes !== 120) throw new Error("default vendas " + r.vendasMes);
+      if (r.metaMargemPct !== 15) throw new Error("default meta " + r.metaMargemPct);
+      // 10/26.916 ≈ 37.15% ≥ 20 → AMARELO
+      if (r.badge !== "AMARELO") throw new Error("default badge " + r.badge);
+      var fromPct = calculateCustoCupom({
+        precoVenda: 100,
+        custoProduto: 40,
+        freteCusto: 10,
+        taxaMarketplacePct: 16,
+        cupomPct: 8,
+        vendasMes: 100,
+        metaMargemPct: 15
+      });
+      // cupom = 100*0.08 = 8; receita = 100-16-10=74; margemSem=34; margemCom=26
+      if (!fromPct.ok) throw new Error(fromPct.error || "fail pct");
+      if (Math.abs(fromPct.cupomReais - 8) > 1e-9) throw new Error("derive cupom " + fromPct.cupomReais);
+      if (Math.abs(fromPct.margemComCupom - 26) > 1e-9) throw new Error("margemCom pct " + fromPct.margemComCupom);
+      var joined = joinCustoCupomCopy(r);
+      if (!joined || joined.indexOf("ESTIMATIVA") === -1) throw new Error("join");
+      if (joined !== r.copyText) throw new Error("copyText mismatch");
+      if (badgeCustoCupom(r) !== r.badge) throw new Error("badge helper");
+      var low = joined.toLowerCase();
+      if (low.indexOf("cupom") === -1 && low.indexOf("cashback") === -1) {
+        throw new Error("missing topic");
+      }
+      return "defaults+join+pct badge=" + r.badge;
+    });
+
+
     var passed = results.filter(function (r) { return r.ok; }).length;
     results.forEach(function (r) {
       console.log("[" + (r.ok ? "PASS" : "FAIL") + "] teste " + r.id + " — " + r.detail);
@@ -18342,6 +18499,512 @@
   }
 
 
+
+  function badgeCustoCupom(r) {
+    if (!r || !r.ok) return "VERMELHO";
+    if (!(r.margemComCupom === r.margemComCupom) || r.margemComCupom <= 0) return "VERMELHO";
+    if (
+      r.margemSemCupom > 0 &&
+      r.cupomPctSobreMargem === r.cupomPctSobreMargem &&
+      r.cupomPctSobreMargem >= 40
+    ) {
+      return "VERMELHO";
+    }
+    if (
+      r.margemSemCupom > 0 &&
+      r.cupomPctSobreMargem === r.cupomPctSobreMargem &&
+      r.cupomPctSobreMargem >= 20
+    ) {
+      return "AMARELO";
+    }
+    if (
+      r.cupomPctSobrePreco === r.cupomPctSobrePreco &&
+      r.cupomPctSobrePreco >= 5
+    ) {
+      return "AMARELO";
+    }
+    return "VERDE";
+  }
+
+  function buildCustoCupomAdvice(r) {
+    if (!r.ok) return r.error || "Dados incompletos.";
+    var base =
+      "Cupom/cashback de " +
+      formatBRL(r.cupomReais) +
+      " por pedido come ~" +
+      (Math.round(r.cupomPctSobrePreco * 100) / 100) +
+      "% do preço";
+    if (r.cupomPctSobreMargem != null && r.cupomPctSobreMargem === r.cupomPctSobreMargem) {
+      base +=
+        " e ~" +
+        (Math.round(r.cupomPctSobreMargem * 100) / 100) +
+        "% da margem antes do cupom";
+    }
+    base +=
+      ". Margem com cupom: " +
+      formatBRL(r.margemComCupom) +
+      ". Impacto/mês (~" +
+      r.vendasMes +
+      " vendas): " +
+      formatBRL(r.impactoMes) +
+      ". Teto p/ margem zero: " +
+      formatBRL(r.tetoCupomMargemZero) +
+      "; teto p/ meta " +
+      (Math.round(r.metaMargemPct * 100) / 100) +
+      "%: " +
+      formatBRL(r.tetoCupomMeta) +
+      ". ";
+    if (r.margemComCupom <= 0) {
+      base += "Margem com cupom ≤ 0 — o desconto fura o lucro: reduza o cupom ou suba o preço. ";
+    } else if (r.margemSemCupom > 0 && r.cupomPctSobreMargem >= 40) {
+      base += "Cupom ≥ 40% da margem — risco alto de erodir o lucro. ";
+    } else if (r.margemSemCupom > 0 && r.cupomPctSobreMargem >= 20) {
+      base += "Cupom ≥ 20% da margem — revise o valor da campanha ou o ticket. ";
+    } else if (r.cupomPctSobrePreco >= 5) {
+      base += "Cupom ≥ 5% do preço — peso alto no ticket; busque cupom menor ou volume que compense. ";
+    } else {
+      base += "Custo de cupom/cashback sob controle vs margem. ";
+    }
+    return (
+      base +
+      "ESTIMATIVA — confira o valor real do cupom/cashback e quem paga (seller vs plataforma) no Seller Center."
+    );
+  }
+
+  function joinCustoCupomCopy(r) {
+    r = r || {};
+    var lines = [];
+    lines.push("Custo de cupom / cashback no marketplace · Precifica");
+    if (r.ok) {
+      lines.push("Preço de venda: " + formatBRL(r.precoVenda));
+      lines.push("Taxa marketplace: " + (Math.round(r.taxaMarketplacePct * 100) / 100) + "%");
+      lines.push("Custo produto: " + formatBRL(r.custoProduto));
+      lines.push("Frete (seller): " + formatBRL(r.freteCusto));
+      lines.push("Cupom / cashback: " + formatBRL(r.cupomReais));
+      if (r.cupomPctInput != null && r.cupomPctInput === r.cupomPctInput) {
+        lines.push("Cupom % informado: " + (Math.round(r.cupomPctInput * 100) / 100) + "%");
+      }
+      lines.push("Vendas/mês: " + r.vendasMes);
+      lines.push("Meta margem %: " + (Math.round(r.metaMargemPct * 100) / 100) + "%");
+      lines.push("Receita líquida base: " + formatBRL(r.receitaLiquidaBase));
+      lines.push("Margem s/ cupom: " + formatBRL(r.margemSemCupom));
+      lines.push("Margem c/ cupom: " + formatBRL(r.margemComCupom));
+      lines.push(
+        "Cupom % preço: " + (Math.round(r.cupomPctSobrePreco * 100) / 100) + "%"
+      );
+      if (r.cupomPctSobreMargem != null && r.cupomPctSobreMargem === r.cupomPctSobreMargem) {
+        lines.push(
+          "Cupom % margem: " + (Math.round(r.cupomPctSobreMargem * 100) / 100) + "%"
+        );
+      }
+      lines.push("Impacto / mês: " + formatBRL(r.impactoMes));
+      lines.push("Teto cupom (margem zero): " + formatBRL(r.tetoCupomMargemZero));
+      lines.push("Teto cupom (meta): " + formatBRL(r.tetoCupomMeta));
+      lines.push("Badge: " + (r.badge || "—"));
+      if (r.advice) lines.push(r.advice);
+    } else {
+      lines.push("Erro: " + (r.error || "dados inválidos"));
+    }
+    lines.push(
+      r.disclaimer ||
+        "ESTIMATIVA — Custo de cupom / cashback no marketplace. Não é conselho financeiro."
+    );
+    return lines.join("\n");
+  }
+
+  function calculateCustoCupom(input) {
+    input = input || {};
+    var precoVenda = toNumber(input.precoVenda);
+    var custoProduto = toNumber(input.custoProduto);
+
+    var taxaMarketplacePct;
+    if (input.taxaMarketplacePct == null || input.taxaMarketplacePct === "") {
+      taxaMarketplacePct = 16;
+    } else {
+      taxaMarketplacePct = toNumber(input.taxaMarketplacePct);
+    }
+
+    var freteRaw =
+      input.freteCusto != null && input.freteCusto !== ""
+        ? input.freteCusto
+        : input.fretePagoPeloSeller;
+    var freteCusto;
+    if (freteRaw == null || freteRaw === "") {
+      freteCusto = 12;
+    } else {
+      freteCusto = toNumber(freteRaw);
+    }
+
+    var vendasRaw =
+      input.vendasMes != null && input.vendasMes !== ""
+        ? input.vendasMes
+        : input.vendasPorMes;
+    var vendasMes;
+    if (vendasRaw == null || vendasRaw === "") {
+      vendasMes = 120;
+    } else {
+      vendasMes = toNumber(vendasRaw);
+    }
+
+    var metaMargemPct;
+    if (input.metaMargemPct == null || input.metaMargemPct === "") {
+      metaMargemPct = 15;
+    } else {
+      metaMargemPct = toNumber(input.metaMargemPct);
+    }
+
+    var cupomPctInput = null;
+    if (input.cupomPct != null && input.cupomPct !== "") {
+      cupomPctInput = toNumber(input.cupomPct);
+    }
+
+    var cupomReais;
+    var hasCupomReais = input.cupomReais != null && input.cupomReais !== "";
+    if (hasCupomReais) {
+      cupomReais = toNumber(input.cupomReais);
+    } else if (cupomPctInput != null && cupomPctInput === cupomPctInput && precoVenda > 0) {
+      cupomReais = precoVenda * (cupomPctInput / 100);
+    } else if (!hasCupomReais && (cupomPctInput == null || cupomPctInput !== cupomPctInput)) {
+      // default cupom when neither provided (UI defaults); empty {} still needs preco/custo
+      cupomReais = 10;
+    } else {
+      cupomReais = NaN;
+    }
+
+    var disclaimer =
+      "ESTIMATIVA — Custo de cupom / cashback no marketplace no navegador. Modelo: taxa = preço × (taxa%/100); receita líquida base = preço − taxa − frete; margem s/ cupom = receita − produto; margem c/ cupom = margem s/ cupom − cupom; impacto/mês = cupom × vendas; teto zero = margem s/ cupom; teto meta = margem s/ cupom − (preço × meta%). Se cupom% e R$ vazio, cupom = preço × %/100. Não inclui ads, impostos extras nem quem paga o cupom na prática. Não é conselho financeiro.";
+
+    function fail(msg) {
+      var f = {
+        ok: false,
+        error: msg,
+        precoVenda: precoVenda,
+        taxaMarketplacePct: taxaMarketplacePct,
+        custoProduto: custoProduto,
+        freteCusto: freteCusto,
+        cupomReais: cupomReais,
+        cupomPctInput: cupomPctInput,
+        vendasMes: vendasMes,
+        metaMargemPct: metaMargemPct,
+        taxaReais: null,
+        receitaLiquidaBase: null,
+        margemSemCupom: null,
+        margemComCupom: null,
+        cupomPctSobrePreco: null,
+        cupomPctSobreMargem: null,
+        impactoMes: null,
+        tetoCupomMargemZero: null,
+        tetoCupomMeta: null,
+        badge: "VERMELHO",
+        advice: msg,
+        disclaimer: disclaimer,
+        copyText: ""
+      };
+      f.copyText = joinCustoCupomCopy(f);
+      return f;
+    }
+
+    if (!(precoVenda > 0) || precoVenda !== precoVenda) {
+      return fail("Informe o preço de venda (R$) maior que zero.");
+    }
+    if (!(custoProduto >= 0) || custoProduto !== custoProduto) {
+      return fail("Informe o custo do produto (R$) ≥ 0.");
+    }
+    if (!(taxaMarketplacePct >= 0) || taxaMarketplacePct !== taxaMarketplacePct) {
+      return fail("Informe a taxa do marketplace (%) ≥ 0.");
+    }
+    if (!(freteCusto >= 0) || freteCusto !== freteCusto) {
+      return fail("Informe o frete (R$) ≥ 0.");
+    }
+    if (!(cupomReais >= 0) || cupomReais !== cupomReais) {
+      return fail("Informe o cupom/cashback (R$ ≥ 0) ou o % do cupom.");
+    }
+    if (cupomPctInput != null && (!(cupomPctInput >= 0) || cupomPctInput !== cupomPctInput)) {
+      return fail("Informe o cupom (%) ≥ 0.");
+    }
+    if (!(vendasMes > 0) || vendasMes !== vendasMes) {
+      return fail("Informe vendas por mês maior que zero.");
+    }
+    if (!(metaMargemPct >= 0) || metaMargemPct !== metaMargemPct) {
+      return fail("Informe a meta de margem (%) ≥ 0.");
+    }
+
+    var taxaReais = precoVenda * (taxaMarketplacePct / 100);
+    var receitaLiquidaBase = precoVenda - taxaReais - freteCusto;
+    var margemSemCupom = receitaLiquidaBase - custoProduto;
+    var margemComCupom = margemSemCupom - cupomReais;
+    var cupomPctSobrePreco = (cupomReais / precoVenda) * 100;
+    var cupomPctSobreMargem =
+      margemSemCupom > 0 ? (cupomReais / margemSemCupom) * 100 : null;
+    var impactoMes = cupomReais * vendasMes;
+    var tetoCupomMargemZero = margemSemCupom;
+    var tetoCupomMeta = margemSemCupom - precoVenda * (metaMargemPct / 100);
+
+    var result = {
+      ok: true,
+      error: null,
+      precoVenda: precoVenda,
+      taxaMarketplacePct: taxaMarketplacePct,
+      custoProduto: custoProduto,
+      freteCusto: freteCusto,
+      cupomReais: cupomReais,
+      cupomPctInput: cupomPctInput,
+      vendasMes: vendasMes,
+      metaMargemPct: metaMargemPct,
+      taxaReais: taxaReais,
+      receitaLiquidaBase: receitaLiquidaBase,
+      margemSemCupom: margemSemCupom,
+      margemComCupom: margemComCupom,
+      cupomPctSobrePreco: cupomPctSobrePreco,
+      cupomPctSobreMargem: cupomPctSobreMargem,
+      impactoMes: impactoMes,
+      tetoCupomMargemZero: tetoCupomMargemZero,
+      tetoCupomMeta: tetoCupomMeta,
+      badge: "AMARELO",
+      advice: "",
+      disclaimer: disclaimer,
+      copyText: ""
+    };
+    result.badge = badgeCustoCupom(result);
+    result.advice = buildCustoCupomAdvice(result);
+    result.copyText = joinCustoCupomCopy(result);
+    return result;
+  }
+
+  function mountCustoCupom(root) {
+    if (!root || typeof document === "undefined") return;
+    root.innerHTML = "";
+    root.classList.add("freightgen", "tacosgen", "custocupomgen");
+
+    var panel = el("div", { class: "freightgen__panel titlegen__panel" });
+    panel.appendChild(
+      el("p", { class: "freightgen__kicker titlegen__kicker" }, "Custo de cupom / cashback · ESTIMATIVA")
+    );
+    panel.appendChild(
+      el(
+        "h2",
+        { class: "freightgen__title titlegen__title" },
+        "Quanto o cupom come da margem — e qual o teto para não furar o lucro?"
+      )
+    );
+
+    var fields = el("div", { class: "freightgen__fields titlegen__fields" });
+    fields.appendChild(
+      field({
+        id: "cc-preco",
+        label: "Preço de venda (R$)",
+        value: "99.9",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cc-taxa",
+        label: "Taxa do marketplace (%)",
+        value: "16",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 16%"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cc-custo",
+        label: "Custo do produto (R$)",
+        value: "45",
+        step: "0.01",
+        min: "0"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cc-frete",
+        label: "Frete pago pelo seller (R$)",
+        value: "12",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 12"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cc-cupom",
+        label: "Cupom / cashback (R$)",
+        value: "10",
+        step: "0.01",
+        min: "0",
+        placeholder: "valor por pedido"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cc-cupom-pct",
+        label: "Cupom (%) — opcional se R$ vazio",
+        value: "",
+        step: "0.01",
+        min: "0",
+        placeholder: "ex.: 10 → 10% do preço"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cc-vendas",
+        label: "Vendas por mês",
+        value: "120",
+        step: "1",
+        min: "0",
+        placeholder: "padrão 120"
+      })
+    );
+    fields.appendChild(
+      field({
+        id: "cc-meta",
+        label: "Meta de margem (% do preço)",
+        value: "15",
+        step: "0.01",
+        min: "0",
+        placeholder: "padrão 15%"
+      })
+    );
+    panel.appendChild(fields);
+    panel.appendChild(
+      el(
+        "p",
+        { class: "freightgen__hint titlegen__hint" },
+        "Preferência: cupom em R$. Se R$ estiver vazio e % preenchido, cupom = preço × %/100. Margem c/ cupom = (preço − taxa − frete − produto) − cupom. ESTIMATIVA."
+      )
+    );
+    root.appendChild(panel);
+
+    var out = el("div", { class: "freightgen__out", "aria-live": "polite" });
+    root.appendChild(out);
+
+    function read() {
+      var taxaRaw = document.getElementById("cc-taxa").value;
+      var freteRaw = document.getElementById("cc-frete").value;
+      var vendasRaw = document.getElementById("cc-vendas").value;
+      var metaRaw = document.getElementById("cc-meta").value;
+      var cupomRaw = document.getElementById("cc-cupom").value;
+      var cupomPctRaw = document.getElementById("cc-cupom-pct").value;
+      var payload = {
+        precoVenda: document.getElementById("cc-preco").value,
+        taxaMarketplacePct: taxaRaw === "" ? undefined : taxaRaw,
+        custoProduto: document.getElementById("cc-custo").value,
+        freteCusto: freteRaw === "" ? undefined : freteRaw,
+        vendasMes: vendasRaw === "" ? undefined : vendasRaw,
+        metaMargemPct: metaRaw === "" ? undefined : metaRaw
+      };
+      if (cupomRaw !== "") {
+        payload.cupomReais = cupomRaw;
+      } else if (cupomPctRaw !== "") {
+        payload.cupomPct = cupomPctRaw;
+      } else {
+        payload.cupomReais = "";
+      }
+      return payload;
+    }
+
+    function render() {
+      var r = calculateCustoCupom(read());
+      out.innerHTML = "";
+      var loss = !r.ok || r.badge === "VERMELHO";
+      var card = el(
+        "article",
+        { class: "result-card" + (loss ? " result-card--loss" : "") }
+      );
+      card.appendChild(
+        el(
+          "p",
+          { class: "result-card__label" },
+          "Custo de cupom · " + (r.badge || "—") + " · ESTIMATIVA"
+        )
+      );
+      if (!r.ok) {
+        card.appendChild(el("p", { class: "result-card__price is-loss" }, "—"));
+        card.appendChild(el("p", { class: "result-card__hint" }, r.error || "Dados incompletos"));
+      } else {
+        var headline =
+          formatBRL(r.margemComCupom) +
+          " margem · " +
+          (Math.round(r.cupomPctSobrePreco * 100) / 100).toLocaleString("pt-BR") +
+          "% do preço";
+        card.appendChild(
+          el(
+            "p",
+            { class: "result-card__price" + (loss ? " is-loss" : "") },
+            headline
+          )
+        );
+        var grid = el("div", { class: "result-card__grid" });
+        function row(k, v) {
+          var d = el("div");
+          d.appendChild(el("span", { class: "muted" }, k));
+          d.appendChild(el("strong", null, v));
+          grid.appendChild(d);
+        }
+        row("Receita líquida base", formatBRL(r.receitaLiquidaBase));
+        row("Margem s/ cupom", formatBRL(r.margemSemCupom));
+        row("Cupom / cashback", formatBRL(r.cupomReais));
+        row("Margem c/ cupom", formatBRL(r.margemComCupom));
+        row(
+          "Cupom % preço",
+          (Math.round(r.cupomPctSobrePreco * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row(
+          "Cupom % margem",
+          r.cupomPctSobreMargem == null
+            ? "—"
+            : (Math.round(r.cupomPctSobreMargem * 100) / 100).toLocaleString("pt-BR") + "%"
+        );
+        row("Impacto / mês", formatBRL(r.impactoMes));
+        row("Teto (margem zero)", formatBRL(r.tetoCupomMargemZero));
+        row(
+          "Teto (meta " + (Math.round(r.metaMargemPct * 100) / 100) + "%)",
+          formatBRL(r.tetoCupomMeta)
+        );
+        row("Badge", r.badge || "—");
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "result-card__hint" }, r.advice));
+      }
+      out.appendChild(card);
+
+      var actions = el("div", { class: "freightgen__actions" });
+      var btn = el("button", { type: "button", class: "btn btn--solid" }, "Copiar resumo");
+      btn.addEventListener("click", function () {
+        var text = r.copyText || joinCustoCupomCopy(r);
+        copyText(text)
+          .then(function () {
+            toast("Resumo copiado.");
+          })
+          .catch(function () {
+            toast("Copia o resumo na mão.");
+          });
+      });
+      actions.appendChild(btn);
+      out.appendChild(actions);
+    }
+
+    [
+      "cc-preco",
+      "cc-taxa",
+      "cc-custo",
+      "cc-frete",
+      "cc-cupom",
+      "cc-cupom-pct",
+      "cc-vendas",
+      "cc-meta"
+    ].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.addEventListener("input", render);
+        node.addEventListener("change", render);
+      }
+    });
+    render();
+  }
+
+
   function wireGlobalUi() {
     document.querySelectorAll("[data-precifica-calc]").forEach(function (node) {
       mountCalculator(node, { preset: node.getAttribute("data-preset") || "" });
@@ -18469,6 +19132,10 @@
 
     document.querySelectorAll("[data-precifica-taxa-antecipacao]").forEach(function (node) {
       mountTaxaAntecipacao(node);
+    });
+
+    document.querySelectorAll("[data-precifica-custo-cupom]").forEach(function (node) {
+      mountCustoCupom(node);
     });
 
 
@@ -18656,6 +19323,11 @@
     joinTaxaAntecipacaoCopy: joinTaxaAntecipacaoCopy,
     badgeTaxaAntecipacao: badgeTaxaAntecipacao,
     buildTaxaAntecipacaoAdvice: buildTaxaAntecipacaoAdvice,
+    calculateCustoCupom: calculateCustoCupom,
+    mountCustoCupom: mountCustoCupom,
+    joinCustoCupomCopy: joinCustoCupomCopy,
+    badgeCustoCupom: badgeCustoCupom,
+    buildCustoCupomAdvice: buildCustoCupomAdvice,
     HOOK_MAX: HOOK_MAX,
     AMAZON_BULLET_SOFT: AMAZON_BULLET_SOFT,
     AMAZON_BULLET_HARD: AMAZON_BULLET_HARD,
