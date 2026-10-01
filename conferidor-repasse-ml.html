@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conferidor de repasse do Mercado Livre: Por venda × Por liberação | Precifica</title>
+  <meta name="description" content="Solte os relatórios de conciliação do Mercado Livre (Por venda e Por liberação de dinheiro) e veja as vendas sem repasse, as liberações a menos e as contas que não fecham. Grátis, e os arquivos não saem do navegador.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/conferidor-repasse-ml.html">
+  <meta property="og:title" content="Conferidor de repasse do Mercado Livre: Por venda × Por liberação | Precifica">
+  <meta property="og:description" content="Solte os relatórios de conciliação do Mercado Livre (Por venda e Por liberação de dinheiro) e veja as vendas sem repasse, as liberações a menos e as contas que não fecham. Grátis, e os arquivos não saem do navegador.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/conferidor-repasse-ml.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Meus relatórios são enviados para algum servidor?","acceptedAnswer":{"@type":"Answer","text":"Não. Os arquivos são lidos com o FileReader do navegador e conferidos neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login. Dá até para desligar a internet depois de abrir a página e conferir assim mesmo."}},
+    {"@type":"Question","name":"Quais relatórios do Mercado Livre o conferidor usa?","acceptedAnswer":{"@type":"Answer","text":"Os dois relatórios da seção Faturamento > Conciliação: \"Por venda\" e \"Por liberação de dinheiro\". No lugar do segundo, também aceita o relatório de liberações do Mercado Pago. Formatos: CSV ou Excel (XLSX)."}},
+    {"@type":"Question","name":"Por que uma mesma operação aparece em várias linhas?","acceptedAnswer":{"@type":"Answer","text":"O Mercado Livre cria uma linha para cada evento (venda, frete cobrado à parte, cancelamento, devolução), todas com o mesmo Número da operação. O conferidor soma todas as linhas da operação antes de comparar, como o próprio Mercado Livre orienta."}},
+    {"@type":"Question","name":"O que significa \"Sem liberação (atrasada)\"?","acceptedAnswer":{"@type":"Answer","text":"É uma venda com valor líquido positivo no relatório Por venda que não aparece no relatório Por liberação, depois de mais dias do que o limite escolhido (o padrão é 40), contados até a data de referência. Antes de reclamar, confira se você soltou o relatório de liberação dos meses certos."}},
+    {"@type":"Question","name":"O conferidor confere a tabela de tarifas do Mercado Livre?","acceptedAnswer":{"@type":"Answer","text":"Não. Ele confere só as contas internas dos seus relatórios: soma das linhas da operação, valor bruto − tarifas = líquido, soma de Detalhes de tarifas = Valor total de tarifas, e o que foi liberado contra o que era esperado. As regras de tarifa mudam, e a ferramenta não as replica."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="shopee.html">Shopee</a>
+        <a href="amazon.html">Amazon</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="prazo-repasse.html">Prazo repasse</a>
+        <a href="custo-embalagem.html">Custo embalagem</a>
+        <a href="parcelamento.html">Parcelamento</a>
+        <a href="custo-full.html">Custo Full</a>
+        <a href="margem-liquida-pos-ads.html">Margem pós-ads</a>
+        <a href="taxa-antecipacao.html">Antecipação</a>
+        <a href="custo-cupom.html">Custo cupom</a>
+        <a href="conferidor-repasse-ml.html" aria-current="page">Conferidor ML</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · confere seus próprios arquivos</p>
+      <h1>Conferidor de repasse do Mercado Livre</h1>
+      <p>Solte o relatório <strong>"Por venda"</strong> e o <strong>"Por liberação de dinheiro"</strong> da Conciliação do Mercado Livre. O conferidor cruza os dois pelo <strong>Número da operação</strong> e mostra as vendas que não foram liberadas, as liberações que vieram a menos e as contas que não fecham dentro do próprio relatório.</p>
+      <p class="cr-privacy" data-cr-privacy><strong>Seus arquivos não saem do navegador.</strong> A leitura e a conferência acontecem neste aparelho, sem envio para servidor nenhum, sem conta e sem login. O leitor de Excel (SheetJS) é servido pelo próprio Precifica.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-conferidor-repasse></div>
+      <noscript><p class="muted">O conferidor precisa de JavaScript, e roda só no seu navegador.</p></noscript>
+    </div>
+
+    <section class="section wrap" id="como-exportar">
+      <h2>Como exportar os dois relatórios</h2>
+      <p class="muted" style="max-width:70ch">Passo a passo da Central de Vendedores do Mercado Livre (<a href="https://vendedores.mercadolivre.com.br/nota/quais-relatorios-podem-ser-reconciliados" rel="noopener noreferrer" target="_blank">"Quais relatórios podem ser conciliados"</a>):</p>
+      <ol class="cr-steps">
+        <li>No Mercado Livre, abra <strong>Faturamento</strong> e depois <strong>Conciliação</strong>.</li>
+        <li>Clique em <strong>Gerar relatório</strong>.</li>
+        <li>Escolha <strong>Por vendas</strong> e o período, de até 31 dias (por exemplo, 01/08 a 31/08). Clique em <strong>Gerar relatório</strong>.</li>
+        <li>Volte em <strong>Gerar relatório</strong>, escolha <strong>Por liberação de dinheiro</strong> e gere o mesmo mês <strong>e o seguinte</strong>. O dinheiro de uma venda de agosto costuma ser liberado em setembro, e cada relatório cobre no máximo 31 dias. Você pode soltar os dois arquivos juntos.</li>
+        <li>Quando o painel avisar que o relatório está pronto, baixe-o <strong>na mesma seção</strong> e solte aqui, no formato em que o painel entregar (CSV ou Excel).</li>
+      </ol>
+      <p class="muted" style="max-width:70ch"><strong>Alternativa para o arquivo 2:</strong> o relatório de liberações do Mercado Pago (no Mercado Pago, <em>Faturamento</em> &gt; <em>Relatórios de pagamentos e extratos da conta</em>). O conferidor reconhece as colunas do glossário oficial (DATE, ORDER_ID, EXTERNAL_REFERENCE, RECORD_TYPE, NET_CREDIT_AMOUNT, NET_DEBIT_AMOUNT) e ignora as linhas de saldo e de total.</p>
+
+      <h2 style="margin-top:28px">Colunas que o conferidor procura</h2>
+      <p class="muted" style="max-width:70ch">Os nomes vêm do artigo oficial <a href="https://vendedores.mercadolivre.com.br/aprender/nota/como-conciliar-usando-os-relatorios-de-venda-e-liberacao-de-dinheiro" rel="noopener noreferrer" target="_blank">"Como conciliar usando os relatórios de venda e liberação de dinheiro"</a> e do <a href="https://www.mercadopago.com.br/developers/pt/docs/prestashop/additional-content/reports/released-money/report-use" rel="noopener noreferrer" target="_blank">glossário do relatório de liberações do Mercado Pago</a>. O cabeçalho é encontrado mesmo com linhas de título acima, com sinais como "(=)" e "(–)", com acentos diferentes e com separador ; , ou TAB. <strong>Se o seu arquivo usar outro nome, a ferramenta avisa e deixa você escolher a coluna</strong>; ela nunca adivinha em silêncio.</p>
+      <div class="cr-table-wrap"><table class="cr-cols">
+        <thead><tr><th>Relatório</th><th>Obrigatórias</th><th>Usadas se existirem</th></tr></thead>
+        <tbody>
+          <tr><td>Por venda</td><td>Número da operação · Data da venda · Valor líquido após tarifas</td><td>Tipo de operação · Valor do item · Desconto do Mercado Livre | Rebate · Desconto do vendedor para comprador · Envio pago pelo comprador · Taxa de parcelamento paga pelo comprador · Valor bruto · Valor total de tarifas · Detalhes de tarifas</td></tr>
+          <tr><td>Por liberação de dinheiro</td><td>Número da operação · Valor líquido</td><td>Data da liberação · Tipo de operação</td></tr>
+          <tr><td>Liberações do Mercado Pago</td><td>ORDER_ID ou EXTERNAL_REFERENCE · NET_CREDIT_AMOUNT / NET_DEBIT_AMOUNT</td><td>DATE · RECORD_TYPE · DESCRIPTION</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted" style="max-width:70ch">A célula <em>Detalhes de tarifas</em> não tem formato público documentado. O conferidor só checa a soma quando consegue ler os valores "líquido" da célula (texto ou JSON). Quando não consegue, pula essa checagem; não inventa.</p>
+
+      <h2 style="margin-top:28px">O que é conferido</h2>
+      <div class="steps">
+        <article class="step"><p class="step__n">01</p><h3>Soma por operação</h3><p>Todas as linhas com o mesmo Número da operação (venda, frete à parte, cancelamento) são somadas antes da comparação, em cada relatório.</p></article>
+        <article class="step"><p class="step__n">02</p><h3>Esperado × liberado</h3><p>O líquido esperado (Por venda) é comparado com o liberado. Sem liberação depois do limite de dias = atrasada. Liberado diferente além de R$ 0,05 = diferença.</p></article>
+        <article class="step"><p class="step__n">03</p><h3>Contas do relatório</h3><p>Valor do item − descontos + envio e parcelamento do comprador = valor bruto; bruto − tarifas = líquido; Detalhes de tarifas = Valor total de tarifas.</p></article>
+      </div>
+
+      <h2 style="margin-top:28px">Arquivos de exemplo</h2>
+      <p class="muted" style="max-width:70ch"><strong>EXEMPLO, com dados fictícios</strong>, que não são de nenhum vendedor real. Os nomes das colunas seguem o artigo oficial citado acima. Use o botão <em>Testar com o arquivo de exemplo</em> ou baixe os arquivos:</p>
+      <ul class="cr-steps">
+        <li><a href="exemplos/conferidor-ml-exemplo-por-venda.csv" download>Exemplo "Por venda" (CSV)</a> · <a href="exemplos/conferidor-ml-exemplo-por-venda.xlsx" download>o mesmo em Excel (XLSX)</a></li>
+        <li><a href="exemplos/conferidor-ml-exemplo-por-liberacao.csv" download>Exemplo "Por liberação de dinheiro" (CSV)</a></li>
+      </ul>
+      <p class="muted" style="max-width:62ch;margin-top:16px">Ferramentas relacionadas: <a href="prazo-repasse.html">Prazo repasse</a> · <a href="taxa-mercado-livre.html">Taxa ML</a> · <a href="taxa-antecipacao.html">Antecipação</a> · <a href="index.html">Precifica</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o conferidor achou dinheiro parado ou liberado a menos, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>Meus relatórios são enviados para algum servidor?</summary>
+        <p>Não. Os arquivos são lidos com o FileReader do navegador e conferidos neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login. Dá até para desligar a internet depois de abrir a página e conferir assim mesmo.</p>
+      </details>
+      <details>
+        <summary>Quais relatórios do Mercado Livre o conferidor usa?</summary>
+        <p>Os dois relatórios da seção Faturamento > Conciliação: &quot;Por venda&quot; e &quot;Por liberação de dinheiro&quot;. No lugar do segundo, também aceita o relatório de liberações do Mercado Pago. Formatos: CSV ou Excel (XLSX).</p>
+      </details>
+      <details>
+        <summary>Por que uma mesma operação aparece em várias linhas?</summary>
+        <p>O Mercado Livre cria uma linha para cada evento (venda, frete cobrado à parte, cancelamento, devolução), todas com o mesmo Número da operação. O conferidor soma todas as linhas da operação antes de comparar, como o próprio Mercado Livre orienta.</p>
+      </details>
+      <details>
+        <summary>O que significa "Sem liberação (atrasada)"?</summary>
+        <p>É uma venda com valor líquido positivo no relatório Por venda que não aparece no relatório Por liberação, depois de mais dias do que o limite escolhido (o padrão é 40), contados até a data de referência. Antes de reclamar, confira se você soltou o relatório de liberação dos meses certos.</p>
+      </details>
+      <details>
+        <summary>O conferidor confere a tabela de tarifas do Mercado Livre?</summary>
+        <p>Não. Ele confere só as contas internas dos seus relatórios: soma das linhas da operação, valor bruto − tarifas = líquido, soma de Detalhes de tarifas = Valor total de tarifas, e o que foi liberado contra o que era esperado. As regras de tarifa mudam, e a ferramenta não as replica.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Conferência aritmética dos relatórios que você mesmo baixou do Mercado Livre e do Mercado Pago. Não é conselho contábil, fiscal ou jurídico, e não é ferramenta oficial do Mercado Livre. Se houver divergência, abra a reclamação no Mercado Livre com o Número da operação.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="titulo.html">Título</a>
+        <a href="descricao.html">Descrição</a>
+        <a href="palavras-chave.html">Palavras-chave</a>
+        <a href="frete.html">Frete</a>
+        <a href="planilha.html">Planilha</a>
+        <a href="equilibrio.html">Equilíbrio</a>
+        <a href="kit-combo.html">Kit/Combo</a>
+        <a href="bullets-amazon.html">Bullets</a>
+        <a href="bid-ml.html">Bid ML</a>
+        <a href="variacoes.html">Variações</a>
+        <a href="teste-ab-titulo.html">Teste A/B</a>
+        <a href="faq-anuncio.html">FAQ anúncio</a>
+        <a href="campanhas-ads.html">Campanhas Ads</a>
+        <a href="preco-minimo-ads.html">Preço mín. Ads</a>
+        <a href="checklist-anuncio.html">Checklist</a>
+        <a href="breakeven-ads.html">Break-even Ads</a>
+        <a href="roi-frete-gratis.html">ROI frete grátis</a>
+        <a href="desconto-maximo.html">Desconto máx.</a>
+        <a href="meta-lucro.html">Meta lucro</a>
+        <a href="estoque-minimo.html">Estoque mín.</a>
+        <a href="imposto-simples.html">Imposto Simples</a>
+        <a href="capital-giro.html">Capital giro</a>
+        <a href="custo-devolucao.html">Custo devolução</a>
+        <a href="prazo-repasse.html">Prazo repasse</a>
+        <a href="custo-embalagem.html">Custo embalagem</a>
+        <a href="parcelamento.html">Parcelamento</a>
+        <a href="custo-full.html">Custo Full</a>
+        <a href="margem-liquida-pos-ads.html">Margem pós-ads</a>
+        <a href="taxa-antecipacao.html">Antecipação</a>
+        <a href="custo-cupom.html">Custo cupom</a>
+        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
+        <a href="taxa-mercado-livre.html">Taxa ML</a>
+        <a href="taxa-shopee.html">Taxa Shopee</a>
+        <a href="taxa-amazon.html">Taxa Amazon</a>
+        <a href="taxa-magalu.html">Taxa Magalu</a>
+        <a href="tacos.html">TACOS</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+  <script src="js/conferidor-repasse.js"></script>
+  <script src="js/conferidor-repasse-ui.js"></script>
+</body>
+</html>
