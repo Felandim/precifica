@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://solitary-waterfall-4024.zerodeploy.app/sitemap.xml
+Sitemap: https://mellow-quarry-n7jk.here.now/sitemap.xml
