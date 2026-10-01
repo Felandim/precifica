@@ -17,6 +17,7 @@ LIVE*.txt
 _ship_tmp/
 # gerados
 *.xlsx
+!exemplos/*.xlsx
 __pycache__/
 *.pyc
 node_modules/
