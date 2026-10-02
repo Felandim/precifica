@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Extrato bancário × saques Mercado Pago: batimento no navegador | Precifica</title>
+  <meta name="description" content="Solte o extrato do banco (CSV/OFX) e o relatório de saques do Mercado Pago e veja saques que não caíram e créditos sem correspondente. Grátis, arquivos não saem do navegador.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/extrato-x-saques-mp.html">
+  <meta property="og:title" content="Extrato bancário × saques Mercado Pago | Precifica">
+  <meta property="og:description" content="Solte o extrato do banco e o relatório de saques do Mercado Pago e veja o que não bate. Grátis, 100% no navegador.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/extrato-x-saques-mp.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Meus extratos são enviados para algum servidor?","acceptedAnswer":{"@type":"Answer","text":"Não. Os arquivos são lidos com o FileReader do navegador e conferidos neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login."}},
+    {"@type":"Question","name":"Qual a diferença para o Conferidor de repasse?","acceptedAnswer":{"@type":"Answer","text":"O Conferidor cruza o relatório Por venda com o Por liberação (dinheiro que entrou no saldo do Mercado Pago). Esta ferramenta cruza o extrato do seu banco com os saques/transferências do Mercado Pago (dinheiro que saiu do MP para a conta bancária)."}},
+    {"@type":"Question","name":"Quais arquivos eu preciso?","acceptedAnswer":{"@type":"Answer","text":"1) Extrato do banco em CSV, Excel ou OFX. 2) Relatório de liberações/saques do Mercado Pago (CSV ou Excel), preferindo o de saques/transferências. Formatos oficiais que você mesmo baixa."}},
+    {"@type":"Question","name":"Por que um saque não casa com o crédito?","acceptedAnswer":{"@type":"Answer","text":"Pode ser janela de datas (TED no dia seguinte), descrição do banco sem a palavra Mercado Pago (desmarque o filtro), valor diferente além de R$ 0,05, ou o saque ainda não caiu. Aumente a janela ou confira o período dos dois arquivos."}},
+    {"@type":"Question","name":"A ferramenta inventa dados?","acceptedAnswer":{"@type":"Answer","text":"Não. Ela só lê as colunas que você soltou, casa por valor e data dentro da tolerância, e lista o que não bate. Nada é estimado nem puxado de API."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="shopee.html">Shopee</a>
+        <a href="amazon.html">Amazon</a>
+        <a href="comparar.html">Comparar</a>
+        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
+        <a href="extrato-x-saques-mp.html" aria-current="page">Extrato × saques</a>
+        <a href="prazo-repasse.html">Prazo repasse</a>
+        <a href="taxa-antecipacao.html">Antecipação</a>
+        <a href="custo-cupom.html">Custo cupom</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · confere seus próprios arquivos</p>
+      <h1>Extrato bancário × saques do Mercado Pago</h1>
+      <p>O dinheiro liberado no Mercado Pago <strong>ainda não é o crédito no seu banco</strong>. Solte o <strong>extrato bancário</strong> (CSV, Excel ou OFX) e o relatório de <strong>saques/transferências</strong> do Mercado Pago. A página casa valor + data e mostra saques que não caíram e créditos “Mercado Pago” sem saque correspondente.</p>
+      <p class="cr-privacy"><strong>Seus arquivos não saem do navegador.</strong> Leitura e batimento neste aparelho, sem conta e sem login. O leitor de Excel (SheetJS) é servido pelo próprio Precifica.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-extrato-saques></div>
+      <noscript><p class="muted">Esta ferramenta precisa de JavaScript e roda só no seu navegador.</p></noscript>
+    </div>
+
+    <section class="section wrap" id="como-exportar">
+      <h2>Como exportar os dois arquivos</h2>
+      <ol class="cr-steps">
+        <li><strong>Extrato do banco:</strong> no internet banking, baixe o período em CSV, Excel ou OFX (Open Financial Exchange). OFX costuma vir com data e valor bem estruturados.</li>
+        <li><strong>Saques do Mercado Pago:</strong> em Relatórios e faturamento / liberações (ou relatório de atividades de saque), exporte o CSV/Excel do período. Se o arquivo misturar liberações de venda e saques, a ferramenta fica só com as linhas de saque/transferência/withdrawal.</li>
+        <li>Solte os dois aqui. Se o banco não escrever “Mercado Pago” na descrição, desmarque o filtro “só créditos que parecem Mercado Pago”.</li>
+      </ol>
+      <p class="muted" style="max-width:70ch">Complementa o <a href="conferidor-repasse-ml.html">Conferidor de repasse</a> (Por venda × Por liberação). Aqui o passo é o batimento bancário depois que o dinheiro sai do Mercado Pago — o mesmo raciocínio descrito por quem analisa por que o extrato “não bate” com o GMV.</p>
+
+      <h2 style="margin-top:28px">O que é conferido</h2>
+      <div class="steps">
+        <article class="step"><p class="step__n">01</p><h3>Créditos no banco</h3><p>Do extrato, entram créditos (valor &gt; 0). Com o filtro ligado, só descrições que parecem Mercado Pago / Merpago / PAG*MercadoPago.</p></article>
+        <article class="step"><p class="step__n">02</p><h3>Saques no MP</h3><p>Do relatório, entram saques/transferências (e débitos NET_DEBIT quando for o layout do MP). Liberações de venda são ignoradas se houver linhas de saque no mesmo arquivo.</p></article>
+        <article class="step"><p class="step__n">03</p><h3>Casamento</h3><p>Valor igual (tolerância R$ 0,05) e data dentro da janela (padrão 2 dias). O que sobra vira “saque sem crédito” ou “crédito sem saque”.</p></article>
+      </div>
+
+      <h2 style="margin-top:28px">Arquivos de exemplo</h2>
+      <p class="muted" style="max-width:70ch"><strong>EXEMPLO, dados fictícios</strong>. Use o botão na ferramenta ou baixe:</p>
+      <ul class="cr-steps">
+        <li><a href="exemplos/extrato-banco-exemplo.csv" download>Extrato bancário (CSV)</a> · <a href="exemplos/extrato-banco-exemplo.ofx" download>o mesmo em OFX</a></li>
+        <li><a href="exemplos/saques-mp-exemplo.csv" download>Saques Mercado Pago (CSV)</a></li>
+      </ul>
+      <p class="muted" style="max-width:62ch;margin-top:16px">Relacionadas: <a href="conferidor-repasse-ml.html">Conferidor ML</a> · <a href="prazo-repasse.html">Prazo repasse</a> · <a href="taxa-antecipacao.html">Antecipação</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o batimento achou saque sumido ou crédito estranho, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>Meus extratos são enviados para algum servidor?</summary>
+        <p>Não. Os arquivos são lidos com o FileReader do navegador e conferidos neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login.</p>
+      </details>
+      <details>
+        <summary>Qual a diferença para o Conferidor de repasse?</summary>
+        <p>O Conferidor cruza o relatório Por venda com o Por liberação (dinheiro que entrou no saldo do Mercado Pago). Esta ferramenta cruza o extrato do seu banco com os saques/transferências do Mercado Pago (dinheiro que saiu do MP para a conta bancária).</p>
+      </details>
+      <details>
+        <summary>Quais arquivos eu preciso?</summary>
+        <p>1) Extrato do banco em CSV, Excel ou OFX. 2) Relatório de liberações/saques do Mercado Pago (CSV ou Excel). Formatos oficiais que você mesmo baixa.</p>
+      </details>
+      <details>
+        <summary>Por que um saque não casa com o crédito?</summary>
+        <p>Pode ser janela de datas (TED no dia seguinte), descrição do banco sem a palavra Mercado Pago (desmarque o filtro), valor diferente além de R$ 0,05, ou o saque ainda não caiu.</p>
+      </details>
+      <details>
+        <summary>A ferramenta inventa dados?</summary>
+        <p>Não. Ela só lê as colunas que você soltou, casa por valor e data dentro da tolerância, e lista o que não bate.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Batimento aritmético dos arquivos que você mesmo baixou do banco e do Mercado Pago. Não é conselho contábil, fiscal ou jurídico, e não é ferramenta oficial do Mercado Livre ou do Mercado Pago.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
+        <a href="extrato-x-saques-mp.html">Extrato × saques</a>
+        <a href="prazo-repasse.html">Prazo repasse</a>
+        <a href="taxa-antecipacao.html">Antecipação</a>
+        <a href="custo-cupom.html">Custo cupom</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+  <script src="js/extrato-saques-mp.js"></script>
+  <script src="js/extrato-saques-mp-ui.js"></script>
+</body>
+</html>
