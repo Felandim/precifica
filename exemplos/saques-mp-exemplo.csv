@@ -1,0 +1,6 @@
+DATE;DESCRIPTION;RECORD_TYPE;NET_CREDIT_AMOUNT;NET_DEBIT_AMOUNT;EXTERNAL_REFERENCE
+2026-09-05;Withdrawal to bank account;withdrawal;;1250.40;WD-1001
+2026-09-12;Saque para conta bancária;saque;;890.00;WD-1002
+2026-09-20;Transferência bancária;transfer;;2100.00;WD-1003
+2026-09-25;Saque para conta bancária;withdrawal;;777.00;WD-1004
+2026-09-03;release;release;100.00;;OP-999
