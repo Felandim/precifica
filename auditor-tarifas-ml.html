@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auditor de tarifas do Mercado Livre: % por venda e outliers | Precifica</title>
+  <meta name="description" content="Solte o relatório Por venda do Mercado Livre e veja % de tarifas por operação, resumo por conceito, outliers vs mediana e linhas só de envio. Grátis, arquivos não saem do navegador.">
+  <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/auditor-tarifas-ml.html">
+  <meta property="og:title" content="Auditor de tarifas do Mercado Livre | Precifica">
+  <meta property="og:description" content="Solte o relatório Por venda e marque % altas, outliers e conflitos de tarifa. Grátis, 100% no navegador.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/auditor-tarifas-ml.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Meus relatórios são enviados para algum servidor?","acceptedAnswer":{"@type":"Answer","text":"Não. Os arquivos são lidos com o FileReader do navegador e auditados neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login."}},
+    {"@type":"Question","name":"Qual relatório do Mercado Livre eu uso?","acceptedAnswer":{"@type":"Answer","text":"O relatório de Conciliação \"Por venda\" (Faturamento → Conciliação → Gerar relatório → Por vendas), em CSV ou Excel. O mesmo layout que o Conferidor de repasse já usa."}},
+    {"@type":"Question","name":"A ferramenta confere se a tarifa do ML está correta pela tabela oficial?","acceptedAnswer":{"@type":"Answer","text":"Não. Ela não replica a tabela de comissões do Mercado Livre. Audita o que o seu próprio relatório cobrou: % sobre o bruto, conceitos no texto de Detalhes de tarifas, outliers vs a mediana do seu lote e linhas só de envio."}},
+    {"@type":"Question","name":"O que é um outlier?","acceptedAnswer":{"@type":"Answer","text":"Uma operação cuja % de tarifas fica bem acima da mediana das outras vendas do mesmo arquivo (e acima de um piso). Pode ser frete extra, erro de cubagem ou conceito duplicado — vale investigar com o Número da operação."}},
+    {"@type":"Question","name":"Qual a diferença para o Conferidor de repasse?","acceptedAnswer":{"@type":"Answer","text":"O Conferidor cruza Por venda × Por liberação (dinheiro que entrou no saldo). O Auditor olha só o Por venda e marca tarifas altas, conflitos e resumo por conceito — o passo antes de pedir estorno."}}
+  ]}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
+        <a href="auditor-tarifas-ml.html" aria-current="page">Auditor tarifas</a>
+        <a href="extrato-x-saques-mp.html">Extrato × saques</a>
+        <a href="prazo-repasse.html">Prazo repasse</a>
+        <a href="custo-cupom.html">Custo cupom</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · confere seus próprios arquivos</p>
+      <h1>Auditor de tarifas do Mercado Livre</h1>
+      <p>Solte o relatório <strong>"Por venda"</strong> da Conciliação. A página agrupa pelo <strong>Número da operação</strong>, calcula a <strong>% de tarifas sobre o bruto</strong>, resume conceitos do texto <em>Detalhes de tarifas</em> e marca % altas (limiar ajustável), outliers vs a mediana do seu lote, linhas só de envio e conceitos conflitantes.</p>
+      <p class="cr-privacy"><strong>Seus arquivos não saem do navegador.</strong> Leitura e auditoria neste aparelho, sem conta e sem login. O leitor de Excel (SheetJS) é servido pelo próprio Precifica.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-auditor-tarifas></div>
+      <noscript><p class="muted">Esta ferramenta precisa de JavaScript e roda só no seu navegador.</p></noscript>
+    </div>
+
+    <section class="section wrap" id="como-exportar">
+      <h2>Como exportar o relatório</h2>
+      <ol class="cr-steps">
+        <li>No Mercado Livre, abra <strong>Faturamento</strong> → <strong>Conciliação</strong>.</li>
+        <li>Clique em <strong>Gerar relatório</strong> → <strong>Por vendas</strong>, escolha até 31 dias e gere.</li>
+        <li>Quando estiver pronto, baixe em CSV ou Excel e solte aqui.</li>
+      </ol>
+      <p class="muted" style="max-width:70ch">Colunas oficiais descritas em <a href="https://vendedores.mercadolivre.com.br/aprender/nota/relatorio-detalhes-do-periodo-como-analisa-lo" rel="noopener noreferrer" target="_blank">"O que compõe o relatório Faturamento"</a> e no guia de conciliação Por venda / Por liberação. Complementa o <a href="conferidor-repasse-ml.html">Conferidor de repasse</a> (venda × liberação) e o <a href="extrato-x-saques-mp.html">Extrato × saques</a>.</p>
+
+      <h2 style="margin-top:28px">O que é auditado</h2>
+      <div class="steps">
+        <article class="step"><p class="step__n">01</p><h3>% por operação</h3><p>Soma bruto e tarifas de todas as linhas com o mesmo Número da operação e calcula tarifas ÷ bruto.</p></article>
+        <article class="step"><p class="step__n">02</p><h3>Conceitos no texto</h3><p>Parseia "Detalhes de tarifas" (líquido R$ …) e agrupa por palavras: custo por vender, envio, devolução, Full, Ads, etc.</p></article>
+        <article class="step"><p class="step__n">03</p><h3>Flags</h3><p>% acima do limiar (padrão 20%), outlier vs mediana do lote, linha só de envio sem venda no arquivo, e mesmo conceito com valores conflitantes.</p></article>
+      </div>
+
+      <h2 style="margin-top:28px">Arquivo de exemplo</h2>
+      <p class="muted" style="max-width:70ch"><strong>EXEMPLO, dados fictícios</strong>. Use o botão na ferramenta ou baixe: <a href="exemplos/auditor-tarifas-ml-exemplo.csv" download>auditor-tarifas-ml-exemplo.csv</a>.</p>
+      <p class="muted" style="max-width:62ch;margin-top:16px">Relacionadas: <a href="conferidor-repasse-ml.html">Conferidor ML</a> · <a href="extrato-x-saques-mp.html">Extrato × saques</a> · <a href="taxa-mercado-livre.html">Taxa ML</a> · <a href="custo-devolucao.html">Custo devolução</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o auditor achou % estranha ou cobrança para contestar, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>Meus relatórios são enviados para algum servidor?</summary>
+        <p>Não. Os arquivos são lidos com o FileReader do navegador e auditados neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login.</p>
+      </details>
+      <details>
+        <summary>Qual relatório do Mercado Livre eu uso?</summary>
+        <p>O relatório de Conciliação &quot;Por venda&quot; (Faturamento → Conciliação → Gerar relatório → Por vendas), em CSV ou Excel.</p>
+      </details>
+      <details>
+        <summary>A ferramenta confere se a tarifa do ML está correta pela tabela oficial?</summary>
+        <p>Não. Ela não replica a tabela de comissões do Mercado Livre. Audita o que o seu próprio relatório cobrou: %, conceitos, outliers e linhas só de envio.</p>
+      </details>
+      <details>
+        <summary>O que é um outlier?</summary>
+        <p>Uma operação cuja % de tarifas fica bem acima da mediana das outras vendas do mesmo arquivo. Pode ser frete extra, cubagem ou conceito duplicado.</p>
+      </details>
+      <details>
+        <summary>Qual a diferença para o Conferidor de repasse?</summary>
+        <p>O Conferidor cruza Por venda × Por liberação. O Auditor olha só o Por venda e marca tarifas altas e conflitos — o passo antes de pedir estorno.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Auditoria aritmética do relatório que você mesmo baixou do Mercado Livre. Não é conselho contábil, fiscal ou jurídico, e não é ferramenta oficial do Mercado Livre. Se houver cobrança suspeita, abra a reclamação no Mercado Livre com o Número da operação.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
+        <a href="auditor-tarifas-ml.html">Auditor tarifas</a>
+        <a href="extrato-x-saques-mp.html">Extrato × saques</a>
+        <a href="prazo-repasse.html">Prazo repasse</a>
+        <a href="taxa-mercado-livre.html">Taxa ML</a>
+        <a href="custo-cupom.html">Custo cupom</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+  <script src="js/auditor-tarifas-ml.js"></script>
+  <script src="js/auditor-tarifas-ml-ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+EXEMPLO PRECIFICA - dados fictícios para testar o auditor de tarifas (não são de nenhum vendedor real)
+Número da operação;Data da venda;Tipo de operação;Valor do item;(–) Desconto do Mercado Livre | Rebate;(–) Desconto do vendedor para comprador;(+) Envio pago pelo comprador;(+) Taxa de parcelamento paga pelo comprador;(=) Valor bruto;Valor total de tarifas;Detalhes de tarifas;Valor líquido após tarifas
+2000090000000101;01/09/2026;Venda;100,00;0,00;0,00;0,00;0,00;100,00;16,00;"Custo por vender no Mercado Livre: bruto R$ 16,00, desconto R$ 0,00, líquido R$ 16,00";84,00
+2000090000000102;02/09/2026;Venda;80,00;0,00;0,00;0,00;0,00;80,00;12,80;"Custo por vender no Mercado Livre: bruto R$ 12,80, desconto R$ 0,00, líquido R$ 12,80";67,20
+2000090000000103;03/09/2026;Venda;150,00;0,00;0,00;0,00;0,00;150,00;24,00;"Custo por vender no Mercado Livre: bruto R$ 24,00, desconto R$ 0,00, líquido R$ 24,00";126,00
+2000090000000104;04/09/2026;Venda;200,00;0,00;0,00;0,00;0,00;200,00;70,00;"Custo por vender no Mercado Livre: bruto R$ 32,00, desconto R$ 0,00, líquido R$ 32,00 | Tarifa de envio extra ou intermunicipal: bruto R$ 38,00, desconto R$ 0,00, líquido R$ 38,00";130,00
+2000090000000105;05/09/2026;Venda;50,00;0,00;0,00;0,00;0,00;50,00;8,00;"Custo por vender no Mercado Livre: bruto R$ 8,00, desconto R$ 0,00, líquido R$ 8,00";42,00
+2000090000000106;06/09/2026;Envio;;;;;;;45,00;"Tarifa de envio extra ou intermunicipal: bruto R$ 45,00, desconto R$ 0,00, líquido R$ 45,00";-45,00
+2000090000000107;07/09/2026;Venda;120,00;0,00;0,00;0,00;0,00;120,00;19,20;"Custo por vender no Mercado Livre: bruto R$ 19,20, desconto R$ 0,00, líquido R$ 19,20";100,80
+2000090000000107;07/09/2026;Venda;120,00;0,00;0,00;0,00;0,00;120,00;19,20;"Custo por vender no Mercado Livre: bruto R$ 40,00, desconto R$ 0,00, líquido R$ 40,00";100,80
+2000090000000108;08/09/2026;Venda;90,00;0,00;0,00;0,00;0,00;90,00;14,40;"Custo por vender no Mercado Livre: bruto R$ 14,40, desconto R$ 0,00, líquido R$ 14,40";75,60
+2000090000000109;09/09/2026;Venda;75,00;0,00;0,00;0,00;0,00;75,00;12,00;"Custo por vender no Mercado Livre: bruto R$ 12,00, desconto R$ 0,00, líquido R$ 12,00";63,00
+2000090000000110;10/09/2026;Venda;60,00;0,00;0,00;0,00;0,00;60,00;9,60;"Custo por vender no Mercado Livre: bruto R$ 9,60, desconto R$ 0,00, líquido R$ 9,60";50,40
