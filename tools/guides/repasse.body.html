@@ -1,0 +1,52 @@
+  <article class="wrap prose" style="padding:32px 0 48px">
+    <p class="hero__kicker">Mercado Livre · conciliação</p>
+    <h1>Como conferir o repasse do Mercado Livre, venda por venda</h1>
+    <p class="meta">Guia prático. Usa só os relatórios que o próprio Mercado Livre entrega. Atualizado em outubro de 2026.</p>
+
+    <p>“Vendi R$ 10 mil no mês e o saldo não bate.” Quase sempre a diferença tem explicação: a venda e a liberação do dinheiro acontecem em datas diferentes, e uma mesma venda pode gerar várias linhas (tarifa cobrada depois, cancelamento, devolução, frete à parte). O jeito de achar o que realmente está errado é cruzar <strong>venda por venda</strong>, não mês contra mês.</p>
+    <p>Abaixo está o método manual, com planilha. No fim tem um atalho gratuito que faz o mesmo cruzamento no navegador, se você preferir.</p>
+
+    <h2>1. Baixe os dois relatórios da Conciliação</h2>
+    <p>Segundo a Central de Vendedores (<a href="https://vendedores.mercadolivre.com.br/aprender/nota/como-gerar-seus-relatorios-de-conciliacao" rel="noopener noreferrer" target="_blank">“Como gerar seus relatórios de conciliação”</a>):</p>
+    <ol>
+      <li>No Mercado Livre, abra <strong>Faturamento</strong> e depois <strong>Conciliação</strong>.</li>
+      <li>Gere o relatório <strong>Por vendas</strong> do mês que você quer conferir. Cada relatório cobre um intervalo de <strong>até 31 dias</strong>.</li>
+      <li>Gere também o relatório <strong>Por liberação de dinheiro</strong> do mesmo mês <strong>e do mês seguinte</strong>. Uma venda feita no fim do mês costuma ser liberada só no mês seguinte.</li>
+      <li>Quando o status ficar “Disponível”, baixe os arquivos (CSV ou Excel).</li>
+    </ol>
+    <p>O artigo oficial <a href="https://vendedores.mercadolivre.com.br/aprender/nota/como-conciliar-usando-os-relatorios-de-venda-e-liberacao-de-dinheiro" rel="noopener noreferrer" target="_blank">“Como conciliar usando os relatórios de venda e liberação de dinheiro”</a> explica a diferença: o “Por venda” organiza pela data da venda, e o “Por liberação” pela data em que o dinheiro ficou disponível.</p>
+
+    <h2>2. Use o Número da operação como chave</h2>
+    <p>O mesmo artigo diz que o <strong>Número da operação</strong> é o elo entre os dois relatórios. É ele que você usa para encontrar a mesma venda nos dois arquivos. Não use data nem valor como chave: datas são diferentes por definição, e valores repetem.</p>
+    <p>Atenção a um detalhe que confunde muita gente: o relatório traz uma linha para cada evento. Se uma tarifa foi cobrada depois, ou houve cancelamento, aparece uma <strong>nova linha com o mesmo Número da operação</strong>. Isso não é duplicidade. Antes de comparar, <strong>some todas as linhas de cada operação</strong>.</p>
+
+    <h2>3. Monte a comparação na planilha</h2>
+    <p>Cole o “Por venda” numa aba chamada <code>Venda</code> e o “Por liberação” numa aba <code>Liberacao</code>. Na aba Venda, crie três colunas ao lado (ajuste as letras às colunas do seu arquivo; aqui o Número da operação está na coluna A e o valor líquido na coluna F das duas abas):</p>
+    <ul>
+      <li><strong>Esperado</strong> (líquido somado da operação): <code>=SOMASE(A:A;A2;F:F)</code></li>
+      <li><strong>Liberado</strong> (tudo que foi liberado para a operação): <code>=SOMASE(Liberacao!A:A;A2;Liberacao!F:F)</code></li>
+      <li><strong>Diferença</strong>: <code>=Liberado − Esperado</code></li>
+    </ul>
+    <p>Depois remova as linhas repetidas da mesma operação (fica uma por número) e filtre a coluna Diferença.</p>
+
+    <h2>4. Classifique o que sobrou</h2>
+    <p>Cada diferença cai em um destes quatro grupos. Cada grupo tem uma ação diferente:</p>
+    <ul>
+      <li><strong>Liberado = 0:</strong> a venda ainda não foi liberada. Veja a data da venda e o tipo de envio. Uma venda recente pode só estar no prazo. Uma venda antiga sem liberação é a primeira coisa a investigar.</li>
+      <li><strong>Liberado menor que o esperado:</strong> procure as linhas extras daquela operação no “Por liberação” e olhe o <em>Tipo de operação</em>. Cancelamento, devolução, tarifa posterior ou ajuste de envio explicam a maioria dos casos.</li>
+      <li><strong>Liberado maior que o esperado:</strong> geralmente é bônus, reembolso de tarifa ou campanha. Não é problema, mas registre para a contabilidade.</li>
+      <li><strong>Linha no “Por liberação” sem venda no “Por venda”:</strong> é uma venda de outro mês ou uma cobrança avulsa. Gere o “Por venda” do mês anterior antes de concluir.</li>
+    </ul>
+
+    <h2>5. Confira as contas dentro do próprio relatório</h2>
+    <p>O artigo oficial também ensina uma checagem que pega erro de leitura: na coluna <em>Detalhes de tarifas</em>, a soma dos valores líquidos de cada tarifa <strong>deve ser igual</strong> à coluna <em>Valor total de tarifas</em>. Se não for, anote a operação. Pode ser só formato do arquivo, mas vale olhar.</p>
+
+    <h2>6. Quando a diferença é real</h2>
+    <p>Separe uma lista com <strong>Número da operação, data, valor esperado, valor liberado e diferença</strong>. Com isso em mãos, abra o atendimento pela Ajuda do Mercado Livre citando cada operação. Pedido genérico (“meu repasse está errado”) costuma voltar com resposta genérica. Uma lista de operações não.</p>
+
+    <h2>Atalho opcional: fazer o cruzamento no navegador</h2>
+    <p>Se a planilha deu trabalho, o <a href="../conferidor-repasse-ml.html?ref=guia-repasse-atalho">Conferidor de repasse do Mercado Livre</a> faz os passos 2 a 5 sozinho: você solta os dois relatórios e ele lista o que não foi liberado, o que veio a menos e as contas que não fecham. É grátis e roda no navegador. O arquivo não sai do seu aparelho, e não precisa de conta nem login. Tem arquivo de exemplo para testar antes de usar os seus.</p>
+    <p>O dinheiro já foi liberado mas não apareceu no banco? Esse é outro problema, explicado no guia <a href="saque-mercado-pago-nao-caiu.html?ref=guia-repasse-para-saque">saque do Mercado Pago não caiu na conta</a>. Se o que incomoda é o tamanho da tarifa, veja <a href="tarifa-mercado-livre-como-conferir.html?ref=guia-repasse-para-tarifa">como conferir a tarifa do Mercado Livre</a>.</p>
+
+    <p class="muted">Este guia descreve os relatórios conforme as páginas oficiais citadas, consultadas em outubro de 2026. Se o painel mudar, vale o que estiver na Central de Vendedores. O Precifica não é ligado ao Mercado Livre.</p>
+  </article>

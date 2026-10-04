@@ -1,0 +1,40 @@
+  <article class="wrap prose" style="padding:32px 0 48px">
+    <p class="hero__kicker">Mercado Livre · tarifas</p>
+    <h1>Tarifa do Mercado Livre veio alta? Como conferir venda por venda</h1>
+    <p class="meta">Guia prático para achar a venda que puxou a média para cima. Atualizado em outubro de 2026.</p>
+
+    <p>A reclamação típica é “o Mercado Livre está levando quase 30% das minhas vendas”. Às vezes é isso mesmo, porque somando tarifa de venda, custo fixo, envio e campanha a conta sobe. Às vezes é <strong>uma meia dúzia de vendas</strong> com frete errado, tarifa de venda cancelada que ficou cobrada, ou envio cobrado acima do normal. A média esconde as duas coisas. O caminho é olhar a porcentagem de cada venda.</p>
+
+    <h2>1. Baixe o relatório “Por vendas”</h2>
+    <p>Em <strong>Faturamento → Conciliação → Gerar relatório → Por vendas</strong>, escolha um período de até 31 dias e baixe em CSV ou Excel (<a href="https://vendedores.mercadolivre.com.br/aprender/nota/como-gerar-seus-relatorios-de-conciliacao" rel="noopener noreferrer" target="_blank">passo a passo oficial</a>). Esse relatório traz, por venda, o valor bruto, o valor total de tarifas e a coluna <em>Detalhes de tarifas</em>.</p>
+
+    <h2>2. Calcule a % de tarifa de cada operação</h2>
+    <p>Uma venda pode ter mais de uma linha (envio separado, tarifa cobrada depois). Por isso, primeiro some por <strong>Número da operação</strong>, que é a chave indicada no <a href="https://vendedores.mercadolivre.com.br/aprender/nota/como-conciliar-usando-os-relatorios-de-venda-e-liberacao-de-dinheiro" rel="noopener noreferrer" target="_blank">guia oficial de conciliação</a>. Depois, numa coluna nova:</p>
+    <p><code>% tarifa = Valor total de tarifas ÷ Valor bruto</code></p>
+    <p>Ordene da maior para a menor. Agora você não tem uma média, tem uma lista.</p>
+
+    <h2>3. Compare com o que deveria ser</h2>
+    <ul>
+      <li><strong>Tarifa de venda:</strong> é uma porcentagem que depende da categoria e do tipo de anúncio (Clássico ou Premium). Pegue um anúncio de cada categoria e rode no <a href="https://www.mercadolivre.com.br/simulador-de-custos" rel="noopener noreferrer" target="_blank">Simulador de custos oficial</a>. O número do simulador é a sua régua.</li>
+      <li><strong>Custo fixo por unidade:</strong> a documentação oficial <a href="https://developers.mercadolivre.com.br/pt_br/comissao-por-vender" rel="noopener noreferrer" target="_blank">“Custos por vender”</a> diz que, abaixo do limite de frete grátis obrigatório, dentro do Mercado Envios só o Flex cobra custo fixo. Com envio próprio ou personalizado, ele é sempre cobrado abaixo desse limite. Acima do limite, não há custo fixo. Se você usa Full ou Coleta e vê custo fixo em produto barato, anote a venda.</li>
+      <li><strong>Envio:</strong> o valor depende de peso e medidas do anúncio. Se dois anúncios do mesmo produto têm fretes muito diferentes, confira as medidas cadastradas de cada um.</li>
+    </ul>
+
+    <h2>4. Os quatro padrões que valem investigar</h2>
+    <ul>
+      <li><strong>Venda com % muito acima da sua mediana:</strong> abra a coluna <em>Detalhes de tarifas</em> dessa venda e veja qual item pesou (venda, envio, Full, Ads).</li>
+      <li><strong>Linha só de envio, sem venda no período:</strong> pode ser cobrança de outro mês ou ajuste. Confira o mês anterior antes de reclamar.</li>
+      <li><strong>Venda cancelada com tarifa:</strong> se a operação aparece como cancelada e a tarifa não foi estornada, ela entra na lista.</li>
+      <li><strong>Soma que não fecha:</strong> o guia oficial diz que a soma dos valores líquidos em <em>Detalhes de tarifas</em> deve bater com <em>Valor total de tarifas</em>. Diferença ali merece um print.</li>
+    </ul>
+
+    <h2>5. Como pedir revisão</h2>
+    <p>Junte por venda: Número da operação, data, valor bruto, tarifa cobrada, o que o simulador mostra para aquele anúncio e a diferença. Abra o atendimento pela Ajuda com essa lista. Uma reclamação com números por operação é muito mais fácil de analisar do que “as tarifas estão altas”.</p>
+    <p>E se a % alta estiver correta? Aí o problema é preço, não cobrança. Rode o produto na <a href="../taxa-mercado-livre.html?ref=guia-tarifa-calc">calculadora de taxa do Mercado Livre</a> para ver o preço mínimo que ainda deixa lucro.</p>
+
+    <h2>Atalho opcional: a lista pronta no navegador</h2>
+    <p>O <a href="../auditor-tarifas-ml.html?ref=guia-tarifa-atalho">Auditor de tarifas do Mercado Livre</a> faz os passos 2 e 4 com o mesmo relatório “Por vendas”. Ele agrupa por Número da operação, calcula a % de cada venda, marca as que passam do limite que você escolher (o padrão é 20%), aponta as vendas fora da curva em relação à mediana do seu lote e as linhas só de envio. É grátis, roda no navegador, e o arquivo não sai do seu aparelho. Tem um arquivo de exemplo para testar.</p>
+    <p>Quer conferir também se o dinheiro foi liberado? Veja <a href="como-conferir-repasse-mercado-livre.html?ref=guia-tarifa-para-repasse">como conferir o repasse do Mercado Livre</a>.</p>
+
+    <p class="muted">Regras de tarifa e custo fixo conforme as páginas oficiais citadas, consultadas em outubro de 2026. Elas mudam com frequência; vale sempre o simulador e a Central de Vendedores. O Precifica não é ligado ao Mercado Livre.</p>
+  </article>
