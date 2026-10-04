@@ -1,0 +1,41 @@
+  <article class="wrap prose" style="padding:32px 0 48px">
+    <p class="hero__kicker">Mercado Pago · saques</p>
+    <h1>Saque do Mercado Pago não caiu na conta? Como conferir com o extrato do banco</h1>
+    <p class="meta">Guia para quem retira o dinheiro das vendas para outro banco. Atualizado em outubro de 2026.</p>
+
+    <p>Dinheiro “liberado” no Mercado Pago ainda não é dinheiro no seu banco. Entre os dois existe o saque (ou transferência), e é ali que alguns valores parecem sumir: um saque que você jura que fez e não aparece no extrato, ou um crédito no banco que você não sabe a qual saque pertence. Com muitos saques por mês, conferir de cabeça não funciona. O método abaixo resolve com dois arquivos.</p>
+
+    <h2>1. Antes de tudo: o status do saque</h2>
+    <p>Abra o comprovante do saque no app ou no site do Mercado Pago e veja o status e a conta de destino. Se o status não for de concluído, o problema ainda está no Mercado Pago. Se for concluído e a conta de destino estiver certa, siga para a conferência com o extrato. Se a conta de destino estiver errada, isso já explica.</p>
+
+    <h2>2. Exporte o relatório de liberações do Mercado Pago</h2>
+    <p>O Mercado Pago explica no artigo <a href="https://www.mercadopago.com.br/blog/relatorio-de-liberacao-de-saldo-na-conta-mercado-pago" rel="noopener noreferrer" target="_blank">“Como usar o relatório de liberação de saldo”</a>:</p>
+    <ol>
+      <li>Acesse <strong>Relatórios e faturamentos</strong>.</li>
+      <li>Vá em <strong>Relatórios de reconciliação contábil</strong>.</li>
+      <li>Escolha o tipo <strong>Liberações</strong>, clique em <strong>Criar relatório</strong>, escolha o período e gere.</li>
+      <li>O arquivo fica em “Relatórios criados” ou chega por e-mail.</li>
+    </ol>
+    <p>Segundo o <a href="https://www.mercadopago.com.br/developers/pt/docs/prestashop/additional-content/reports/released-money/report-use" rel="noopener noreferrer" target="_blank">glossário oficial desse relatório</a>, os saques aparecem como linhas de saldo antes e depois da transferência, identificadas como <code>pre_payout_</code> e <code>pos_payout_</code> seguidas do número da transação, e existe uma coluna com a conta de destino da retirada (<code>PAYOUT_BANK_ACCOUNT_NUMBER</code>). São essas linhas que interessam aqui. As liberações de venda ficam de fora desta conferência.</p>
+
+    <h2>3. Exporte o extrato do banco</h2>
+    <p>No internet banking, baixe o extrato do mesmo período, com uns dias a mais no fim, porque o crédito pode cair depois do pedido de saque. Se o banco oferecer <strong>OFX</strong>, prefira: data e valor vêm bem estruturados. CSV ou Excel também servem.</p>
+
+    <h2>4. Case saque com crédito</h2>
+    <p>Na planilha, faça duas listas: os saques do Mercado Pago (data e valor) e os créditos do banco que vieram do Mercado Pago (a descrição costuma citar Mercado Pago, mas isso varia de banco para banco). Para cada saque, procure um crédito com <strong>o mesmo valor</strong> numa <strong>janela de poucos dias</strong> depois da data do saque. Risque os pares encontrados.</p>
+    <p>No fim sobram dois tipos de linha:</p>
+    <ul>
+      <li><strong>Saque sem crédito:</strong> é o que você precisa cobrar. Anote data, valor e o número da transação do relatório.</li>
+      <li><strong>Crédito sem saque:</strong> pode ser um saque fora do período exportado, uma transferência feita por outra pessoa ou um valor que não veio de venda. Amplie o período antes de concluir.</li>
+    </ul>
+    <p>Atenção a dois saques com o mesmo valor em dias próximos: case pela ordem das datas, não pelo primeiro que aparecer.</p>
+
+    <h2>5. Com quem falar</h2>
+    <p>Se o saque aparece concluído no Mercado Pago e não há crédito no banco, leve o comprovante (com data, valor e número da transação) para os dois lados: o atendimento do Mercado Pago e o seu banco. Sem o número da transação, a conversa demora bem mais.</p>
+
+    <h2>Atalho opcional: o batimento no navegador</h2>
+    <p>A ferramenta <a href="../extrato-x-saques-mp.html?ref=guia-saque-atalho">Extrato bancário × saques do Mercado Pago</a> faz o passo 4 sozinha: você solta o extrato (CSV, Excel ou OFX) e o relatório do Mercado Pago, e ela lista os saques que não caíram e os créditos sem saque correspondente. A tolerância de valor e a janela de dias são ajustáveis. É grátis e roda no navegador, e os arquivos não saem do seu aparelho. Tem extrato e relatório de exemplo para testar.</p>
+    <p>Se a dúvida é anterior, se a venda foi liberada certo, comece pelo guia <a href="como-conferir-repasse-mercado-livre.html?ref=guia-saque-para-repasse">como conferir o repasse do Mercado Livre</a>.</p>
+
+    <p class="muted">Descrições dos relatórios conforme as páginas oficiais citadas, consultadas em outubro de 2026. Prazos de transferência dependem do Mercado Pago e do seu banco; confira na Ajuda do Mercado Pago. O Precifica não é ligado ao Mercado Pago nem ao Mercado Livre.</p>
+  </article>
