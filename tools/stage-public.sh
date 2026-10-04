@@ -10,7 +10,7 @@ tar -C "$ROOT" -cf - \
   --exclude='.herenow' --exclude='herenow.json' --exclude='zerodeploy-claim.json' \
   --exclude='LIVE_URL.txt' --exclude='keepalive.sh' --exclude='keepalive.*' \
   --exclude='*.log' --exclude='*.nohup' --exclude='SHIPPED-*.md' \
-  --exclude='README.md' --exclude='DISTRIBUTION.md' \
+  --exclude='README.md' --exclude='DISTRIBUTION.md' --exclude='DISTRIBUTION' \
   --exclude='07a8af429e89100dd60bab9dd62b955b.txt' --exclude='cloudflared.log' \
   --exclude='*.txt' --exclude='tests' --exclude='IDEAS' --exclude='__pycache__' --exclude='*.pyc' \
   . | tar -C "$STAGE" -xf -
