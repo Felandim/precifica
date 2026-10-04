@@ -85,7 +85,7 @@
     return Promise.resolve({ name: name, rows: rows, table: E.buildSaqueTable(rows), forced: {}, kind: "saque" });
   }
 
-  function addFiles(kind, items) {
+  function addFiles(kind, items, isExample) {
     return Promise.all(items.map(function (it) {
       var p = kind === "banco" ? loadBankItem(it.name, it.buf) : loadSaqueItem(it.name, it.buf);
       return Promise.resolve(p).catch(function (e) {
@@ -95,6 +95,7 @@
       state[kind] = state[kind].concat(loaded);
       renderFiles(kind);
       maybeRun();
+      if (!isExample && loaded.some(function (f) { return f.table && f.table.ok; }) && window.precificaActivation) window.precificaActivation("extrato-x-saques-mp", "arquivo");
     });
   }
 
@@ -132,6 +133,7 @@
 
   var exampleBtn = h("button", { type: "button", class: "btn btn--solid", text: "Testar com o arquivo de exemplo" });
   exampleBtn.addEventListener("click", function () {
+    if (window.precificaActivation) window.precificaActivation("extrato-x-saques-mp", "exemplo");
     resetAll();
     status.textContent = "Carregando o exemplo (dados fictícios)…";
     var files = [
@@ -140,7 +142,7 @@
     ];
     Promise.all(files.map(function (f) {
       return fetch(f[1]).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.arrayBuffer(); })
-        .then(function (b) { return addFiles(f[0], [{ name: f[1].split("/").pop() + " (EXEMPLO)", buf: b }]); });
+        .then(function (b) { return addFiles(f[0], [{ name: f[1].split("/").pop() + " (EXEMPLO)", buf: b }], true); });
     })).catch(function (e) { status.textContent = "Não consegui carregar o exemplo: " + e.message; });
   });
   var resetBtn = h("button", { type: "button", class: "btn btn--ghost", text: "Limpar" });

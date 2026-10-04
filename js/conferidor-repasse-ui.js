@@ -53,7 +53,7 @@
     return Promise.resolve(C.parseCSV(C.decodeText(buf)));
   }
 
-  function addFiles(kind, items) {
+  function addFiles(kind, items, isExample) {
     // items: [{name, buf}]
     return Promise.all(items.map(function (it) {
       return rowsFromBuffer(it.name, it.buf).then(function (rows) {
@@ -65,6 +65,7 @@
       state[kind] = state[kind].concat(loaded);
       renderFiles(kind);
       maybeRun();
+      if (!isExample && loaded.some(function (f) { return f.table && f.table.ok; }) && window.precificaActivation) window.precificaActivation("conferidor-repasse-ml", "arquivo");
     });
   }
 
@@ -102,11 +103,12 @@
 
   var exampleBtn = h("button", { type: "button", class: "btn btn--solid", "data-cr-example": "", text: "Testar com o arquivo de exemplo" });
   exampleBtn.addEventListener("click", function () {
+    if (window.precificaActivation) window.precificaActivation("conferidor-repasse-ml", "exemplo");
     resetAll();
     status.textContent = "Carregando o exemplo (dados fictícios)…";
     var files = [["venda", "exemplos/conferidor-ml-exemplo-por-venda.csv"], ["liberacao", "exemplos/conferidor-ml-exemplo-por-liberacao.csv"]];
     Promise.all(files.map(function (f) {
-      return fetch(f[1]).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.arrayBuffer(); }).then(function (b) { return addFiles(f[0], [{ name: f[1].split("/").pop() + " (EXEMPLO)", buf: b }]); });
+      return fetch(f[1]).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.arrayBuffer(); }).then(function (b) { return addFiles(f[0], [{ name: f[1].split("/").pop() + " (EXEMPLO)", buf: b }], true); });
     })).catch(function (e) { status.textContent = "Não consegui carregar o exemplo: " + e.message; });
   });
   var resetBtn = h("button", { type: "button", class: "btn btn--ghost", text: "Limpar" });

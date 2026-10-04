@@ -53,7 +53,7 @@
     return Promise.resolve(A.parseCSV(A.decodeText(buf)));
   }
 
-  function addFiles(items) {
+  function addFiles(items, isExample) {
     return Promise.all(items.map(function (it) {
       return rowsFromBuffer(it.name, it.buf).then(function (rows) {
         return { name: it.name, rows: rows, table: A.buildTable(rows), forced: {} };
@@ -64,6 +64,7 @@
       state.files = state.files.concat(loaded);
       renderFiles();
       maybeRun();
+      if (!isExample && loaded.some(function (f) { return f.table && f.table.ok; }) && window.precificaActivation) window.precificaActivation("full-aging-estoque", "arquivo");
     });
   }
 
@@ -106,11 +107,12 @@
 
   var exampleBtn = h("button", { type: "button", class: "btn btn--solid", text: "Testar com o arquivo de exemplo" });
   exampleBtn.addEventListener("click", function () {
+    if (window.precificaActivation) window.precificaActivation("full-aging-estoque", "exemplo");
     resetAll();
     status.textContent = "Carregando o exemplo (dados fictícios)…";
     fetch("exemplos/full-aging-estoque-exemplo.csv")
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.arrayBuffer(); })
-      .then(function (b) { return addFiles([{ name: "full-aging-estoque-exemplo.csv (EXEMPLO)", buf: b }]); })
+      .then(function (b) { return addFiles([{ name: "full-aging-estoque-exemplo.csv (EXEMPLO)", buf: b }], true); })
       .catch(function (e) { status.textContent = "Não consegui carregar o exemplo: " + e.message; });
   });
   var resetBtn = h("button", { type: "button", class: "btn btn--ghost", text: "Limpar" });
