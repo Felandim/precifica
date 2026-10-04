@@ -18,6 +18,8 @@ tar -C "$ROOT" -cf - \
 cp -a "$ROOT/robots.txt" "$STAGE/" 2>/dev/null || true
 cp -a "$ROOT/sitemap.xml" "$STAGE/" 2>/dev/null || true
 cp -a "$ROOT/sitemap-live.xml" "$STAGE/" 2>/dev/null || true
+# IndexNow verification keys are public; restore only 32-hex key filenames.
+find "$ROOT" -maxdepth 1 -type f -regextype posix-extended -regex '.*/[0-9a-fA-F]{32}\.txt' -exec cp -a {} "$STAGE/" \;
 # planilhas internas na raiz (ex.: Precifica-precificacao.xlsx) ficam fora; exemplos/*.xlsx são públicos
 find "$STAGE" -maxdepth 1 -type f -name '*.xlsx' -delete
 echo "$STAGE"
