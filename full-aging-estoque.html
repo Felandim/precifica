@@ -6,10 +6,135 @@
   <title>Aging de estoque Full Mercado Livre: custo e risco | Precifica</title>
   <meta name="description" content="Solte o Excel do Full e veja aging por faixa, custo estimado de armazenamento e SKUs perto do estoque antigo. Grátis, arquivos não saem do navegador.">
   <link rel="canonical" href="https://mellow-quarry-n7jk.here.now/full-aging-estoque.html">
+  <meta property="og:title" content="Aging de estoque Full | Precifica">
+  <meta property="og:description" content="Solte o Excel Full e marque SKUs encalhados com custo estimado de armazenagem. Grátis, 100% no navegador.">
+  <meta property="og:url" content="https://mellow-quarry-n7jk.here.now/full-aging-estoque.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#12110c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Meus relatórios são enviados para algum servidor?","acceptedAnswer":{"@type":"Answer","text":"Não. Os arquivos são lidos com o FileReader do navegador e analisados neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login."}},
+    {"@type":"Question","name":"Qual relatório do Full eu uso?","acceptedAnswer":{"@type":"Answer","text":"Os Excel oficiais em Anúncios → Gestão de estoque Full: Controle de estoque, Relatório geral de estoque Full ou consolidado de movimentações. Precisa de colunas de SKU/código, unidades e dias no CD (ou data de entrada)."}},
+    {"@type":"Question","name":"O custo estimado é o valor da fatura?","acceptedAnswer":{"@type":"Answer","text":"Não. É uma estimativa com as diárias oficiais de referência (editáveis). Confirme no painel Custos por estoque antigo e na fatura do Mercado Livre."}},
+    {"@type":"Question","name":"O que é estoque antigo?","acceptedAnswer":{"@type":"Answer","text":"Cobrança extra do Full quando unidades ficam meses no CD sem vender: cerca de 2 meses em Supermercado e 4 meses nas demais categorias, conforme a Central de Vendedores."}},
+    {"@type":"Question","name":"Qual a diferença para a calculadora Custo Full?","acceptedAnswer":{"@type":"Answer","text":"A calculadora Custo Full simula 1 produto na mão. Esta ferramenta processa o inventário inteiro do seu Excel e ranqueia aging e custo estimado por SKU."}}
+  ]}
+  </script>
 </head>
 <body>
-  <p>Redirecting to full page… load from <a href="https://mellow-quarry-n7jk.here.now/full-aging-estoque.html">here.now</a>. Source lives in repo after sync.</p>
-  <script>location.replace('https://mellow-quarry-n7jk.here.now/full-aging-estoque.html');</script>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html">PRECIFICA<span>preço com lucro</span></a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Precifica</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
+        <a href="auditor-tarifas-ml.html">Auditor tarifas</a>
+        <a href="extrato-x-saques-mp.html">Extrato × saques</a>
+        <a href="full-aging-estoque.html" aria-current="page">Aging Full</a>
+        <a href="custo-full.html">Custo Full</a>
+        <a href="blog/">Blog</a>
+        <a class="nav-pix" href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-intro wrap">
+      <p class="hero__kicker">Nova ferramenta · confere seus próprios arquivos</p>
+      <h1>Aging de estoque Full</h1>
+      <p>Solte o <strong>Excel/CSV do Full</strong>. A página classifica <strong>aging</strong> (0–30 … 120+ dias), estima <strong>custo de armazenamento</strong> com a tabela oficial de porte (editável) e marca SKUs perto do <strong>custo por estoque antigo</strong> (≈2 meses Supermercado / ≈4 meses demais).</p>
+      <p class="cr-privacy"><strong>Seus arquivos não saem do navegador.</strong> Leitura e análise neste aparelho, sem conta e sem login. O leitor de Excel (SheetJS) é servido pelo próprio Precifica.</p>
+    </section>
+
+    <div class="wrap">
+      <div data-full-aging></div>
+      <noscript><p class="muted">Esta ferramenta precisa de JavaScript e roda só no seu navegador.</p></noscript>
+    </div>
+
+    <section class="section wrap" id="como-exportar">
+      <h2>Como exportar o relatório</h2>
+      <ol class="cr-steps">
+        <li>No Mercado Livre, abra <strong>Anúncios</strong> → <strong>Gestão de estoque Full</strong>.</li>
+        <li>Em <strong>Controle de estoque</strong> (ou Relatório geral / consolidado de movimentações), baixe o Excel.</li>
+        <li>Solte o arquivo aqui. Se os nomes das colunas forem diferentes, ajuste o mapeamento.</li>
+      </ol>
+      <p class="muted" style="max-width:70ch">Relatórios oficiais: <a href="https://vendedores.mercadolivre.com.br/aprender/nota/como-gerenciar-seu-estoque-full-com-os-relatorios-de-excel" rel="noopener noreferrer" target="_blank">Como gerenciar seu estoque Full com os relatórios de Excel</a>. Custos: <a href="https://vendedores.mercadolivre.com.br/aprender/nota/quanto-custa-vender-pelo-full" rel="noopener noreferrer" target="_blank">Quanto custa vender pelo Full</a>.</p>
+
+      <h2 style="margin-top:28px">O que é analisado</h2>
+      <div class="steps">
+        <article class="step"><p class="step__n">01</p><h3>Aging por faixa</h3><p>Dias no CD (ou data de entrada → hoje) em faixas 0–30, 31–60, 61–90, 91–120 e 120+.</p></article>
+        <article class="step"><p class="step__n">02</p><h3>Custo estimado</h3><p>Unidades × diária do porte (P/M/G/XG, editável) → R$/dia e R$/mês.</p></article>
+        <article class="step"><p class="step__n">03</p><h3>Flags</h3><p>Risco de estoque antigo, alerta próximo ao limiar, sem vendas no período e cobertura alta.</p></article>
+      </div>
+
+      <h2 style="margin-top:28px">Arquivo de exemplo</h2>
+      <p class="muted" style="max-width:70ch"><strong>EXEMPLO, dados fictícios</strong>. Use o botão na ferramenta ou baixe: <a href="exemplos/full-aging-estoque-exemplo.csv" download>full-aging-estoque-exemplo.csv</a>.</p>
+      <p class="muted" style="max-width:62ch;margin-top:16px">Relacionadas: <a href="custo-full.html">Custo Full</a> · <a href="auditor-tarifas-ml.html">Auditor tarifas</a> · <a href="conferidor-repasse-ml.html">Conferidor ML</a> · <a href="estoque-minimo.html">Estoque mín.</a>.</p>
+    </section>
+
+    <section class="wrap pix" id="pix">
+      <h2>O site fica no ar com PIX</h2>
+      <p>Sem paywall. Se o aging mostrou SKU que ia sangrar na fatura, um café no PIX ajuda a manter o Precifica no ar.</p>
+      <div class="pix__key">
+        <span data-pix-key></span>
+        <button type="button" class="btn btn--solid" data-copy-pix>Copiar chave PIX</button>
+      </div>
+    </section>
+
+    <section class="section wrap faq" id="faq">
+      <h2>Perguntas frequentes</h2>
+      <details open>
+        <summary>Meus relatórios são enviados para algum servidor?</summary>
+        <p>Não. Os arquivos são lidos com o FileReader do navegador e analisados neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login.</p>
+      </details>
+      <details>
+        <summary>Qual relatório do Full eu uso?</summary>
+        <p>Os Excel oficiais em Anúncios → Gestão de estoque Full: Controle de estoque, Relatório geral ou consolidado de movimentações. Precisa de SKU/código, unidades e dias no CD (ou data de entrada).</p>
+      </details>
+      <details>
+        <summary>O custo estimado é o valor da fatura?</summary>
+        <p>Não. É uma estimativa com diárias oficiais de referência (editáveis). Confirme no painel Custos por estoque antigo e na fatura.</p>
+      </details>
+      <details>
+        <summary>O que é estoque antigo?</summary>
+        <p>Cobrança extra quando unidades ficam meses no CD: cerca de 2 meses em Supermercado e 4 meses nas demais categorias (Central de Vendedores).</p>
+      </details>
+      <details>
+        <summary>Qual a diferença para a calculadora Custo Full?</summary>
+        <p>Custo Full simula 1 produto. Esta ferramenta processa o inventário inteiro do Excel e ranqueia aging e custo por SKU.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Estimativa aritmética a partir do relatório que você mesmo baixou. Não é conselho contábil, fiscal ou jurídico, e não é ferramenta oficial do Mercado Livre. Confirme custos no painel Full antes de liquidar ou retirar estoque.</p>
+      <p>© <span id="year">2026</span> Precifica</p>
+      <nav aria-label="Rodapé">
+        <a href="index.html">Início</a>
+        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
+        <a href="auditor-tarifas-ml.html">Auditor tarifas</a>
+        <a href="extrato-x-saques-mp.html">Extrato × saques</a>
+        <a href="full-aging-estoque.html">Aging Full</a>
+        <a href="custo-full.html">Custo Full</a>
+        <a href="mercado-livre.html">Mercado Livre</a>
+        <a href="blog/">Blog</a>
+        <a href="apoiar.html">Apoiar</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>window.PRECIFICA_PIX_KEY = window.PRECIFICA_PIX_KEY || "7a941c50-b79f-4791-a7f4-5fe2a68ffea0";</script>
+  <script src="js/precifica.js"></script>
+  <script src="js/full-aging-estoque.js"></script>
+  <script src="js/full-aging-estoque-ui.js"></script>
 </body>
 </html>

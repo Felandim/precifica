@@ -1,0 +1,10 @@
+EXEMPLO PRECIFICA - dados fictícios de estoque Full (não são de nenhum vendedor real)
+SKU;Título;Unidades;Porte;Dias no CD;Vendas 30 dias;Categoria
+SKU-CABO-USB;Cabo USB-C 1m;120;Pequeno;18;45;Eletrônicos
+SKU-MOUSE;Mouse sem fio;80;Pequeno;42;22;Eletrônicos
+SKU-TECLADO;Teclado mecânico;55;Médio;75;8;Eletrônicos
+SKU-MONITOR;Monitor 24 pol;30;Grande;95;3;Eletrônicos
+SKU-CADEIRA;Cadeira gamer;12;Extragrande;130;0;Eletrônicos
+SKU-ARROZ;Arroz 5kg;200;Médio;70;5;Supermercado
+SKU-ORGANIZ;Organizadora M;40;Médio;110;2;Casa
+SKU-NOVO;Produto lançamento;25;Pequeno;5;12;Eletrônicos
