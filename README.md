@@ -5,6 +5,17 @@ Calculadora de preço para Mercado Livre, Shopee e Amazon. Site estático: HTML,
 **No ar (canônico, durável):** https://mellow-quarry-n7jk.here.now/
 Código-fonte aqui; o site público é só o do here.now.
 
+## Ferramentas grátis para vendedor do Mercado Livre
+
+Rodam no navegador, sem login; o arquivo não sai do computador.
+
+| Problema | Ferramenta | Guia manual (passo a passo) |
+|---|---|---|
+| O repasse do Mercado Livre não bate com as vendas | [Conferidor de repasse](https://mellow-quarry-n7jk.here.now/conferidor-repasse-ml.html?ref=github-readme-conferidor) | [Como conferir o repasse, venda por venda](https://mellow-quarry-n7jk.here.now/blog/como-conferir-repasse-mercado-livre.html?ref=github-readme-guia-repasse) |
+| A tarifa do Mercado Livre veio mais alta que o esperado | [Auditor de tarifas](https://mellow-quarry-n7jk.here.now/auditor-tarifas-ml.html?ref=github-readme-auditor) | [Tarifa veio alta? Como conferir](https://mellow-quarry-n7jk.here.now/blog/tarifa-mercado-livre-como-conferir.html?ref=github-readme-guia-tarifa) |
+| O saque do Mercado Pago não apareceu no extrato do banco | [Extrato × saques Mercado Pago](https://mellow-quarry-n7jk.here.now/extrato-x-saques-mp.html?ref=github-readme-extrato) | [Saque não caiu? Como conferir com o extrato](https://mellow-quarry-n7jk.here.now/blog/saque-mercado-pago-nao-caiu.html?ref=github-readme-guia-saque) |
+| Quais produtos do Full vão pagar custo por estoque antigo | [Aging de estoque Full](https://mellow-quarry-n7jk.here.now/full-aging-estoque.html?ref=github-readme-full-aging) | [Custo por estoque antigo no Full](https://mellow-quarry-n7jk.here.now/blog/custo-estoque-antigo-full.html?ref=github-readme-guia-full) |
+
 ## Abrir no computador
 
 ```bash
@@ -43,10 +54,10 @@ Taxas são **estimativa**. Confirme no Seller Center / simulador oficial.
 
 ## Publicação (sem túnel)
 
-1. `bash tools/stage-public.sh /tmp/precifica-pub` monta a árvore pública (sem segredos, logs, planilha, notas internas).
-2. Publica no here.now (slug permanente `mellow-quarry-n7jk`).
-3. Atualiza `site-manifest.txt` (`cd /tmp/precifica-pub && find . -type f | sed 's#^\./##' | sort | xargs sha256sum`) e commita na `main`
-   junto com as fontes alteradas. O workflow `sync-from-live` baixa cada arquivo do here.now, confere o sha256,
-   e commita na `main`.
+1. `bash tools/stage-public.sh /tmp/precifica-pub` monta a árvore pública (sem segredos, logs, planilha, notas internas)
+   e gera dentro dela `site-manifest.txt` (sha256 de cada arquivo público), mais `site-manifest.sha256` (hash do manifesto) na raiz do projeto.
+2. Publica no here.now (slug permanente `mellow-quarry-n7jk`); o manifesto vai junto e fica em `/site-manifest.txt`.
+3. Commita na `main` só `site-manifest.sha256` (uma linha) junto com as fontes alteradas. O workflow `sync-from-live` baixa
+   o manifesto do here.now, confere o hash dele contra `site-manifest.sha256`, baixa cada arquivo, confere o sha256 e commita na `main`.
 
 Nunca versionar: credenciais do here.now, `herenow.json`, claims, `LIVE_URL.txt`, logs, `keepalive.*`, `cloudflared*` (ver `.gitignore`).

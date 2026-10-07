@@ -6,14 +6,15 @@ STAGE=${1:-/tmp/precifica-pub}
 rm -rf "$STAGE"
 mkdir -p "$STAGE"
 tar -C "$ROOT" -cf - \
-  --exclude='.git' --exclude='tools' --exclude='_ship_tmp' --exclude='_xlsxgen' \
+  --exclude='.git' --exclude='.github' --exclude='tools' --exclude='_ship_tmp' --exclude='_xlsxgen' \
   --exclude='.herenow' --exclude='herenow.json' --exclude='zerodeploy-claim.json' \
   --exclude='LIVE_URL.txt' --exclude='keepalive.sh' --exclude='keepalive.*' \
   --exclude='*.log' --exclude='*.nohup' --exclude='SHIPPED-*.md' \
   --exclude='README.md' --exclude='DISTRIBUTION.md' --exclude='DISTRIBUTION' \
   --exclude='07a8af429e89100dd60bab9dd62b955b.txt' --exclude='cloudflared.log' \
-  --exclude='*.txt' --exclude='tests' --exclude='IDEAS' --exclude='__pycache__' --exclude='*.pyc' \
+  --exclude='*.txt' --exclude='site-manifest.sha256' --exclude='tests' --exclude='IDEAS' --exclude='__pycache__' --exclude='*.pyc' \
   . | tar -C "$STAGE" -xf -
+# site-manifest.txt must always hash the FULL staged public tree (every public file), never only changed files.
 # keep robots.txt + sitemaps (txt exclude was too broad for robots — restore)
 cp -a "$ROOT/robots.txt" "$STAGE/" 2>/dev/null || true
 cp -a "$ROOT/sitemap.xml" "$STAGE/" 2>/dev/null || true
@@ -22,5 +23,11 @@ cp -a "$ROOT/sitemap-live.xml" "$STAGE/" 2>/dev/null || true
 find "$ROOT" -maxdepth 1 -type f -regextype posix-extended -regex '.*/[0-9a-fA-F]{32}\.txt' -exec cp -a {} "$STAGE/" \;
 # planilhas internas na raiz (ex.: Precifica-precificacao.xlsx) ficam fora; exemplos/*.xlsx são públicos
 find "$STAGE" -maxdepth 1 -type f -name '*.xlsx' -delete
+# Manifesto público: sha256 de TODOS os arquivos publicados (menos ele mesmo). Vai para o here.now em /site-manifest.txt;
+# no GitHub só se commita site-manifest.sha256 (uma linha), que o workflow sync-from-live usa para validar o manifesto do ar.
+( cd "$STAGE" && find . -type f ! -path ./site-manifest.txt -print0 | sed -z 's#^\./##' | LC_ALL=C sort -z | xargs -0 sha256sum ) > "$STAGE.manifest.tmp"
+mv "$STAGE.manifest.tmp" "$STAGE/site-manifest.txt"
+cp -a "$STAGE/site-manifest.txt" "$ROOT/site-manifest.txt"
+sha256sum "$STAGE/site-manifest.txt" | cut -d' ' -f1 > "$ROOT/site-manifest.sha256"
 echo "$STAGE"
 find "$STAGE" -type f | wc -l
