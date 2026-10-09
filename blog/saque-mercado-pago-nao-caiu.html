@@ -18,7 +18,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Saque do Mercado Pago não caiu na conta? Como conferir com o extrato do banco", "description": "Passo a passo para casar os saques do relatório de liberações do Mercado Pago com o extrato do banco (OFX/CSV) e achar o saque que não caiu.", "inLanguage": "pt-BR", "datePublished": "2026-10-04", "dateModified": "2026-10-04", "mainEntityOfPage": "https://mellow-quarry-n7jk.here.now/blog/saque-mercado-pago-nao-caiu.html", "author": {"@type": "Organization", "name": "Precifica"}, "publisher": {"@type": "Organization", "name": "Precifica"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Saque do Mercado Pago não caiu na conta? Como conferir com o extrato do banco", "description": "Passo a passo para casar os saques do relatório de liberações do Mercado Pago com o extrato do banco (OFX/CSV) e achar o saque que não caiu.", "inLanguage": "pt-BR", "datePublished": "2026-10-04", "dateModified": "2026-10-09", "mainEntityOfPage": "https://mellow-quarry-n7jk.here.now/blog/saque-mercado-pago-nao-caiu.html", "author": {"@type": "Organization", "name": "Precifica"}, "publisher": {"@type": "Organization", "name": "Precifica"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "O saque aparece concluído no Mercado Pago, mas não caiu no banco. O que fazer?", "acceptedAnswer": {"@type": "Answer", "text": "Confira primeiro a conta de destino no comprovante. Se estiver certa, procure no extrato do banco um crédito com o mesmo valor nos dias seguintes ao saque. Se não houver, leve o comprovante com data, valor e número da transação ao atendimento do Mercado Pago e ao seu banco."}}, {"@type": "Question", "name": "Onde baixo o relatório com os saques do Mercado Pago?", "acceptedAnswer": {"@type": "Answer", "text": "Em Relatórios e faturamentos, depois Relatórios de reconciliação contábil. Escolha o tipo Liberações, clique em Criar relatório, escolha o período e gere. O arquivo fica em Relatórios criados ou chega por e-mail."}}, {"@type": "Question", "name": "Como acho os saques dentro do relatório de liberações?", "acceptedAnswer": {"@type": "Answer", "text": "Segundo o glossário oficial do relatório, os saques aparecem como linhas identificadas por pre_payout_ e pos_payout_ seguidas do número da transação, e a coluna PAYOUT_BANK_ACCOUNT_NUMBER mostra a conta de destino."}}, {"@type": "Question", "name": "Caiu um crédito no banco e não sei de qual saque ele é. E agora?", "acceptedAnswer": {"@type": "Answer", "text": "Antes de concluir, amplie o período exportado do Mercado Pago: pode ser um saque de fora do período. Também pode ser uma transferência feita por outra pessoa ou um valor que não veio de venda. Com dois saques do mesmo valor em dias próximos, case pela ordem das datas."}}]}</script>
 </head>
 <body>
   <header class="site-header">
@@ -103,6 +104,24 @@
 
     <h2>5. Com quem falar</h2>
     <p>Se o saque aparece concluído no Mercado Pago e não há crédito no banco, leve o comprovante (com data, valor e número da transação) para os dois lados: o atendimento do Mercado Pago e o seu banco. Sem o número da transação, a conversa demora bem mais.</p>
+
+    <h2 id="faq">Perguntas frequentes</h2>
+    <details open>
+      <summary>O saque aparece concluído no Mercado Pago, mas não caiu no banco. O que fazer?</summary>
+      <p>Confira primeiro a conta de destino no comprovante. Se estiver certa, procure no extrato do banco um crédito com o mesmo valor nos dias seguintes ao saque. Se não houver, leve o comprovante com data, valor e número da transação ao atendimento do Mercado Pago e ao seu banco.</p>
+    </details>
+    <details>
+      <summary>Onde baixo o relatório com os saques do Mercado Pago?</summary>
+      <p>Em Relatórios e faturamentos, depois Relatórios de reconciliação contábil. Escolha o tipo Liberações, clique em Criar relatório, escolha o período e gere. O arquivo fica em Relatórios criados ou chega por e-mail.</p>
+    </details>
+    <details>
+      <summary>Como acho os saques dentro do relatório de liberações?</summary>
+      <p>Segundo o glossário oficial do relatório, os saques aparecem como linhas identificadas por pre_payout_ e pos_payout_ seguidas do número da transação, e a coluna PAYOUT_BANK_ACCOUNT_NUMBER mostra a conta de destino.</p>
+    </details>
+    <details>
+      <summary>Caiu um crédito no banco e não sei de qual saque ele é. E agora?</summary>
+      <p>Antes de concluir, amplie o período exportado do Mercado Pago: pode ser um saque de fora do período. Também pode ser uma transferência feita por outra pessoa ou um valor que não veio de venda. Com dois saques do mesmo valor em dias próximos, case pela ordem das datas.</p>
+    </details>
 
     <h2>Atalho opcional: o batimento no navegador</h2>
     <p>A ferramenta <a href="../extrato-x-saques-mp.html?ref=guia-saque-atalho">Extrato bancário × saques do Mercado Pago</a> faz o passo 4 sozinha: você solta o extrato (CSV, Excel ou OFX) e o relatório do Mercado Pago, e ela lista os saques que não caíram e os créditos sem saque correspondente. A tolerância de valor e a janela de dias são ajustáveis. É grátis e roda no navegador, e os arquivos não saem do seu aparelho. Tem extrato e relatório de exemplo para testar.</p>
