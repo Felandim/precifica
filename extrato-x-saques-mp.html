@@ -21,7 +21,7 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
     {"@type":"Question","name":"Meus extratos são enviados para algum servidor?","acceptedAnswer":{"@type":"Answer","text":"Não. Os arquivos são lidos com o FileReader do navegador e conferidos neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login."}},
-    {"@type":"Question","name":"Qual a diferença para o Conferidor de repasse?","acceptedAnswer":{"@type":"Answer","text":"O Conferidor cruza o relatório Por venda com o Por liberação (dinheiro que entrou no saldo do Mercado Pago). Esta ferramenta cruza o extrato do seu banco com os saques/transferências do Mercado Pago (dinheiro que saiu do MP para a conta bancária)."}},
+    {"@type":"Question","name":"Isso confere se a venda foi liberada?","acceptedAnswer":{"@type":"Answer","text":"Não. Conferir a liberação é cruzar o relatório Por venda com o Por liberação (dinheiro que entrou no saldo do Mercado Pago). Esta ferramenta cruza o extrato do seu banco com os saques/transferências do Mercado Pago (dinheiro que saiu do MP para a conta bancária)."}},
     {"@type":"Question","name":"Quais arquivos eu preciso?","acceptedAnswer":{"@type":"Answer","text":"1) Extrato do banco em CSV, Excel ou OFX. 2) Relatório de liberações/saques do Mercado Pago (CSV ou Excel), preferindo o de saques/transferências. Formatos oficiais que você mesmo baixa."}},
     {"@type":"Question","name":"Por que um saque não casa com o crédito?","acceptedAnswer":{"@type":"Answer","text":"Pode ser janela de datas (TED no dia seguinte), descrição do banco sem a palavra Mercado Pago (desmarque o filtro), valor diferente além de R$ 0,05, ou o saque ainda não caiu. Aumente a janela ou confira o período dos dois arquivos."}},
     {"@type":"Question","name":"A ferramenta inventa dados?","acceptedAnswer":{"@type":"Answer","text":"Não. Ela só lê as colunas que você soltou, casa por valor e data dentro da tolerância, e lista o que não bate. Nada é estimado nem puxado de API."}}
@@ -38,7 +38,6 @@
         <a href="shopee.html">Shopee</a>
         <a href="amazon.html">Amazon</a>
         <a href="comparar.html">Comparar</a>
-        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
         <a href="auditor-tarifas-ml.html">Auditor tarifas</a>
         <a href="full-aging-estoque.html">Aging Full</a>
         <a href="extrato-x-saques-mp.html" aria-current="page">Extrato × saques</a>
@@ -71,7 +70,7 @@
         <li><strong>Saques do Mercado Pago:</strong> em Relatórios e faturamento / liberações (ou relatório de atividades de saque), exporte o CSV/Excel do período. Se o arquivo misturar liberações de venda e saques, a ferramenta fica só com as linhas de saque/transferência/withdrawal.</li>
         <li>Solte os dois aqui. Se o banco não escrever “Mercado Pago” na descrição, desmarque o filtro “só créditos que parecem Mercado Pago”.</li>
       </ol>
-      <p class="muted" style="max-width:70ch">Complementa o <a href="conferidor-repasse-ml.html">Conferidor de repasse</a> (Por venda × Por liberação). Aqui o passo é o batimento bancário depois que o dinheiro sai do Mercado Pago — o mesmo raciocínio descrito por quem analisa por que o extrato “não bate” com o GMV.</p>
+      <p class="muted" style="max-width:70ch">Antes, confira se a venda foi liberada (relatórios Por venda × Por liberação; veja o <a href="blog/como-conferir-repasse-mercado-livre.html">guia do repasse</a>). Aqui o passo é o batimento bancário depois que o dinheiro sai do Mercado Pago — o mesmo raciocínio descrito por quem analisa por que o extrato “não bate” com o GMV.</p>
 
       <h2 style="margin-top:28px">O que é conferido</h2>
       <div class="steps">
@@ -87,7 +86,7 @@
         <li><a href="exemplos/saques-mp-exemplo.csv" download>Saques Mercado Pago (CSV)</a></li>
       </ul>
       <p class="muted" style="max-width:62ch;margin-top:16px" data-guia-link>Prefere conferir na mão? Leia o guia <a href="blog/saque-mercado-pago-nao-caiu.html?ref=tool-extrato">saque do Mercado Pago não caiu na conta? Como conferir com o extrato</a>.</p>
-      <p class="muted" style="max-width:62ch;margin-top:16px">Relacionadas: <a href="conferidor-repasse-ml.html">Conferidor ML</a> · <a href="prazo-repasse.html">Prazo repasse</a> · <a href="taxa-antecipacao.html">Antecipação</a>.</p>
+      <p class="muted" style="max-width:62ch;margin-top:16px">Relacionadas: <a href="blog/como-conferir-repasse-mercado-livre.html">Guia do repasse</a> · <a href="prazo-repasse.html">Prazo repasse</a> · <a href="taxa-antecipacao.html">Antecipação</a>.</p>
     </section>
 
     <section class="wrap pix" id="pix">
@@ -106,8 +105,8 @@
         <p>Não. Os arquivos são lidos com o FileReader do navegador e conferidos neste aparelho. A página não envia os dados para nenhum servidor e não tem conta nem login.</p>
       </details>
       <details>
-        <summary>Qual a diferença para o Conferidor de repasse?</summary>
-        <p>O Conferidor cruza o relatório Por venda com o Por liberação (dinheiro que entrou no saldo do Mercado Pago). Esta ferramenta cruza o extrato do seu banco com os saques/transferências do Mercado Pago (dinheiro que saiu do MP para a conta bancária).</p>
+        <summary>Isso confere se a venda foi liberada?</summary>
+        <p>Não. Conferir a liberação é cruzar o relatório Por venda com o Por liberação (dinheiro que entrou no saldo do Mercado Pago), passo a passo no <a href="blog/como-conferir-repasse-mercado-livre.html">guia do repasse</a>. Esta ferramenta cruza o extrato do seu banco com os saques/transferências do Mercado Pago (dinheiro que saiu do MP para a conta bancária).</p>
       </details>
       <details>
         <summary>Quais arquivos eu preciso?</summary>
@@ -130,7 +129,6 @@
       <p>© <span id="year">2026</span> Precifica</p>
       <nav aria-label="Rodapé">
         <a href="index.html">Início</a>
-        <a href="conferidor-repasse-ml.html">Conferidor ML</a>
         <a href="auditor-tarifas-ml.html">Auditor tarifas</a>
         <a href="full-aging-estoque.html">Aging Full</a>
         <a href="extrato-x-saques-mp.html">Extrato × saques</a>
