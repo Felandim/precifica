@@ -1,6 +1,7 @@
 # Traz para a main os arquivos públicos do site durável (here.now), verificando o sha256 de cada um.
 # O manifesto (site-manifest.txt) é publicado junto com o site; na main fica só site-manifest.sha256 (uma linha),
 # que prova que o manifesto baixado do ar é o mesmo gerado pelo tools/stage-public.sh. Não publica nada (sem GitHub Pages).
+# Arquivos que saem do manifesto (ferramenta tirada do ar) também saem da main.
 # Fluxo diário: stage-public.sh -> publicar no here.now -> commitar site-manifest.sha256 (+ fontes) na main -> este workflow roda.
 name: sync-from-live
 on:
@@ -42,6 +43,15 @@ jobs:
       - name: Commit na main
         run: |
           set -euo pipefail
+          # Arquivo que estava no manifesto anterior (commitado) e saiu do novo foi tirado do ar: remover da main também.
+          if [ -f site-manifest.txt ]; then
+            sed 's/^[0-9a-f]\{64\}  //' site-manifest.txt | LC_ALL=C sort -u > "$RUNNER_TEMP/old.list"
+            sed 's/^[0-9a-f]\{64\}  //' "$RUNNER_TEMP/pub/site-manifest.txt" | LC_ALL=C sort -u > "$RUNNER_TEMP/new.list"
+            LC_ALL=C comm -23 "$RUNNER_TEMP/old.list" "$RUNNER_TEMP/new.list" | while read -r path; do
+              case "$path" in ""|/*|*..*|.github/*) continue;; esac
+              if [ -e "$path" ]; then git rm -q -- "$path"; echo "removido (saiu do ar): $path"; fi
+            done
+          fi
           cp -a "$RUNNER_TEMP/pub/." .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
