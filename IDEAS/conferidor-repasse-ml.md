@@ -75,3 +75,12 @@ Janela: de 2026-10-01 a **2026-10-15 (checar nesse dia, PT)**.
 2. **E ≥ 1 sinal externo:** um PIX ou uma mensagem citando o conferidor, **ou** uma divergência real relatada por algum usuário.
 
 **Se 1 ou 2 falhar em 2026-10-15:** tirar a página do ar (o HTML, os dois JS, `js/vendor/`, `exemplos/`, o card, o nav e as URLs do sitemap), sem v2. Se passar: a próxima iteração é o histórico local (IndexedDB) e, havendo um export real, a versão Shopee (10/18).
+
+---
+
+## Kill check executado: 2026-10-15 → REPROVOU, TIRADA DO AR
+
+- **Critério 1 (≥ 100 views de `/conferidor-repasse-ml.html` em 14 dias):** 2 views (analytics here.now, range 30d, lida em 15/10 ~08:30 BRT; uma delas pode ser checagem do próprio box). A analytics separa por página, então o critério alternativo (+20% de visitas do site) não se aplica. **Falhou.**
+- **Critério 2 (≥ 1 PIX, mensagem ou divergência relatada):** nenhum sinal registrado. Como o critério 1 já falhou, a ferramenta reprova de qualquer jeito.
+- **Feito em 15/10:** removidos do site `conferidor-repasse-ml.html`, `js/conferidor-repasse.js`, `js/conferidor-repasse-ui.js`, `a/conferidor-repasse-ml-*.html`, `exemplos/conferidor-ml-exemplo-*`, o card da home, o link "Conferidor ML" do menu e rodapé de todas as páginas, o atalho no guia do repasse, as menções nas outras 3 ferramentas e a URL do sitemap. `js/vendor/` **ficou**, porque as outras 3 ferramentas usam o SheetJS. O guia manual `/blog/como-conferir-repasse-mercado-livre.html` continua no ar (útil sem a ferramenta). Testes e `tools/headless-conferidor.js` arquivados.
+- Cópia de tudo que saiu: `/workspace/precifica-killed/conferidor-2026-10-15/` no box (fora do site). Sem v2, conforme a regra.
