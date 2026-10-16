@@ -76,10 +76,23 @@ Depois: concentrar só no canal que bater a meta. Se nenhum bater até 14/10, a 
 
 | Data (BRT) | Canal | URL do post | ref | Ação | Views com esse referrer em +3 dias | Em +7 dias | Ficou no ar? | Nota |
 |---|---|---|---|---|---|---|---|---|
-| 2026-10-04 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | guia publicado | | | sim | |
-| 2026-10-04 | SEO | /blog/tarifa-mercado-livre-como-conferir.html | guia-tarifa-* | guia publicado | | | sim | |
-| 2026-10-04 | SEO | /blog/saque-mercado-pago-nao-caiu.html | guia-saque-* | guia publicado | | | sim | |
-| 2026-10-04 | SEO | /blog/custo-estoque-antigo-full.html | guia-full-* | guia publicado | | | sim | |
+| 2026-10-04 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | guia publicado | 1 view (Direct); 0 de buscador (07/10) | 1 view, 0 de buscador (11/10) | sim | |
+| 2026-10-04 | SEO | /blog/tarifa-mercado-livre-como-conferir.html | guia-tarifa-* | guia publicado | 0 (07/10) | 0 (11/10) | sim | |
+| 2026-10-04 | SEO | /blog/saque-mercado-pago-nao-caiu.html | guia-saque-* | guia publicado | 0 (07/10) | 0 (11/10) | sim | |
+| 2026-10-04 | SEO | /blog/custo-estoque-antigo-full.html | guia-full-* | guia publicado | 0 (07/10) | 0 (11/10) | sim | |
+| 2026-10-07 | SEO (descoberta) | github.com/Felandim/precifica (README) | github-readme-* | tabela 4 ferramentas + 4 guias | github.com 2→3 (1 view em 08/10, não confirmada; 10/10) | | sim | medir por referrer github.com |
+| 2026-10-08 | SEO | /blog/ | blog-index-* | título/descrição/H1 do índice alinhados aos 4 guias + IndexNow | | | sim | |
+| 2026-10-09 | SEO | /blog/saque-mercado-pago-nao-caiu.html | guia-saque-* | FAQ + FAQPage + IndexNow | 0 (12/10) | | sim | |
+| 2026-10-10 | SEO | /blog/tarifa-mercado-livre-como-conferir.html | guia-tarifa-* | FAQ + FAQPage + IndexNow | 0 (13/10) | | sim | |
+| 2026-10-11 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | FAQ + FAQPage + IndexNow | | | sim | |
+| 2026-10-12 | SEO | / (home) | — | seção "O dinheiro do Mercado Livre bateu?" com links diretos aos 4 guias + IndexNow | | | sim | title da home não mudado (uma mudança por vez) |
+| 2026-10-13 | SEO | / (home) | — | title/description/og:* da home na dor do vendedor ML ("Calculadora Mercado Livre: preço, tarifa e repasse") + sitemap lastmod + IndexNow | | | sim | medir por referrer de buscador em / e nos guias |
+| 2026-10-14 | SEO | /conferidor-repasse-ml.html | — | title/description "Conciliação Mercado Livre" + IndexNow | página tirada do ar em 15/10 | — | não | kill check |
+| 2026-10-15 | KILL CHECK | /conferidor-repasse-ml.html | — | 2 views em 14 dias (< 100), 0 sinal externo → tirada do ar; guia manual do repasse fica | — | — | não (404) | ver IDEAS/conferidor-repasse-ml.md |
+| 2026-10-16 | KILL CHECK | /extrato-x-saques-mp.html | — | 0 views em 14 dias (< 80), 0 sinal externo → tirada do ar; guia manual do saque fica; SEO auditor title "Tarifa Mercado Livre" | — | — | não (404) | ver IDEAS/extrato-x-saques-mp.md |
 
 ## 8. Revisão semanal
 Domingo, 2026-10-11: comparar views por referrer nos três canais. Dobrar a aposta no melhor e cortar os outros. Última checagem em 2026-10-25 para o SEO.
+
+### Revisão 2026-10-11
+Nenhum canal moveu a métrica (Google/Bing 0 páginas indexadas, 0 views de buscador; README 1 view não confirmada). Esperar o Google não basta antes dos kill checks. Proposta levada ao Felipe: Reddit r/mercadolivre com conta do box por e-mail (sem celular, sem ação dele), 1 comentário útil por dia, meta 3 no ar e ≥15 views reddit.com até 18/10. Aguardando o OK dele (contraria a regra só Google/Bing de 04/10).
