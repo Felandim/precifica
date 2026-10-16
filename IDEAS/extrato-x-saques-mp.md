@@ -47,3 +47,13 @@ Se 1 ou 2 falhar: tirar do ar, sem v2.
 - Lote 2026-10-02: nenhuma ideia ≥ 13/18. Melhor ≥ 11: **extrato-x-saques-mp (12/18)**.
 - Construído e publicado em 2026-10-02: `extrato-x-saques-mp.html`.
 - Kill check: **2026-10-16 PT** (≥80 page views **e** ≥1 PIX/mensagem/divergência relatada).
+
+
+---
+
+## Kill check executado: 2026-10-16 → REPROVOU, TIRADA DO AR
+
+- **Critério 1 (≥ 80 views de `/extrato-x-saques-mp.html` em 14 dias):** 0 views (analytics here.now, range 30d, lida em 16/10 ~08:23 BRT; a página nem aparece em topPaths). A analytics separa por página, então o critério alternativo (+15% de visitas do site) não se aplica. **Falhou.**
+- **Critério 2 (≥ 1 PIX, mensagem ou divergência relatada):** nenhum sinal registrado. Como o critério 1 já falhou, a ferramenta reprova de qualquer jeito.
+- **Feito em 16/10:** removidos do site `extrato-x-saques-mp.html`, `js/extrato-saques-mp.js`, `js/extrato-saques-mp-ui.js`, `a/extrato-x-saques-mp-*.html`, `exemplos/extrato-banco-exemplo.*`, `exemplos/saques-mp-exemplo.csv`, o card da home, o link "Extrato × saques" do menu e rodapé de todas as páginas, o atalho no guia do saque, as menções no auditor e a URL do sitemap. `js/vendor/` **ficou**, porque auditor e full-aging usam o SheetJS. O guia manual `/blog/saque-mercado-pago-nao-caiu.html` continua no ar (útil sem a ferramenta; seção virou "Se o saque foi feito, mas o problema continua"). Teste unitário arquivado.
+- Cópia de tudo que saiu: `/workspace/precifica-killed/extrato-2026-10-16/` no box (fora do site). Sem v2, conforme a regra.

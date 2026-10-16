@@ -13,7 +13,7 @@ Rodam no navegador, sem login; o arquivo não sai do computador.
 |---|---|---|
 | O repasse do Mercado Livre não bate com as vendas | — (tirada do ar em 15/10/2026; use o guia) | [Como conferir o repasse, venda por venda](https://mellow-quarry-n7jk.here.now/blog/como-conferir-repasse-mercado-livre.html?ref=github-readme-guia-repasse) |
 | A tarifa do Mercado Livre veio mais alta que o esperado | [Auditor de tarifas](https://mellow-quarry-n7jk.here.now/auditor-tarifas-ml.html?ref=github-readme-auditor) | [Tarifa veio alta? Como conferir](https://mellow-quarry-n7jk.here.now/blog/tarifa-mercado-livre-como-conferir.html?ref=github-readme-guia-tarifa) |
-| O saque do Mercado Pago não apareceu no extrato do banco | [Extrato × saques Mercado Pago](https://mellow-quarry-n7jk.here.now/extrato-x-saques-mp.html?ref=github-readme-extrato) | [Saque não caiu? Como conferir com o extrato](https://mellow-quarry-n7jk.here.now/blog/saque-mercado-pago-nao-caiu.html?ref=github-readme-guia-saque) |
+| O saque do Mercado Pago não apareceu no extrato do banco | — (tirada do ar em 16/10/2026; use o guia) | [Saque não caiu? Como conferir com o extrato](https://mellow-quarry-n7jk.here.now/blog/saque-mercado-pago-nao-caiu.html?ref=github-readme-guia-saque) |
 | Quais produtos do Full vão pagar custo por estoque antigo | [Aging de estoque Full](https://mellow-quarry-n7jk.here.now/full-aging-estoque.html?ref=github-readme-full-aging) | [Custo por estoque antigo no Full](https://mellow-quarry-n7jk.here.now/blog/custo-estoque-antigo-full.html?ref=github-readme-guia-full) |
 
 ## Abrir no computador

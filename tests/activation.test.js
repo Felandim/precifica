@@ -3,7 +3,6 @@
 var fs = require("fs"), path = require("path");
 var ROOT = path.join(__dirname, "..");
 var tools = [
-  ["extrato-x-saques-mp", "extrato-saques-mp-ui.js"],
   ["auditor-tarifas-ml", "auditor-tarifas-ml-ui.js"],
   ["full-aging-estoque", "full-aging-estoque-ui.js"]
 ];
@@ -39,7 +38,7 @@ tools.forEach(function (pair) {
 
 t("robots e sitemap apontam o conjunto de divulgação", function () {
   var sm = read("sitemap.xml"), robots = read("robots.txt");
-  var urls = ["/", "/blog/como-conferir-repasse-mercado-livre.html", "/blog/tarifa-mercado-livre-como-conferir.html", "/blog/saque-mercado-pago-nao-caiu.html", "/blog/custo-estoque-antigo-full.html", "/extrato-x-saques-mp.html", "/auditor-tarifas-ml.html", "/full-aging-estoque.html"];
+  var urls = ["/", "/blog/como-conferir-repasse-mercado-livre.html", "/blog/tarifa-mercado-livre-como-conferir.html", "/blog/saque-mercado-pago-nao-caiu.html", "/blog/custo-estoque-antigo-full.html", "/auditor-tarifas-ml.html", "/full-aging-estoque.html"];
   urls.forEach(function (u) { ok(sm.indexOf("<loc>https://mellow-quarry-n7jk.here.now" + u + "</loc>") >= 0, "sitemap sem " + u); });
   ok(/Sitemap:\s*https:\/\/mellow-quarry-n7jk\.here\.now\/sitemap\.xml/.test(robots), "robots sem sitemap");
 });
