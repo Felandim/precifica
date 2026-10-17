@@ -4,7 +4,7 @@ var ROOT = path.join(__dirname, '..');
 var BASE = 'https://mellow-quarry-n7jk.here.now/';
 var G = [
   ['blog/como-conferir-repasse-mercado-livre.html', null], // conferidor tirado do ar no kill check de 2026-10-15
-  ['blog/tarifa-mercado-livre-como-conferir.html', 'auditor-tarifas-ml.html'],
+  ['blog/tarifa-mercado-livre-como-conferir.html', null], // auditor tirado do ar no kill check de 2026-10-17
   ['blog/saque-mercado-pago-nao-caiu.html', null], // extrato tirado do ar no kill check de 2026-10-16
   ['blog/custo-estoque-antigo-full.html', 'full-aging-estoque.html']
 ];
@@ -25,6 +25,7 @@ G.forEach(function (g) {
   if (g[1]) ok(art.indexOf('href="../' + g[1] + '?ref=') >= 0, g[0] + ' linka a ferramenta com ?ref=');
   ok(art.indexOf('conferidor-repasse-ml') < 0, g[0] + ' não linka conferidor tirado do ar');
   ok(art.indexOf('extrato-x-saques-mp') < 0, g[0] + ' não linka extrato tirado do ar');
+  ok(art.indexOf('auditor-tarifas-ml') < 0, g[0] + ' não linka auditor tirado do ar');
   ok(/vendedores\.mercadolivre\.com\.br|mercadopago\.com\.br/.test(art), g[0] + ' cita página oficial');
   // todo link interno do artigo carrega ?ref= único
   var re = /href="(?!https?:)([^"]+)"/g, m;

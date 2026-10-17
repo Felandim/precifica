@@ -38,3 +38,8 @@ Se 1 ou 2 falhar: tirar do ar, sem v2.
 
 ## Decisão
 **PASSA na régua 13/18 → CONSTRUIR.** Melhor do lote 2026-10-03.
+
+## Resultado do kill check (2026-10-17)
+- Critério 1: ≥ 80 views em `/auditor-tarifas-ml.html` em 14 dias (03/10 → 17/10) → **0** (a página nunca apareceu em topPaths da analytics here.now; a analytics separa por página, então o critério alternativo +15% não se aplica).
+- Critério 2: ≥ 1 PIX, mensagem citando a ferramenta ou cobrança a mais relatada → **nenhum**.
+- **REPROVOU → tirada do ar em 2026-10-17, sem v2.** Backup: `/workspace/precifica-killed/auditor-2026-10-17/`. O guia manual `/blog/tarifa-mercado-livre-como-conferir.html` continua no ar (o atalho virou "Se a tarifa está certa, mas o problema continua").
