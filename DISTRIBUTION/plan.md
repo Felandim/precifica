@@ -80,16 +80,18 @@ Depois: concentrar só no canal que bater a meta. Se nenhum bater até 14/10, a 
 | 2026-10-04 | SEO | /blog/tarifa-mercado-livre-como-conferir.html | guia-tarifa-* | guia publicado | 0 (07/10) | 0 (11/10) | sim | |
 | 2026-10-04 | SEO | /blog/saque-mercado-pago-nao-caiu.html | guia-saque-* | guia publicado | 0 (07/10) | 0 (11/10) | sim | |
 | 2026-10-04 | SEO | /blog/custo-estoque-antigo-full.html | guia-full-* | guia publicado | 0 (07/10) | 0 (11/10) | sim | |
-| 2026-10-07 | SEO (descoberta) | github.com/Felandim/precifica (README) | github-readme-* | tabela 4 ferramentas + 4 guias | github.com 2→3 (1 view em 08/10, não confirmada; 10/10) | | sim | medir por referrer github.com |
-| 2026-10-08 | SEO | /blog/ | blog-index-* | título/descrição/H1 do índice alinhados aos 4 guias + IndexNow | | | sim | |
-| 2026-10-09 | SEO | /blog/saque-mercado-pago-nao-caiu.html | guia-saque-* | FAQ + FAQPage + IndexNow | 0 (12/10) | | sim | |
-| 2026-10-10 | SEO | /blog/tarifa-mercado-livre-como-conferir.html | guia-tarifa-* | FAQ + FAQPage + IndexNow | 0 (13/10) | | sim | |
-| 2026-10-11 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | FAQ + FAQPage + IndexNow | | | sim | |
-| 2026-10-12 | SEO | / (home) | — | seção "O dinheiro do Mercado Livre bateu?" com links diretos aos 4 guias + IndexNow | | | sim | title da home não mudado (uma mudança por vez) |
-| 2026-10-13 | SEO | / (home) | — | title/description/og:* da home na dor do vendedor ML ("Calculadora Mercado Livre: preço, tarifa e repasse") + sitemap lastmod + IndexNow | | | sim | medir por referrer de buscador em / e nos guias |
+| 2026-10-07 | SEO (descoberta) | github.com/Felandim/precifica (README) | github-readme-* | tabela 4 ferramentas + 4 guias | github.com 2→3 (1 view em 08/10, não confirmada; 10/10) | github.com 3 (14/10, log do dia); 4 em 16–17/10 | sim | medir por referrer github.com |
+| 2026-10-08 | SEO | /blog/ | blog-index-* | título/descrição/H1 do índice alinhados aos 4 guias + IndexNow | 0 de buscador (conferido tarde, 17/10) | /blog 2 views no total (Direct), 0 de buscador (conferido tarde, 17/10) | sim | |
+| 2026-10-09 | SEO | /blog/saque-mercado-pago-nao-caiu.html | guia-saque-* | FAQ + FAQPage + IndexNow | 0 (12/10) | 0 (conferido tarde, 17/10) | sim | |
+| 2026-10-10 | SEO | /blog/tarifa-mercado-livre-como-conferir.html | guia-tarifa-* | FAQ + FAQPage + IndexNow | 0 (13/10) | 0 (17/10) | sim | |
+| 2026-10-11 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | FAQ + FAQPage + IndexNow | 1 view no total (Direct), 0 de buscador (conferido tarde, 17/10) | em 18/10 | sim | |
+| 2026-10-12 | SEO | / (home) | — | seção "O dinheiro do Mercado Livre bateu?" com links diretos aos 4 guias + IndexNow | 0 de buscador (conferido tarde, 17/10) | em 19/10 | sim | title da home não mudado (uma mudança por vez) |
+| 2026-10-13 | SEO | / (home) | — | title/description/og:* da home na dor do vendedor ML ("Calculadora Mercado Livre: preço, tarifa e repasse") + sitemap lastmod + IndexNow | 0 de buscador (conferido tarde, 17/10) | em 20/10 | sim | medir por referrer de buscador em / e nos guias |
 | 2026-10-14 | SEO | /conferidor-repasse-ml.html | — | title/description "Conciliação Mercado Livre" + IndexNow | página tirada do ar em 15/10 | — | não | kill check |
 | 2026-10-15 | KILL CHECK | /conferidor-repasse-ml.html | — | 2 views em 14 dias (< 100), 0 sinal externo → tirada do ar; guia manual do repasse fica | — | — | não (404) | ver IDEAS/conferidor-repasse-ml.md |
 | 2026-10-16 | KILL CHECK | /extrato-x-saques-mp.html | — | 0 views em 14 dias (< 80), 0 sinal externo → tirada do ar; guia manual do saque fica; SEO auditor title "Tarifa Mercado Livre" | — | — | não (404) | ver IDEAS/extrato-x-saques-mp.md |
+| 2026-10-17 | KILL CHECK | /auditor-tarifas-ml.html | — | 0 views em 14 dias (< 80), 0 sinal externo → tirada do ar; guia manual da tarifa fica (atalho virou "Se a tarifa está certa, mas o problema continua") | — | — | não (404) | ver IDEAS/auditor-tarifas-ml.md |
+| 2026-10-17 | SEO | /blog/custo-estoque-antigo-full.html | guia-full-* | title → "Custo por estoque antigo Mercado Livre (Full): quais produtos pagam" (H1/corpo iguais) + sitemap lastmod + IndexNow | em 20/10 | em 24/10 | sim | autocomplete "custo por estoque antigo mercado livre" (threads.md); title antigo não tinha "Mercado Livre" |
 
 ## 8. Revisão semanal
 Domingo, 2026-10-11: comparar views por referrer nos três canais. Dobrar a aposta no melhor e cortar os outros. Última checagem em 2026-10-25 para o SEO.

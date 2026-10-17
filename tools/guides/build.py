@@ -18,7 +18,7 @@ GUIDES = [
    'Passo a passo para casar os saques do relatório de liberações do Mercado Pago com o extrato do banco (OFX/CSV) e achar o saque que não caiu.',
    'Saque do Mercado Pago não caiu na conta? Como conferir com o extrato do banco'),
   ('full', 'custo-estoque-antigo-full.html',
-   'Custo por estoque antigo no Full: quais produtos vão ser cobrados | Precifica',
+   'Custo por estoque antigo Mercado Livre (Full): quais produtos pagam | Precifica',
    'Regra oficial do custo por estoque antigo do Full (4 meses, 2 em Supermercado), onde ver os dias de cada unidade e como montar a lista de risco antes da fatura.',
    'Custo por estoque antigo no Full: como ver quais produtos vão ser cobrados'),
 ]
