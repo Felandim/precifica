@@ -3,7 +3,7 @@
 import json, os, html
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
-BASE = 'https://mellow-quarry-n7jk.here.now/blog/'
+BASE = 'https://precifica-br.pages.dev/blog/'
 GUIDES = [
   ('repasse', 'como-conferir-repasse-mercado-livre.html',
    'Conciliação Mercado Livre: como conferir o repasse venda por venda | Precifica',
@@ -26,7 +26,7 @@ header = open(os.path.join(HERE, '_header.html'), encoding='utf-8').read()
 footer = open(os.path.join(HERE, '_footer.html'), encoding='utf-8').read()
 for key, fname, title, desc, h1 in GUIDES:
     body = open(os.path.join(HERE, key + '.body.html'), encoding='utf-8').read()
-    url = BASE + fname
+    url = BASE + fname[:-5]  # Cloudflare Pages serve sem .html (308 de /x.html para /x)
     ld = {"@context": "https://schema.org", "@type": "Article", "headline": h1, "description": desc,
           "inLanguage": "pt-BR", "datePublished": "2026-10-04", "dateModified": "2026-10-04",
           "mainEntityOfPage": url, "author": {"@type": "Organization", "name": "Precifica"},
