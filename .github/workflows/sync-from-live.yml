@@ -1,8 +1,8 @@
-# Traz para a main os arquivos públicos do site durável (here.now), verificando o sha256 de cada um.
+# Traz para a main os arquivos públicos do site durável (Cloudflare Pages, projeto precifica-br), verificando o sha256 de cada um.
 # O manifesto (site-manifest.txt) é publicado junto com o site; na main fica só site-manifest.sha256 (uma linha),
 # que prova que o manifesto baixado do ar é o mesmo gerado pelo tools/stage-public.sh. Não publica nada (sem GitHub Pages).
 # Arquivos que saem do manifesto (ferramenta tirada do ar) também saem da main.
-# Fluxo diário: stage-public.sh -> publicar no here.now -> commitar site-manifest.sha256 (+ fontes) na main -> este workflow roda.
+# Fluxo diário: tools/deploy-pages.sh (stage + Cloudflare Pages) -> commitar site-manifest.sha256 (+ fontes) na main -> este workflow roda.
 name: sync-from-live
 on:
   push:
@@ -15,7 +15,7 @@ concurrency:
   group: sync
   cancel-in-progress: false
 env:
-  LIVE: https://mellow-quarry-n7jk.here.now
+  LIVE: https://precifica-br.pages.dev
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -34,6 +34,8 @@ jobs:
           while read -r sha path; do
             [ -z "$path" ] && continue
             case "$path" in /*|*..*) echo "caminho inválido: $path"; exit 1;; esac
+            # Arquivos de configuração do Cloudflare Pages não são servidos; ficam como estão na main.
+            case "$path" in _headers|_redirects|_routes.json) continue;; esac
             mkdir -p "$RUNNER_TEMP/pub/$(dirname "$path")"
             curl -fsSL --retry 5 --retry-delay 10 "$LIVE/$path" -o "$RUNNER_TEMP/pub/$path"
             echo "$sha  $RUNNER_TEMP/pub/$path" | sha256sum -c --quiet -
@@ -48,7 +50,7 @@ jobs:
             sed 's/^[0-9a-f]\{64\}  //' site-manifest.txt | LC_ALL=C sort -u > "$RUNNER_TEMP/old.list"
             sed 's/^[0-9a-f]\{64\}  //' "$RUNNER_TEMP/pub/site-manifest.txt" | LC_ALL=C sort -u > "$RUNNER_TEMP/new.list"
             LC_ALL=C comm -23 "$RUNNER_TEMP/old.list" "$RUNNER_TEMP/new.list" | while read -r path; do
-              case "$path" in ""|/*|*..*|.github/*) continue;; esac
+              case "$path" in ""|/*|*..*|.github/*|_headers|_redirects|_routes.json) continue;; esac
               if [ -e "$path" ]; then git rm -q -- "$path"; echo "removido (saiu do ar): $path"; fi
             done
           fi
@@ -56,4 +58,4 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --cached --quiet; then echo "main já atualizada"; else git commit -q -m "site: sync do here.now ($(date -u +%F))" && git push origin HEAD:main; fi
+          if git diff --cached --quiet; then echo "main já atualizada"; else git commit -q -m "site: sync do Cloudflare Pages ($(date -u +%F))" && git push origin HEAD:main; fi
