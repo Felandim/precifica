@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mellow-quarry-n7jk.here.now/sitemap.xml
+Sitemap: https://precifica-br.pages.dev/sitemap.xml
