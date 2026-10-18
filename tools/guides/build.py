@@ -6,7 +6,7 @@ ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
 BASE = 'https://mellow-quarry-n7jk.here.now/blog/'
 GUIDES = [
   ('repasse', 'como-conferir-repasse-mercado-livre.html',
-   'Como conferir o repasse do Mercado Livre, venda por venda | Precifica',
+   'Conciliação Mercado Livre: como conferir o repasse venda por venda | Precifica',
    'Conciliação do Mercado Livre passo a passo: relatório Por venda e Por liberação, Número da operação, fórmula de planilha e o que fazer com cada diferença.',
    'Como conferir o repasse do Mercado Livre, venda por venda'),
   ('tarifa', 'tarifa-mercado-livre-como-conferir.html',

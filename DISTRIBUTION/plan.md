@@ -84,7 +84,7 @@ Depois: concentrar só no canal que bater a meta. Se nenhum bater até 14/10, a 
 | 2026-10-08 | SEO | /blog/ | blog-index-* | título/descrição/H1 do índice alinhados aos 4 guias + IndexNow | 0 de buscador (conferido tarde, 17/10) | /blog 2 views no total (Direct), 0 de buscador (conferido tarde, 17/10) | sim | |
 | 2026-10-09 | SEO | /blog/saque-mercado-pago-nao-caiu.html | guia-saque-* | FAQ + FAQPage + IndexNow | 0 (12/10) | 0 (conferido tarde, 17/10) | sim | |
 | 2026-10-10 | SEO | /blog/tarifa-mercado-livre-como-conferir.html | guia-tarifa-* | FAQ + FAQPage + IndexNow | 0 (13/10) | 0 (17/10) | sim | |
-| 2026-10-11 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | FAQ + FAQPage + IndexNow | 1 view no total (Direct), 0 de buscador (conferido tarde, 17/10) | em 18/10 | sim | |
+| 2026-10-11 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | FAQ + FAQPage + IndexNow | 1 view no total (Direct), 0 de buscador (conferido tarde, 17/10) | 1 view no total (Direct), 0 de buscador (18/10) | sim | |
 | 2026-10-12 | SEO | / (home) | — | seção "O dinheiro do Mercado Livre bateu?" com links diretos aos 4 guias + IndexNow | 0 de buscador (conferido tarde, 17/10) | em 19/10 | sim | title da home não mudado (uma mudança por vez) |
 | 2026-10-13 | SEO | / (home) | — | title/description/og:* da home na dor do vendedor ML ("Calculadora Mercado Livre: preço, tarifa e repasse") + sitemap lastmod + IndexNow | 0 de buscador (conferido tarde, 17/10) | em 20/10 | sim | medir por referrer de buscador em / e nos guias |
 | 2026-10-14 | SEO | /conferidor-repasse-ml.html | — | title/description "Conciliação Mercado Livre" + IndexNow | página tirada do ar em 15/10 | — | não | kill check |
@@ -92,9 +92,28 @@ Depois: concentrar só no canal que bater a meta. Se nenhum bater até 14/10, a 
 | 2026-10-16 | KILL CHECK | /extrato-x-saques-mp.html | — | 0 views em 14 dias (< 80), 0 sinal externo → tirada do ar; guia manual do saque fica; SEO auditor title "Tarifa Mercado Livre" | — | — | não (404) | ver IDEAS/extrato-x-saques-mp.md |
 | 2026-10-17 | KILL CHECK | /auditor-tarifas-ml.html | — | 0 views em 14 dias (< 80), 0 sinal externo → tirada do ar; guia manual da tarifa fica (atalho virou "Se a tarifa está certa, mas o problema continua") | — | — | não (404) | ver IDEAS/auditor-tarifas-ml.md |
 | 2026-10-17 | SEO | /blog/custo-estoque-antigo-full.html | guia-full-* | title → "Custo por estoque antigo Mercado Livre (Full): quais produtos pagam" (H1/corpo iguais) + sitemap lastmod + IndexNow | em 20/10 | em 24/10 | sim | autocomplete "custo por estoque antigo mercado livre" (threads.md); title antigo não tinha "Mercado Livre" |
+| 2026-10-18 | KILL CHECK | /full-aging-estoque.html | — | 0 views em 14 dias (< 80), 0 sinal externo → tirada do ar; guia manual do Full fica (atalho virou "Se a lista está pronta, mas o custo continua"); js/vendor (SheetJS), js/activation.js e a/ saíram (sem uso) | — | — | não (404) | ver IDEAS/full-aging-estoque.md; nenhuma ferramenta ML fica no ar |
+| 2026-10-18 | SEO | /blog/como-conferir-repasse-mercado-livre.html | guia-repasse-* | title → "Conciliação Mercado Livre: como conferir o repasse venda por venda" (H1/og/corpo iguais) + sitemap lastmod + IndexNow | em 21/10 | em 25/10 | sim | autocomplete "conciliação mercado livre" / "como fazer conciliação mercado livre" (threads.md); "como conferir repasse" não tem sugestão |
 
 ## 8. Revisão semanal
 Domingo, 2026-10-11: comparar views por referrer nos três canais. Dobrar a aposta no melhor e cortar os outros. Última checagem em 2026-10-25 para o SEO.
 
 ### Revisão 2026-10-11
 Nenhum canal moveu a métrica (Google/Bing 0 páginas indexadas, 0 views de buscador; README 1 view não confirmada). Esperar o Google não basta antes dos kill checks. Proposta levada ao Felipe: Reddit r/mercadolivre com conta do box por e-mail (sem celular, sem ação dele), 1 comentário útil por dia, meta 3 no ar e ≥15 views reddit.com até 18/10. Aguardando o OK dele (contraria a regra só Google/Bing de 04/10).
+
+### Revisão 2026-10-18
+Números reais (analytics here.now, 08:19 BRT, antes das nossas checagens): all-time 78 views / 65 visitantes; 30d 60 / 47; últimos 7 dias (12–18/10) 9 views / 9 visitantes, **todas em `/`**; Direct 8, github.com 1. Nenhuma view com referrer de buscador desde o início (04/09). Google `site:` 0 páginas, Bing `site:` 0 páginas. Crawlers 30d: Bingbot 12, Googlebot 4 (3 deles nos últimos 7 dias, mas sem página indexada).
+
+| Canal | Desde | Resultado real | Veredito |
+|---|---|---|---|
+| SEO Google/Bing (4 guias + /blog/ + home; ~1 mudança SEO por dia desde 06/10; IndexNow 200/202) | 04/10 | 0 páginas indexadas; 0 views de buscador em 14 dias; guias: /blog 2 views, repasse 1, tarifa 0, saque 0, Full 0 (todas Direct) | Não moveu. Mantém o corte de 25/10 (≥1 guia indexado e ≥30 views de buscador); sem guia novo |
+| README GitHub (Felandim/precifica) | 07/10 | github.com 2 → 4 views (+2 em 11 dias; 1 nos últimos 7 dias), caem em `/`, nunca numa ferramenta ou guia | Melhor "sinal" e irrelevante (2 views). Manter como está, custo 0; não investir mais |
+| Contábeis / Reddit | — | cortados pelo Felipe em 04/10 (sem celular); proposta Reddit de 11/10 não foi aprovada | Fora |
+
+**Conclusão:** nenhum canal moveu a métrica; não há canal para dobrar a aposta. As 4 ferramentas de arquivo reprovaram nos kill checks (conferidor 15/10: 2 views; extrato 16/10: 0; auditor 17/10: 0; full-aging 18/10: 0) e saíram do ar. **O objetivo do DISTRIBUTION MODE (trazer vendedores do ML às 4 ferramentas) acabou.** Ficam no ar os 4 guias manuais, o /blog/ e as calculadoras antigas.
+
+**Recomendação para a rotina diária daqui em diante:**
+1. Precifica: parar de mexer nos guias. Só checar a analytics (sem nova mudança SEO) até o corte de 25/10; em 25/10 aplicar a regra (sem ≥1 guia indexado e ≥30 views de buscador → encerrar o trabalho de SEO do Precifica e deixar o site parado no ar, sem custo).
+2. Nenhum produto novo sem aprovação do Felipe (regra de 15/10: "build nothing before he approves"). O próximo passo útil é montar um lote de ideias em **outros nichos**, incluindo consumidor comum (não só vendedor/empresa), com as knockouts duras antes da nota: a IA faz a partir de um prompt ou arquivo = morre; sem canal alcançável (sem celular, sem fórum) = morre; sem caminho de pagamento = morre. Levar o lote ao Felipe e esperar o OK.
+3. Lição para o lote: as 4 ferramentas morreram na **aquisição** (0–2 views cada), não na ativação. Toda ideia nova precisa provar um canal de aquisição que já funcione para nós antes de ser construída; "SEO e esperar" sozinho não bastou em 14 dias num domínio novo (here.now) sem links de entrada.
+
