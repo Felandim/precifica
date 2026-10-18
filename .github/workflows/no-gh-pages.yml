@@ -1,0 +1,43 @@
+# Guarda: GitHub Pages é EXCLUSIVO do projeto Brasileirão em Rodadas (felandim.github.io).
+# Este repo publica só no Cloudflare Pages (precifica-br.pages.dev). Se aparecer um branch gh-pages
+# (ou qualquer push mirar gh-pages), este workflow apaga o branch e FALHA de propósito para avisar.
+name: no-gh-pages
+on:
+  push:
+    branches: ['**']
+  create:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: read
+concurrency:
+  group: no-gh-pages
+  cancel-in-progress: false
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Proibir branch gh-pages e Pages neste repo
+        run: |
+          set -uo pipefail
+          bad=0
+          if [ "${GITHUB_REF:-}" = "refs/heads/gh-pages" ]; then
+            echo "::error::push/criação mirando gh-pages ($GITHUB_EVENT_NAME por $GITHUB_ACTOR)"; bad=1
+          fi
+          if gh api "repos/$REPO/branches/gh-pages" --silent 2>/dev/null; then
+            echo "::error::branch gh-pages existe em $REPO; apagando (GitHub Pages é só do Brasileirão)"
+            gh api -X DELETE "repos/$REPO/git/refs/heads/gh-pages" && echo "gh-pages apagado"
+            bad=1
+          else
+            echo "ok: sem branch gh-pages"
+          fi
+          if gh api "repos/$REPO/pages" --silent 2>/dev/null; then
+            echo "::warning::GitHub Pages ainda ativado em $REPO; tentando desativar"
+            gh api -X DELETE "repos/$REPO/pages" 2>&1 || echo "::warning::sem permissão para desativar Pages (só o dono, em Settings > Pages)"
+          fi
+          exit $bad
