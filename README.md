@@ -5,16 +5,16 @@ Calculadora de preço para Mercado Livre, Shopee e Amazon. Site estático: HTML,
 **No ar (canônico, durável):** https://mellow-quarry-n7jk.here.now/
 Código-fonte aqui; o site público é só o do here.now.
 
-## Ferramentas grátis para vendedor do Mercado Livre
+## Guias grátis para vendedor do Mercado Livre
 
-Rodam no navegador, sem login; o arquivo não sai do computador.
+As 4 ferramentas de arquivo foram tiradas do ar nos kill checks de 15–18/10/2026 (nenhuma chegou à meta de uso). Os guias manuais continuam no ar.
 
 | Problema | Ferramenta | Guia manual (passo a passo) |
 |---|---|---|
 | O repasse do Mercado Livre não bate com as vendas | — (tirada do ar em 15/10/2026; use o guia) | [Como conferir o repasse, venda por venda](https://mellow-quarry-n7jk.here.now/blog/como-conferir-repasse-mercado-livre.html?ref=github-readme-guia-repasse) |
 | A tarifa do Mercado Livre veio mais alta que o esperado | — (tirada do ar em 17/10/2026; use o guia) | [Tarifa veio alta? Como conferir](https://mellow-quarry-n7jk.here.now/blog/tarifa-mercado-livre-como-conferir.html?ref=github-readme-guia-tarifa) |
 | O saque do Mercado Pago não apareceu no extrato do banco | — (tirada do ar em 16/10/2026; use o guia) | [Saque não caiu? Como conferir com o extrato](https://mellow-quarry-n7jk.here.now/blog/saque-mercado-pago-nao-caiu.html?ref=github-readme-guia-saque) |
-| Quais produtos do Full vão pagar custo por estoque antigo | [Aging de estoque Full](https://mellow-quarry-n7jk.here.now/full-aging-estoque.html?ref=github-readme-full-aging) | [Custo por estoque antigo no Full](https://mellow-quarry-n7jk.here.now/blog/custo-estoque-antigo-full.html?ref=github-readme-guia-full) |
+| Quais produtos do Full vão pagar custo por estoque antigo | — (tirada do ar em 18/10/2026; use o guia) | [Custo por estoque antigo no Full](https://mellow-quarry-n7jk.here.now/blog/custo-estoque-antigo-full.html?ref=github-readme-guia-full) |
 
 ## Abrir no computador
 

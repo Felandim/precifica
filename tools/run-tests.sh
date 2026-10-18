@@ -7,7 +7,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 node -e 'var P=require("./js/precifica.js"); var r=P.runTests(); var f=r.filter(function(x){return !x.ok}).length; console.log("JS: "+r.length+" testes, falhas="+f); process.exit(f?1:0);' > /tmp/precifica-jstests.out 2>&1
 js=$?; tail -1 /tmp/precifica-jstests.out
-# Testes Node em tests/*.test.js (ferramentas ML no ar, guias SEO, ativação)
+# Testes Node em tests/*.test.js (guias SEO + checagem das ferramentas tiradas do ar; as 4 ferramentas ML saíram nos kill checks de 15–18/10/2026)
 for f in tests/*.test.js; do
   [ -e "$f" ] || continue
   node "$f" > /tmp/precifica-nodetest.out 2>&1; r=$?
