@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build clean public tree for here.now / ZeroDeploy (no secrets).
+# Build clean public tree for Cloudflare Pages (no secrets).
 set -euo pipefail
 ROOT=/workspace/precifica
 STAGE=${1:-/tmp/precifica-pub}
@@ -23,7 +23,12 @@ cp -a "$ROOT/sitemap-live.xml" "$STAGE/" 2>/dev/null || true
 find "$ROOT" -maxdepth 1 -type f -regextype posix-extended -regex '.*/[0-9a-fA-F]{32}\.txt' -exec cp -a {} "$STAGE/" \;
 # planilhas internas na raiz (ex.: Precifica-precificacao.xlsx) ficam fora; exemplos/*.xlsx são públicos
 find "$STAGE" -maxdepth 1 -type f -name '*.xlsx' -delete
-# Manifesto público: sha256 de TODOS os arquivos publicados (menos ele mesmo). Vai para o here.now em /site-manifest.txt;
+# Cloudflare Web Analytics: se tools/cf-beacon-token.txt tiver o token (público), injeta o beacon antes de </body> em todo HTML.
+CF_TOKEN=""; [[ -f "$ROOT/tools/cf-beacon-token.txt" ]] && CF_TOKEN=$(tr -d " \n" < "$ROOT/tools/cf-beacon-token.txt")
+if [[ -n "$CF_TOKEN" ]]; then
+  find "$STAGE" -name '*.html' -print0 | xargs -0 -r sed -i "s#</body>#<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{\"token\": \"$CF_TOKEN\"}'></script></body>#"
+fi
+# Manifesto público: sha256 de TODOS os arquivos publicados (menos ele mesmo). Vai para o site no ar em /site-manifest.txt;
 # no GitHub só se commita site-manifest.sha256 (uma linha), que o workflow sync-from-live usa para validar o manifesto do ar.
 ( cd "$STAGE" && find . -type f ! -path ./site-manifest.txt -print0 | sed -z 's#^\./##' | LC_ALL=C sort -z | xargs -0 sha256sum ) > "$STAGE.manifest.tmp"
 mv "$STAGE.manifest.tmp" "$STAGE/site-manifest.txt"
